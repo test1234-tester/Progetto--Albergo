@@ -1,0 +1,84 @@
+<section class="auth-page d-flex align-items-center justify-content-center">
+  <div class="card auth-card shadow-sm">
+    <div class="card-body p-4 p-md-5">
+      <h1 class="auth-title mb-4">Crea account</h1>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="reg-nome">Nome</label>
+          <input id="reg-nome" type="text" class="form-control" formControlName="nome" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="reg-cognome">Cognome</label>
+          <input id="reg-cognome" type="text" class="form-control" formControlName="cognome" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="reg-username">Username</label>
+          <input id="reg-username" type="text" class="form-control" formControlName="username" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="reg-cellulare">Cellulare</label>
+          <input id="reg-cellulare" type="tel" class="form-control" formControlName="cellulare" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="reg-email">Email</label>
+          <input
+            id="reg-email"
+            type="email"
+            class="form-control"
+            formControlName="email"
+            autocomplete="email"
+            [class.is-invalid]="registerForm.controls.email.invalid && registerForm.controls.email.touched"
+          />
+          @if (registerForm.controls.email.invalid && registerForm.controls.email.touched) {
+            <p class="error">Inserisci un'email valida.</p>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="reg-password">Password</label>
+          <input
+            id="reg-password"
+            type="password"
+            class="form-control"
+            formControlName="password"
+            autocomplete="new-password"
+            [class.is-invalid]="registerForm.controls.password.invalid && registerForm.controls.password.touched"
+          />
+          @if (registerForm.controls.password.invalid && registerForm.controls.password.touched) {
+            <p class="error">La password deve avere almeno 6 caratteri.</p>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="reg-confirm">Conferma password</label>
+          <input
+            id="reg-confirm"
+            type="password"
+            class="form-control"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            [class.is-invalid]="registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched"
+          />
+          @if (registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched) {
+            <p class="error">Le password non coincidono.</p>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <p class="error">{{ errorMessage() }}</p>
+        }
+
+        <button type="submit" class="btn btn-primary w-100 mt-2" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Registrazione in corso…' : 'Registrati' }}
+        </button>
+      </form>
+
+      <p class="auth-switch mt-4 mb-0">Hai già un account? <a routerLink="/login">Accedi</a></p>
+    </div>
+  </div>
+</section>
