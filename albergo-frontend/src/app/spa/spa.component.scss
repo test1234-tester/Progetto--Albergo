@@ -1,8 +1,8 @@
-/* Styling Generale della Pagina SPA - allineato al tema Albergo Online */
+/* Styling Generale della Pagina SPA */
 .spa-page {
-  background-color: var(--albergo-navy-dark);
-  color: var(--albergo-cream);
-  font-family: var(--albergo-font-body);
+  background-color: var(--albergo-navy-dark, #0f172a);
+  color: var(--albergo-cream, #faf7f2);
+  font-family: var(--albergo-font-body, system-ui, -apple-system, sans-serif);
   min-height: 100vh;
   padding-bottom: 3rem;
 }
@@ -13,15 +13,15 @@
 
 /* Top Banner */
 .top-banner {
-  background: linear-gradient(90deg, var(--albergo-gold, #d97706), var(--albergo-gold-light));
-  color: var(--albergo-navy-dark);
+  background: linear-gradient(90deg, var(--albergo-gold, #d97706), var(--albergo-gold-light, #f59e0b));
+  color: var(--albergo-navy-dark, #0f172a);
   padding: 0.75rem 0;
   font-size: 0.95rem;
 }
 
 .badge {
-  background-color: var(--albergo-navy-dark);
-  color: var(--albergo-gold-light);
+  background-color: var(--albergo-navy-dark, #0f172a);
+  color: var(--albergo-gold-light, #f59e0b);
   padding: 0.25rem 0.6rem;
   border-radius: 9999px;
   font-weight: bold;
@@ -35,7 +35,7 @@
 }
 
 .sub-title {
-  color: var(--albergo-gold-light);
+  color: var(--albergo-gold-light, #f59e0b);
   letter-spacing: 2px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -46,7 +46,7 @@
 .hero-section h1 {
   font-family: var(--albergo-font-heading, var(--albergo-font-body));
   font-size: 2.5rem;
-  color: var(--albergo-cream);
+  color: var(--albergo-cream, #faf7f2);
   margin-bottom: 1rem;
 }
 
@@ -74,9 +74,9 @@
 
 .tab-btn.active,
 .tab-btn:hover {
-  background-color: var(--albergo-gold-light);
-  color: var(--albergo-navy-dark);
-  border-color: var(--albergo-gold-light);
+  background-color: var(--albergo-gold-light, #f59e0b);
+  color: var(--albergo-navy-dark, #0f172a);
+  border-color: var(--albergo-gold-light, #f59e0b);
 }
 
 /* Carousel Section */
@@ -112,8 +112,8 @@
 }
 
 .tag-badge {
-  background-color: var(--albergo-gold-light);
-  color: var(--albergo-navy-dark);
+  background-color: var(--albergo-gold-light, #f59e0b);
+  color: var(--albergo-navy-dark, #0f172a);
   padding: 0.2rem 0.6rem;
   border-radius: 0.3rem;
   font-size: 0.75rem;
@@ -122,7 +122,7 @@
 }
 
 .image-overlay h3 {
-  color: var(--albergo-cream);
+  color: var(--albergo-cream, #faf7f2);
   margin-top: 0.5rem;
   font-size: 1.5rem;
 }
@@ -133,7 +133,7 @@
   top: 50%;
   transform: translateY(-50%);
   background-color: rgba(15, 23, 42, 0.6);
-  color: var(--albergo-cream);
+  color: var(--albergo-cream, #faf7f2);
   border: none;
   width: 44px;
   height: 44px;
@@ -143,38 +143,9 @@
   transition: background-color 0.3s;
 }
 
-.nav-btn:hover { background-color: var(--albergo-gold-light); color: var(--albergo-navy-dark); }
+.nav-btn:hover { background-color: var(--albergo-gold-light, #f59e0b); color: var(--albergo-navy-dark, #0f172a); }
 .nav-btn.prev { left: 1rem; }
 .nav-btn.next { right: 1rem; }
-
-.video-indicator {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background-color: rgba(220, 38, 38, 0.85);
-  color: white;
-  padding: 0.4rem 0.8rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  background-color: white;
-  border-radius: 50%;
-  animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
-}
 
 /* Thumbnails */
 .thumbnails-wrapper {
@@ -203,7 +174,7 @@
 }
 
 .thumb-btn.active {
-  border-color: var(--albergo-gold-light);
+  border-color: var(--albergo-gold-light, #f59e0b);
   transform: scale(1.03);
 }
 
@@ -221,18 +192,11 @@
 }
 
 .description-card:hover {
-  border-color: var(--albergo-gold-light);
-}
-
-.hover-hint {
-  font-size: 0.75rem;
-  color: var(--albergo-gold-light);
-  text-align: right;
-  margin-bottom: 0.5rem;
+  border-color: var(--albergo-gold-light, #f59e0b);
 }
 
 .tag-label {
-  color: var(--albergo-gold-light);
+  color: var(--albergo-gold-light, #f59e0b);
   font-size: 0.85rem;
   font-weight: bold;
   text-transform: uppercase;
@@ -241,7 +205,7 @@
 .card-header h2 {
   font-family: var(--albergo-font-heading, var(--albergo-font-body));
   font-size: 1.8rem;
-  color: var(--albergo-cream);
+  color: var(--albergo-cream, #faf7f2);
   margin-top: 0.25rem;
   margin-bottom: 1.25rem;
 }
@@ -256,15 +220,15 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  background-color: var(--albergo-navy-dark);
+  background-color: var(--albergo-navy-dark, #0f172a);
   padding: 0.75rem 1rem;
   border-radius: 0.75rem;
   flex: 1;
 }
 
-.stat-box i { font-size: 1.25rem; color: var(--albergo-gold-light); }
+.stat-box i { font-size: 1.25rem; color: var(--albergo-gold-light, #f59e0b); }
 .stat-box small { display: block; color: rgba(250, 247, 242, 0.5); font-size: 0.75rem; }
-.stat-box strong { color: var(--albergo-cream); font-size: 0.95rem; }
+.stat-box strong { color: var(--albergo-cream, #faf7f2); font-size: 0.95rem; }
 
 .description-text {
   color: rgba(250, 247, 242, 0.8);
@@ -273,14 +237,14 @@
 }
 
 .features-block {
-  background-color: var(--albergo-navy-dark);
+  background-color: var(--albergo-navy-dark, #0f172a);
   padding: 1.25rem;
   border-radius: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
 .features-block h4 {
-  color: var(--albergo-gold-light);
+  color: var(--albergo-gold-light, #f59e0b);
   font-size: 0.95rem;
   margin-bottom: 0.75rem;
 }
@@ -306,13 +270,13 @@
   border-top: 1px solid rgba(250, 247, 242, 0.15);
 }
 
-.amount { font-size: 2.2rem; font-weight: bold; color: var(--albergo-cream); }
+.amount { font-size: 2.2rem; font-weight: bold; color: var(--albergo-cream, #faf7f2); }
 .period { color: rgba(250, 247, 242, 0.7); font-size: 0.9rem; }
-.price-sub { color: var(--albergo-gold-light); font-size: 0.85rem; margin-top: 0.25rem; margin-bottom: 1rem; }
+.price-sub { color: var(--albergo-gold-light, #f59e0b); font-size: 0.85rem; margin-top: 0.25rem; margin-bottom: 1rem; }
 
 .cta-button {
-  background: linear-gradient(135deg, var(--albergo-gold-light), var(--albergo-gold, #d97706));
-  color: var(--albergo-navy-dark);
+  background: linear-gradient(135deg, var(--albergo-gold-light, #f59e0b), var(--albergo-gold, #d97706));
+  color: var(--albergo-navy-dark, #0f172a);
   font-weight: bold;
   font-size: 1rem;
   border: none;
@@ -339,7 +303,7 @@
 }
 
 .modal-box {
-  background-color: var(--albergo-navy-dark);
+  background-color: var(--albergo-navy-dark, #0f172a);
   border: 1px solid rgba(250, 247, 242, 0.15);
   width: 100%;
   max-width: 550px;
@@ -350,13 +314,13 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  overflow: hidden; // il box stesso non scrolla: scrolla solo il contenuto interno
+  overflow: hidden;
 }
 
 .modal-scroll-content {
   overflow-y: auto;
-  padding-right: 0.5rem; // spazio per non far coprire il testo dalla scrollbar
-  margin-top: 0.5rem; // evita che il testo parta troppo vicino al bottone-X
+  padding-right: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 .close-btn {
@@ -369,79 +333,23 @@
   font-size: 1.75rem;
   line-height: 1;
   cursor: pointer;
-  z-index: 1; // resta sempre sopra al contenuto che scrolla
+  z-index: 1;
   transition: color 0.2s;
 }
 
 .close-btn:hover {
-  color: var(--albergo-gold-light);
+  color: var(--albergo-gold-light, #f59e0b);
 }
 
 .modal-title {
   font-family: var(--albergo-font-heading, var(--albergo-font-body));
-  color: var(--albergo-cream);
+  color: var(--albergo-cream, #faf7f2);
   font-size: 1.5rem;
   margin-bottom: 0.25rem;
 }
 .modal-subtitle { color: rgba(250, 247, 242, 0.7); font-size: 0.9rem; margin-bottom: 1.5rem; }
 
 .form-group { margin-bottom: 1rem; }
-.form-group label { display: block; color: rgba(250, 247, 242, 0.8); font-size: 0.85rem; margin-bottom: 0.4rem; }
-
-.form-control {
-  width: 100%;
-  background-color: var(--albergo-navy-dark);
-  border: 1px solid rgba(250, 247, 242, 0.15);
-  color: var(--albergo-cream);
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  box-sizing: border-box;
-}
-
-.form-control:focus { border-color: var(--albergo-gold-light); outline: none; }
-
-.form-row { display: flex; gap: 1rem; }
-.col { flex: 1; }
-
-.hotel-fields,
-.pet-fields {
-  background-color: var(--albergo-navy-dark);
-  padding: 1rem;
-  border-radius: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px dashed rgba(250, 247, 242, 0.15);
-}
-
-.help-text { color: var(--albergo-gold-light); font-size: 0.75rem; display: block; margin-top: 0.5rem; }
-
-.checkbox-label { color: rgba(250, 247, 242, 0.8); font-size: 0.85rem; cursor: pointer; }
-
-.submit-btn {
-  background-color: var(--albergo-gold-light);
-  color: var(--albergo-navy-dark);
-  font-weight: bold;
-  width: 100%;
-  padding: 0.9rem;
-  border: none;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  margin-top: 1rem;
-}
-
-/* Confirmation Box */
-.check-icon { font-size: 3.5rem; color: #10b981; margin-bottom: 1rem; }
-.confirmation-box h3 { color: var(--albergo-cream); margin-bottom: 0.5rem; }
-.confirmation-box p { color: rgba(250, 247, 242, 0.8); font-size: 0.95rem; }
-
-.summary-card {
-  background-color: var(--albergo-navy-dark);
-  padding: 1rem;
-  border-radius: 0.75rem;
-  margin: 1.5rem 0;
-  text-align: left;
-}
-
-.summary-card p { margin-bottom: 0.5rem; font-size: 0.85rem; }
 
 /* Correzione Contrasto Form Modal */
 .modal-box {
@@ -461,6 +369,20 @@
     &::placeholder {
       color: #6c757d !important;
       opacity: 0.8;
+    }
+  }
+
+  /* Styling per l'Input Group del CVC */
+  .input-group {
+    .btn-outline-secondary {
+      border-color: #ced4da;
+      color: #495057;
+      background-color: #f8f9fa;
+
+      &:hover {
+        background-color: #e2e6ea;
+        color: #212529;
+      }
     }
   }
 

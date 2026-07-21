@@ -1,67 +1,168 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
-// Importazione dell'interfaccia dal file separato "slot-spa.ts" (risalendo di un livello)
-import { SlotSpa } from '../slot-spa';
-
-interface SpaItem {
-  title: string;
+export interface SpaItem {
+  id: number;
   tag: string;
-  img: string;
+  title: string;
   duration: string;
   temp: string;
   text: string;
   features: string[];
+  img: string;
+}
+
+export interface SlotSpa {
+  data: string;
+  orarioInizio: string;
+  orarioFine: string;
 }
 
 @Component({
   selector: 'app-spa',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './spa.component.html',
   styleUrl: './spa.component.scss'
 })
-export class SpaComponent implements OnDestroy {
+export class SpaComponent {
   currentCategory: 'human' | 'pet' = 'human';
-  currentIndex: number = 0;
+  currentIndex = 0;
+  isModalOpen = false;
+  isConfirmed = false;
 
-  // Gestione Video Tour (Hover)
-  isVideoTourActive: boolean = false;
-  private videoInterval: any = null;
-  private savedIndex: number = 0;
+  // Segnale per gestire la visibilità del CVC
+  mostraCvc = signal<boolean>(false);
 
-  // Gestione Modal Prenotazione
-  isModalOpen: boolean = false;
-  isConfirmed: boolean = false;
+  // Codice univoco generato alla conferma
+  codicePrenotazione = signal<string>('');
 
-  // Carrello per prenotazioni multiple SPA
-  slotSelezionati: SlotSpa[] = [];
+  humanList: SpaItem[] = [
+    {
+      id: 1,
+      tag: 'Relax Muscolare',
+      title: 'Idromassaggio Panorama Vista Mare',
+      duration: '60 min',
+      temp: '36°C - 38°C',
+      text: 'Immergiti in una vasca idromassaggio affacciata sulle scogliere liguri per sciogliere ogni tensione muscolare.',
+      features: ['Bocchette idromassaggio orientabili', 'Vista panoramica sul mare', 'Tisana detox inclusa'],
+      img: '/spa1.png'
+    },
+    {
+      id: 2,
+      tag: 'Detox & Calore',
+      title: 'Sauna Finlandese Panoramica',
+      duration: '45 min',
+      temp: '80°C - 90°C',
+      text: 'Un calore avvolgente e secco con una splendida vetrata sul mare per favorire la circolazione e l’eliminazione delle tossine.',
+      features: ['Legno pregiato', 'Aromaterapia alle essenze naturali', 'Doccia fredda di reazione'],
+      img: '/spa2.png'
+    },
+    {
+      id: 3,
+      tag: 'Trattamenti Corpo',
+      title: 'Area Massaggi & Trattamenti Esclusivi',
+      duration: '50 min',
+      temp: '24°C',
+      text: 'Cabine trattamenti riservate dove terapisti esperti eseguono massaggi decontratturanti e trattamenti con olii essenziali.',
+      features: ['Massaggi singoli o di coppia', 'Olii biologici certificati', 'Musica rilassante personalizzata'],
+      img: '/spa3.png'
+    },
+    {
+      id: 4,
+      tag: 'Area Rest & Refresh',
+      title: 'Lounge Bar & Zona Relax Vista Mare',
+      duration: '30 min',
+      temp: '22°C',
+      text: 'Uno spazio elegante per riposarsi tra un percorso e l’altro, sorseggiando tisane biologiche ed estratti di frutta fresca.',
+      features: ['Lettini anatomici', 'Buffet di frutta fresca e tisane', 'Servizio al tavolo'],
+      img: '/spa4.png'
+    },
+    {
+      id: 5,
+      tag: 'Esperienza Aqua',
+      title: 'Piscina Infinity Esterna',
+      duration: '90 min',
+      temp: '32°C',
+      text: 'Nuota nella piscina a sfioro che si fonde con l’orizzonte del mare ligure.',
+      features: ['Acqua riscaldata', 'Cascatelle cervicali', 'Bordi a sfioro infinity'],
+      img: '/spa5.png'
+    },
+    {
+      id: 6,
+      tag: 'Purificazione',
+      title: 'Grotta di Sale Naturale (Aloterapia)',
+      duration: '45 min',
+      temp: '21°C',
+      text: 'Microclima salino per la rigenerazione delle vie respiratorie e il benessere della pelle.',
+      features: ['Sale rosa dell’Himalaya', 'Haloterapia micronizzata', 'Cromoterapia rilassante'],
+      img: '/spa6.png'
+    }
+  ];
 
-  // Input temporanei per aggiungere uno slot
+  petList: SpaItem[] = [
+    {
+      id: 101,
+      tag: 'Fisioterapia & Relax',
+      title: 'Massaggio Rilassante per Cani',
+      duration: '30 min',
+      temp: '24°C',
+      text: 'Massaggio delicato eseguito da operatori qualificati per distendere la muscolatura del tuo pet.',
+      features: ['Trattamento decontratturante', 'Musica rilassante per animali', 'Olii pet-safe anallergici'],
+      img: '/spa-cani-massaggio.png'
+    },
+    {
+      id: 102,
+      tag: 'Idroterapia Pet',
+      title: 'Idromassaggio & Swim Canino',
+      duration: '45 min',
+      temp: '30°C',
+      text: 'Vasca idromassaggio ad altezza regolabile con microbolle per stimolare la circolazione dei nostri amici a 4 zampe.',
+      features: ['Vasca igienizzata ad uso esclusivo', 'Microbolle idromassaggio', 'Assistenza continua dell’operatore'],
+      img: '/spa-cani-piscina.png'
+    },
+    {
+      id: 103,
+      tag: 'Relax Vista Mare',
+      title: 'Area Solarium & Lounge Pet',
+      duration: 'Illimitata',
+      temp: '22°C',
+      text: 'Lettini e brandine dedicate per far riposare il tuo cane in totale comfort dopo il trattamento.',
+      features: ['Brandine ortopediche', 'Ciotole con acqua fresca filtrata', 'Snack biologici di benvenuto'],
+      img: '/spa-cani-relax.png'
+    },
+    {
+      id: 104,
+      tag: 'Igiene & Cura',
+      title: 'Bagno Terapeutico e Trattamento Pelo',
+      duration: '40 min',
+      temp: '32°C',
+      text: 'Lavaggio delicato con shampoo bio nutriente e asciugatura ultra-silenziosa.',
+      features: ['Shampoo e balsamo bio', 'Asciugatura no-stress silenziosa', 'Spazzolatura e lucidatura pelo'],
+      img: '/spa-cani-trattamento.png'
+    }
+  ];
+
   nuovoSlot: SlotSpa = {
-    data: '',
-    orarioInizio: '',
-    orarioFine: ''
+    data: new Date().toISOString().split('T')[0],
+    orarioInizio: '10:00',
+    orarioFine: '12:00'
   };
 
-  // Form Model Pulito e Aggiornato
+  slotSelezionati: SlotSpa[] = [];
+
   bookingData = {
     nome: '',
     email: '',
-    
-    // Modalità: 'hotel' (Abbina al soggiorno) oppure 'spa-only' (Solo SPA online)
-    tipoPrenotazione: 'hotel', 
-    codicePrenotazione: '', 
-
-    // Pagamento Diretto SPA ('card' oppure 'bonifico')
-    metodoPagamento: 'card', 
+    tipoPrenotazione: 'spa-only',
+    codicePrenotazione: '',
+    metodoPagamento: 'card',
     cardHolder: '',
     cardNumber: '',
     cardExpiry: '',
     cardCvc: '',
-
-    // Gestione Pet SPA
     haPet: false,
     tipoPet: '',
     nomePet: '',
@@ -69,149 +170,28 @@ export class SpaComponent implements OnDestroy {
     tagliaPet: ''
   };
 
-  // Database Servizi SPA
-  db: { human: SpaItem[], pet: SpaItem[] } = {
-    human: [
-      {
-        title: "Piscina Infinity Vista Mare",
-        tag: "Outdoor Area",
-        img: "Gemini_Generated_Image_ukvqepukvqepukvq.png",
-        duration: "Illimitata",
-        temp: "29°C",
-        text: "La nostra magnifica piscina a sfioro all'aperto ti regalerà l'illusione di nuotare sospeso tra il cielo e il Mar Ligure. Dotata di idromassaggio a bordo sfioro e solarium con vista sul promontorio.",
-        features: ["Idromassaggio integrato", "Zona Solarium King Size", "Accesso libero continuo"]
-      },
-      {
-        title: "Vasca Idromassaggio Panoramica",
-        tag: "Hydrotherapy",
-        img: "Gemini_Generated_Image_as8p13as8p13as8p.png",
-        duration: "Consigliati 30 min",
-        temp: "36°C",
-        text: "Immersa tra vetrate a tutta altezza che dominano sia le montagne della Liguria che il mare. I getti d'acqua differenziati rilassano le tensioni muscolari regalando un benessere profondo.",
-        features: ["Postazioni ergonomiche", "Cascate cervicali", "Vista duale Mare & Monti"]
-      },
-      {
-        title: "Grotta di Sale Himalayano",
-        tag: "Halotherapy",
-        img: "Gemini_Generated_Image_xmx7xyxmx7xyxmx7.png",
-        duration: "45 min",
-        temp: "24°C",
-        text: "Un microclima unico con pareti in puro sale rosa illuminato. Purifica le vie respiratorie e la pelle grazie alla nebulizzazione di microparticelle saline ionizzate.",
-        features: ["Nebulizzazione secca di sale", "Cromoterapia rilassante", "Sedute anatomiche riscaldate"]
-      },
-      {
-        title: "Sauna Finlandese Vista Mare",
-        tag: "Thermotherapy",
-        img: "Gemini_Generated_Image_ukvqepukvqepukvq (1).png",
-        duration: "15 min a sessione",
-        temp: "85°C",
-        text: "Realizzata in pregiato legno di cedro con un'ampia vetrata affacciata sulle acque di Finale Ligure. Favorisce la disintossicazione profonda e stimola la circolazione.",
-        features: ["Stufa in pietra lavica", "Essenze aromatiche pino & eucalipto", "Doccia di reazione adiacente"]
-      },
-      {
-        title: "Cabina Massaggi Olistici",
-        tag: "Relaxation",
-        img: "Gemini_Generated_Image_ukvqepukvqepukvq (2).png",
-        duration: "Su richiesta",
-        temp: "22°C",
-        text: "Ambiente intimo e profumato dove i nostri terapisti eseguono trattamenti personalizzati e massaggi olistici fronte mare per ristabilire l'equilibrio di corpo e mente.",
-        features: ["Olii biologici della Riviera", "Lettini termici regolabili", "Musica e aroma personalizzati"]
-      },
-      {
-        title: "Area Relax & Lounge Tisana",
-        tag: "Lounge Area",
-        img: "Gemini_Generated_Image_ukvqepukvqepukvq (3).png",
-        duration: "Illimitata",
-        temp: "23°C",
-        text: "Il luogo perfetto per concludere il percorso. Rilassati su chaise-longue eleganti sorseggiando tisane biologiche, infusi freddi e frutta fresca di stagione.",
-        features: ["Infusi e tisane bio incluse", "Frutta fresca di stagione", "Ambiente insonorizzato"]
-      }
-    ],
-    pet: [
-      {
-        title: "Piscina Idroterapia Canina",
-        tag: "Pet Hydrotherapy",
-        img: "spa-cani-piscina.png",
-        duration: "Illimitata",
-        temp: "28°C",
-        text: "Vasca circolare panoramica riscaldata con gradini di ingresso facilitati...",
-        features: ["Idromassaggio a pressione regolabile", "Assistente Pet dedicato", "Superficie in teak antiscivolo"]
-      },
-      {
-        title: "Area Massaggi & Fisioterapia Pet",
-        tag: "Pet Wellness",
-        img: "spa-cani-massaggio.png",
-        duration: "30 min",
-        temp: "23°C",
-        text: "Lettini imbottiti panoramici pensati per cani e gatti...",
-        features: ["Operatori certificati Pet", "Asciugamani caldi Paws & Relax", "Musica rilassante per animali"]
-      },
-      {
-        title: "Vasca Trattamenti Ozonoterapia & Bagno",
-        tag: "Pet Grooming",
-        img: "spa-cani-trattamento.png",
-        duration: "45 min",
-        temp: "32°C",
-        text: "Bagni rigeneranti con microbolle all'ozono...",
-        features: ["Trattamenti idratanti e dermoprotettivi", "Microbolle idromassaggio", "Shampoo bio delicato"]
-      },
-      {
-        title: "Lounge Relax & Custodia Pet VIP",
-        tag: "Pet Custody",
-        img: "spa-cani-relax.png",
-        duration: "Illimitata",
-        temp: "22°C",
-        text: "Mentre ti godi la SPA principale, i tuoi amici a quattro zampe riposano...",
-        features: ["Custodia VIP gratuita inclusa", "Snack biologici e ciotole di design", "Brandine traspiranti King Size"]
-      }
-    ]
-  };
-
   get currentList(): SpaItem[] {
-    return this.db[this.currentCategory];
+    return this.currentCategory === 'human' ? this.humanList : this.petList;
   }
 
   get currentItem(): SpaItem {
-    return this.currentList[this.currentIndex];
+    return this.currentList[this.currentIndex] || this.currentList[0];
   }
 
-  switchCategory(cat: 'human' | 'pet'): void {
-    this.currentCategory = cat;
+  switchCategory(category: 'human' | 'pet'): void {
+    this.currentCategory = category;
     this.currentIndex = 0;
+  }
+
+  navigateCarousel(direction: number): void {
+    const total = this.currentList.length;
+    this.currentIndex = (this.currentIndex + direction + total) % total;
   }
 
   selectSlide(index: number): void {
     this.currentIndex = index;
   }
 
-  navigateCarousel(direction: number): void {
-    const len = this.currentList.length;
-    this.currentIndex = (this.currentIndex + direction + len) % len;
-  }
-
-  // --- LOGICA GESTIONE SLOT MULTIPLI ---
-  aggiungiSlot(): void {
-    if (!this.nuovoSlot.data || !this.nuovoSlot.orarioInizio || !this.nuovoSlot.orarioFine) {
-      alert("Seleziona data, orario di inizio e orario di fine prima di aggiungere la prenotazione.");
-      return;
-    }
-
-    // Aggiunge lo slot all'array
-    this.slotSelezionati.push({ ...this.nuovoSlot });
-
-    // Reset degli input
-    this.nuovoSlot = {
-      data: '',
-      orarioInizio: '',
-      orarioFine: ''
-    };
-  }
-
-  rimuoviSlot(index: number): void {
-    this.slotSelezionati.splice(index, 1);
-  }
-
-  // --- LOGICA MODAL PRENOTAZIONE ---
   openBookingModal(): void {
     this.isModalOpen = true;
     this.isConfirmed = false;
@@ -221,73 +201,23 @@ export class SpaComponent implements OnDestroy {
     this.isModalOpen = false;
   }
 
+  toggleMostraCvc(): void {
+    this.mostraCvc.update(v => !v);
+  }
+
+  aggiungiSlot(): void {
+    if (this.nuovoSlot.data && this.nuovoSlot.orarioInizio && this.nuovoSlot.orarioFine) {
+      this.slotSelezionati.push({ ...this.nuovoSlot });
+    }
+  }
+
+  rimuoviSlot(index: number): void {
+    this.slotSelezionati.splice(index, 1);
+  }
+
   submitBooking(): void {
-    if (this.slotSelezionati.length === 0) {
-      alert("Aggiungi almeno una prenotazione (Data e Orario) prima di procedere.");
-      return;
-    }
-
-    if (this.bookingData.tipoPrenotazione === 'hotel') {
-      
-      // Controllo ID Prenotazione per addebito in camera
-      if (!this.bookingData.codicePrenotazione.trim()) {
-        alert("Per favore, inserisci il tuo Codice/ID Prenotazione dell'Albergo.");
-        return;
-      }
-
-      const payloadSoggiorno = {
-        nomeCliente: this.bookingData.nome,
-        email: this.bookingData.email,
-        idPrenotazioneAlbergo: this.bookingData.codicePrenotazione,
-        importoAddebito: 200 * this.slotSelezionati.length,
-        prenotazioni: this.slotSelezionati,
-        dettagliPet: this.bookingData.haPet ? {
-          tipo: this.bookingData.tipoPet,
-          nome: this.bookingData.nomePet,
-          razza: this.bookingData.razzaPet,
-          taglia: this.bookingData.tagliaPet
-        } : null
-      };
-
-      console.log('Invio Addebito Soggiorno con Slot Multipli:', payloadSoggiorno);
-      this.isConfirmed = true;
-
-    } else {
-      // Gestione Solo SPA (Carta di Credito o Bonifico)
-      this.gestisciPagamentoDiretto();
-    }
-  }
-
-  private gestisciPagamentoDiretto(): void {
-    if (this.bookingData.metodoPagamento === 'card') {
-      // Validazione basica della carta
-      if (!this.bookingData.cardNumber || !this.bookingData.cardHolder || !this.bookingData.cardCvc) {
-        alert("Compila tutti i campi della carta di credito per proseguire.");
-        return;
-      }
-    }
-
-    const payloadPagamento = {
-      nomeCliente: this.bookingData.nome,
-      email: this.bookingData.email,
-      metodo: this.bookingData.metodoPagamento,
-      importo: 200 * this.slotSelezionati.length,
-      prenotazioni: this.slotSelezionati,
-      dettagliPet: this.bookingData.haPet ? {
-        tipo: this.bookingData.tipoPet,
-        nome: this.bookingData.nomePet,
-        razza: this.bookingData.razzaPet,
-        taglia: this.bookingData.tagliaPet
-      } : null
-    };
-
-    console.log('Invio Pagamento Diretto con Slot Multipli:', payloadPagamento);
+    const codice = 'SPA-' + Math.floor(1000 + Math.random() * 9000);
+    this.codicePrenotazione.set(codice);
     this.isConfirmed = true;
-  }
-
-  ngOnDestroy(): void {
-    if (this.videoInterval) {
-      clearInterval(this.videoInterval);
-    }
   }
 }
