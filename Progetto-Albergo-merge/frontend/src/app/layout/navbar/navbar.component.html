@@ -1,0 +1,41 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">Grand Hotel Minerva</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+      data-bs-target="#navbarContent" aria-controls="navbarContent"
+      aria-expanded="false" aria-label="Apri il menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/stanze" routerLinkActive="active">Camere</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/spa" routerLinkActive="active">SPA</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav align-items-lg-center">
+        @if (!authService.isAuthenticated()) {
+          <li class="nav-item"><a class="nav-link" routerLink="/login">Accedi</a></li>
+          <li class="nav-item"><a class="btn btn-outline-light btn-sm ms-lg-2" routerLink="/register">Registrati</a></li>
+        } @else if (authService.isStaff()) {
+          <li class="nav-item"><a class="nav-link text-warning fw-bold" routerLink="/staff">Gestionale staff</a></li>
+          <li class="nav-item"><span class="navbar-text mx-lg-2">Reception: {{ authService.currentUser()?.username }}</span></li>
+          <li class="nav-item"><button class="btn btn-outline-light btn-sm" type="button" (click)="logout()">Esci</button></li>
+        } @else {
+          <li class="nav-item"><a class="nav-link" routerLink="/area-personale">Area personale</a></li>
+          <li class="nav-item"><span class="navbar-text mx-lg-2">Ciao, {{ authService.currentUser()?.nome }}</span></li>
+          <li class="nav-item"><button class="btn btn-outline-light btn-sm" type="button" (click)="logout()">Esci</button></li>
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

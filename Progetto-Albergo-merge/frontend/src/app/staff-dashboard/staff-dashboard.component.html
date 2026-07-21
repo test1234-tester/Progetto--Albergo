@@ -1,0 +1,192 @@
+<section class="staff-page container-fluid py-4 px-3 px-lg-5">
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status"></div>
+      <p class="mt-3">Caricamento gestionale staff…</p>
+    </div>
+  } @else if (dashboard(); as data) {
+    <header class="staff-header mb-4">
+      <div>
+        <span class="eyebrow">Pannello operativo</span>
+        <h1>Gestionale staff</h1>
+        <p class="text-muted mb-0">Vista completa di prenotazioni, camere e clienti.</p>
+      </div>
+      <button class="btn btn-outline-dark" type="button" (click)="loadDashboard()">Aggiorna dati</button>
+    </header>
+
+    <nav class="staff-nav mb-4" aria-label="Sezioni gestionale">
+      <button type="button" [class.active]="activeSection() === 'overview'" (click)="setSection('overview')">Riepilogo</button>
+      <button type="button" [class.active]="activeSection() === 'bookings'" (click)="setSection('bookings')">Prenotazioni</button>
+      <button type="button" [class.active]="activeSection() === 'rooms'" (click)="setSection('rooms')">Camere</button>
+      <button type="button" [class.active]="activeSection() === 'users'" (click)="setSection('users')">Clienti</button>
+    </nav>
+
+    @if (errorMessage()) {
+      <div class="alert alert-danger">{{ errorMessage() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="alert alert-success">{{ successMessage() }}</div>
+    }
+
+    @if (activeSection() === 'overview') {
+      <div class="stats-grid mb-4">
+        <article class="stat-box">
+          <span>Camere occupate</span>
+          <strong>{{ data.stats.camereOccupate }} / {{ data.stats.camereTotali }}</strong>
+          <small>{{ occupancyPercentage() }}% di occupazione</small>
+        </article>
+        <article class="stat-box">
+          <span>Prenotazioni</span>
+          <strong>{{ data.stats.prenotazioniTotali }}</strong>
+          <small>{{ pendingBookings() }} da confermare</small>
+        </article>
+        <article class="stat-box">
+          <span>Clienti registrati</span>
+          <strong>{{ data.stats.clientiRegistrati }}</strong>
+          <small>Profili presenti nel database</small>
+        </article>
+        <article class="stat-box warning">
+          <span>Pagamenti pendenti</span>
+          <strong>{{ data.stats.pagamentiInPendenza }}</strong>
+          <small>Record pagamento non completati</small>
+        </article>
+      </div>
+
+      <div class="overview-grid">
+        <section class="staff-panel">
+          <div class="panel-title">
+            <div><span class="eyebrow">Arrivi</span><h2>Prossime prenotazioni</h2></div>
+            <button type="button" class="text-button" (click)="setSection('bookings')">Vedi tutte</button>
+          </div>
+          @if (data.bookings.length === 0) {
+            <p class="text-muted mb-0">Non ci sono prenotazioni registrate.</p>
+          } @else {
+            <div class="compact-list">
+              @for (booking of data.bookings.slice(0, 6); track booking.id) {
+                <div class="compact-row">
+                  <div>
+                    <strong>{{ booking.cliente || booking.nominativo }}</strong>
+                    <span>{{ booking.camera }} · {{ booking.dataArrivo | date: 'dd/MM/yyyy' }}</span>
+                  </div>
+                  <span class="status-dot" [class.ok]="booking.confermata">
+                    {{ booking.confermata ? 'Confermata' : 'In attesa' }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="staff-panel">
+          <div class="panel-title">
+            <div><span class="eyebrow">Struttura</span><h2>Stato camere</h2></div>
+            <button type="button" class="text-button" (click)="setSection('rooms')">Gestisci</button>
+          </div>
+          <div class="room-mini-grid">
+            @for (room of data.rooms.slice(0, 18); track room.id) {
+              <span [class.occupied]="room.occupata" [title]="room.nome">{{ room.numero }}</span>
+            }
+          </div>
+          <p class="legend mb-0"><i></i> Libera <i class="occupied"></i> Occupata</p>
+        </section>
+      </div>
+    }
+
+    @if (activeSection() === 'bookings') {
+      <section class="staff-panel table-panel">
+        <div class="panel-title">
+          <div><span class="eyebrow">Prenotazioni albergo</span><h2>Gestione soggiorni</h2></div>
+          <span class="record-count">{{ data.bookings.length }} record</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>ID</th><th>Cliente</th><th>Camera</th><th>Periodo</th><th>Ospiti</th><th>Stato</th><th></th></tr></thead>
+            <tbody>
+              @for (booking of data.bookings; track booking.id) {
+                <tr>
+                  <td>#{{ booking.id }}</td>
+                  <td><strong>{{ booking.cliente || '—' }}</strong><small>{{ booking.email }}</small></td>
+                  <td>{{ booking.camera }}</td>
+                  <td>{{ booking.dataArrivo | date: 'dd/MM/yy' }} – {{ booking.dataPartenza | date: 'dd/MM/yy' }}</td>
+                  <td>{{ booking.nominativo || '—' }}</td>
+                  <td><span class="status-dot" [class.ok]="booking.confermata">{{ booking.confermata ? 'Confermata' : 'In attesa' }}</span></td>
+                  <td class="text-end">
+                    <button type="button" class="btn btn-sm"
+                      [class.btn-outline-secondary]="booking.confermata"
+                      [class.btn-dark]="!booking.confermata"
+                      [disabled]="pendingItemId() === booking.id"
+                      (click)="toggleBooking(booking)">
+                      {{ pendingItemId() === booking.id ? 'Attendi…' : (booking.confermata ? 'Riapri' : 'Conferma') }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'rooms') {
+      <section class="staff-panel table-panel">
+        <div class="panel-title">
+          <div><span class="eyebrow">Inventario</span><h2>Gestione camere</h2></div>
+          <span class="record-count">{{ data.rooms.length }} camere</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>Numero</th><th>Camera</th><th>Prezzo/notte</th><th>Occupanti</th><th>Stato</th><th></th></tr></thead>
+            <tbody>
+              @for (room of data.rooms; track room.id) {
+                <tr>
+                  <td><strong>{{ room.numero }}</strong></td>
+                  <td>{{ room.nome }}</td>
+                  <td>{{ room.prezzoPerNotte | currency: 'EUR' }}</td>
+                  <td>{{ room.occupanti }}</td>
+                  <td><span class="status-dot" [class.ok]="!room.occupata">{{ room.occupata ? 'Occupata' : 'Libera' }}</span></td>
+                  <td class="text-end">
+                    <button type="button" class="btn btn-sm"
+                      [class.btn-outline-secondary]="room.occupata"
+                      [class.btn-dark]="!room.occupata"
+                      [disabled]="pendingItemId() === room.id"
+                      (click)="toggleRoom(room)">
+                      {{ pendingItemId() === room.id ? 'Attendi…' : (room.occupata ? 'Libera camera' : 'Segna occupata') }}
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (activeSection() === 'users') {
+      <section class="staff-panel table-panel">
+        <div class="panel-title">
+          <div><span class="eyebrow">Anagrafica</span><h2>Clienti registrati</h2></div>
+          <span class="record-count">{{ data.users.length }} clienti</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>ID</th><th>Nominativo</th><th>Username</th><th>Email</th><th>Cellulare</th></tr></thead>
+            <tbody>
+              @for (user of data.users; track user.id) {
+                <tr>
+                  <td>#{{ user.id }}</td>
+                  <td><strong>{{ user.nominativo || '—' }}</strong></td>
+                  <td>{{ user.username || '—' }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.cellulare || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  } @else {
+    <div class="alert alert-danger">{{ errorMessage() ?? 'Gestionale staff non disponibile.' }}</div>
+  }
+</section>

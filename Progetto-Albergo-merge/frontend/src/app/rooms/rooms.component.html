@@ -1,0 +1,93 @@
+<section class="rooms-page container py-5">
+  <div class="text-center mb-5">
+    <h1 class="display-4 fw-bold text-serif">Le nostre esclusive tipologie</h1>
+    <p class="text-muted">Scegli l'atmosfera perfetta per il tuo soggiorno ideale</p>
+  </div>
+
+  <!-- Form di Ricerca Date -->
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" novalidate class="search-form row g-3 align-items-end mb-5 p-4 bg-light rounded shadow-sm">
+    <div class="col-12 col-sm-4 col-md-4">
+      <label class="form-label fw-semibold" for="checkIn">Data di Check-in</label>
+      <input id="checkIn" type="date" class="form-control form-control-lg" formControlName="checkIn" />
+    </div>
+
+    <div class="col-12 col-sm-4 col-md-4">
+      <label class="form-label fw-semibold" for="checkOut">Data di Check-out</label>
+      <input id="checkOut" type="date" class="form-control form-control-lg" formControlName="checkOut" />
+    </div>
+
+    <div class="col-12 col-sm-4 col-md-4">
+      <button type="submit" class="btn btn-dark btn-lg w-100" [disabled]="isLoading()">
+        {{ isLoading() ? 'Verifica in corso…' : 'Verifica disponibilità' }}
+      </button>
+    </div>
+
+    @if (searchForm.errors?.['invalidRange'] && searchForm.controls.checkOut.touched) {
+      <div class="col-12">
+        <p class="text-danger small mb-0 mt-2">La data di check-out deve essere successiva a quella di check-in.</p>
+      </div>
+    }
+  </form>
+
+  @if (errorMessage()) {
+    <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
+  }
+
+  <!-- Vetrina delle 3 Tipologie -->
+  @if (hasSearched() && !isLoading() && !errorMessage()) {
+    @if (rooms().length === 0) {
+      <div class="text-center py-5">
+        <p class="text-muted fs-5">Nessuna stanza disponibile per le date selezionate.</p>
+      </div>
+    } @else {
+      <div class="typology-showcase">
+        <!-- Cicla le 3 categorie fisse calcolate in percentuale -->
+        @for (typology of groupedRooms(); track typology.idVetrina; let isEven = $even) {
+          
+          <div class="row align-items-stretch mb-5 shadow-sm rounded overflow-hidden bg-white border border-light">
+            
+            <!-- Immagine di Copertina della Tipologia -->
+            <div class="col-12 col-lg-6 p-0" [class.order-lg-2]="isEven">
+              <div class="position-relative h-100" style="min-height: 380px;">
+                <img [src]="typology.immagine" [alt]="typology.nome" class="w-100 h-100 object-fit-cover position-absolute" />
+              </div>
+            </div>
+
+            <!-- Dettagli della Tipologia con indicatore di disponibilità residua -->
+            <div class="col-12 col-lg-6 p-4 p-md-5 d-flex flex-column justify-content-center" [class.order-lg-1]="isEven">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-uppercase tracking-wider text-muted small fw-bold">Esperienza Premium</span>
+                  <!-- Mostra quante stanze di questa fascia percentuale sono rimaste libere -->
+                  <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6">
+                    {{ typology.conteggio }} rimaste libere
+                  </span>
+                </div>
+                <h2 class="h1 fw-bold text-serif mb-3">{{ typology.nome }}</h2>
+                <p class="text-secondary leading-relaxed fs-5 mb-4">{{ typology.descrizione }}</p>
+              </div>
+
+              <!-- Tariffe e pulsante Scopri legato al primo ID utile -->
+              <div class="mt-auto pt-4 border-top border-light d-flex align-items-center justify-content-between">
+                <div>
+                  <span class="text-muted small d-block">Tariffa a notte a partire da</span>
+                  <span class="fs-3 fw-bold text-dark">{{ typology.prezzoPerNotte }} €</span>
+                </div>
+                
+                <!-- Il link usa typology.idCameraReale, così la prenotazione si aggancia a una camera vera sul DB -->
+                <a
+                  [routerLink]="['/stanze', typology.idCameraReale, 'prenota']"
+                  [queryParams]="bookingQueryParams()"
+                  class="btn btn-dark btn-lg px-4"
+                >
+                  Scopri e Prenota
+                </a>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+  }
+</section>

@@ -1,0 +1,54 @@
+<!-- Struttura minima: la grafica definitiva del form pagamento è a cura di Sviluppatore 3 -->
+<section class="payment-page">
+  @if (confirmedStatus()) {
+    <h1>Pagamento inviato</h1>
+    <p>Stato prenotazione: {{ confirmedStatus() }}</p>
+    <button type="button" (click)="goHome()">Torna alla home</button>
+  } @else {
+    <h1>Pagamento</h1>
+
+    <div class="recap">
+      <p>Caparra (10%): {{ caparra() }} €</p>
+      <p>Saldo alla conferma: {{ saldo() }} €</p>
+    </div>
+
+    <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" novalidate>
+      <label>
+        Titolare carta
+        <input type="text" formControlName="cardHolder" />
+      </label>
+
+      <label>
+        Numero carta
+        <input type="text" formControlName="cardNumber" inputmode="numeric" maxlength="16" />
+      </label>
+      @if (paymentForm.controls.cardNumber.invalid && paymentForm.controls.cardNumber.touched) {
+        <p class="error">Numero carta non valido (16 cifre).</p>
+      }
+
+      <label>
+        Scadenza (MM/YY)
+        <input type="text" formControlName="expiry" placeholder="MM/YY" />
+      </label>
+      @if (paymentForm.controls.expiry.invalid && paymentForm.controls.expiry.touched) {
+        <p class="error">Formato scadenza non valido.</p>
+      }
+
+      <label>
+        CVV
+        <input type="text" formControlName="cvv" inputmode="numeric" maxlength="4" />
+      </label>
+      @if (paymentForm.controls.cvv.invalid && paymentForm.controls.cvv.touched) {
+        <p class="error">CVV non valido.</p>
+      }
+
+      @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Invio in corso…' : 'Paga caparra' }}
+      </button>
+    </form>
+  }
+</section>

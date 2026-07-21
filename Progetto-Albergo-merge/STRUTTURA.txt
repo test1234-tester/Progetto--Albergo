@@ -1,0 +1,21 @@
+Progetto-Albergo-pulito-v2
+|-- AVVIA-FRONTEND.cmd
+|-- README-PRIMA-DI-INIZIARE.md
+|-- VERIFICA-V2.md
+|-- COSA-E-STATO-SISTEMATO.md
+|-- backend
+|   |-- pom.xml
+|   |-- mvnw / mvnw.cmd
+|   `-- src
+|       |-- main
+|       |   |-- java
+|       |   `-- resources
+|       `-- test
+|-- frontend
+|   |-- package.json
+|   |-- package-lock.json
+|   |-- angular.json
+|   |-- proxy.conf.json
+|   |-- public
+|   `-- src
+`-- documentazione
