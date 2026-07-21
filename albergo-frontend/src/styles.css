@@ -87,3 +87,7 @@ a:hover {
 .text-muted-albergo {
   color: var(--albergo-muted);
 }
+body {
+  margin: 0;
+  padding: 0;
+}
