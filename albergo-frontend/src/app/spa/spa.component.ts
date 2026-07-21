@@ -2,6 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+// Importazione dell'interfaccia dal file separato "slot-spa.ts" (risalendo di un livello)
+import { SlotSpa } from '../slot-spa';
+
 interface SpaItem {
   title: string;
   tag: string;
@@ -31,6 +34,16 @@ export class SpaComponent implements OnDestroy {
   // Gestione Modal Prenotazione
   isModalOpen: boolean = false;
   isConfirmed: boolean = false;
+
+  // Carrello per prenotazioni multiple SPA
+  slotSelezionati: SlotSpa[] = [];
+
+  // Input temporanei per aggiungere uno slot
+  nuovoSlot: SlotSpa = {
+    data: '',
+    orarioInizio: '',
+    orarioFine: ''
+  };
 
   // Form Model Pulito e Aggiornato
   bookingData = {
@@ -176,6 +189,27 @@ export class SpaComponent implements OnDestroy {
     this.currentIndex = (this.currentIndex + direction + len) % len;
   }
 
+  // --- LOGICA GESTIONE SLOT MULTIPLI ---
+  aggiungiSlot(): void {
+    if (!this.nuovoSlot.data || !this.nuovoSlot.orarioInizio || !this.nuovoSlot.orarioFine) {
+      alert("Seleziona data, orario di inizio e orario di fine prima di aggiungere la prenotazione.");
+      return;
+    }
+
+    // Aggiunge lo slot all'array
+    this.slotSelezionati.push({ ...this.nuovoSlot });
+
+    // Reset degli input
+    this.nuovoSlot = {
+      data: '',
+      orarioInizio: '',
+      orarioFine: ''
+    };
+  }
+
+  rimuoviSlot(index: number): void {
+    this.slotSelezionati.splice(index, 1);
+  }
 
   // --- LOGICA MODAL PRENOTAZIONE ---
   openBookingModal(): void {
@@ -188,6 +222,11 @@ export class SpaComponent implements OnDestroy {
   }
 
   submitBooking(): void {
+    if (this.slotSelezionati.length === 0) {
+      alert("Aggiungi almeno una prenotazione (Data e Orario) prima di procedere.");
+      return;
+    }
+
     if (this.bookingData.tipoPrenotazione === 'hotel') {
       
       // Controllo ID Prenotazione per addebito in camera
@@ -200,7 +239,8 @@ export class SpaComponent implements OnDestroy {
         nomeCliente: this.bookingData.nome,
         email: this.bookingData.email,
         idPrenotazioneAlbergo: this.bookingData.codicePrenotazione,
-        importoAddebito: 200,
+        importoAddebito: 200 * this.slotSelezionati.length,
+        prenotazioni: this.slotSelezionati,
         dettagliPet: this.bookingData.haPet ? {
           tipo: this.bookingData.tipoPet,
           nome: this.bookingData.nomePet,
@@ -209,7 +249,7 @@ export class SpaComponent implements OnDestroy {
         } : null
       };
 
-      console.log('Invio Addebito Soggiorno:', payloadSoggiorno);
+      console.log('Invio Addebito Soggiorno con Slot Multipli:', payloadSoggiorno);
       this.isConfirmed = true;
 
     } else {
@@ -231,7 +271,8 @@ export class SpaComponent implements OnDestroy {
       nomeCliente: this.bookingData.nome,
       email: this.bookingData.email,
       metodo: this.bookingData.metodoPagamento,
-      importo: 200,
+      importo: 200 * this.slotSelezionati.length,
+      prenotazioni: this.slotSelezionati,
       dettagliPet: this.bookingData.haPet ? {
         tipo: this.bookingData.tipoPet,
         nome: this.bookingData.nomePet,
@@ -240,7 +281,7 @@ export class SpaComponent implements OnDestroy {
       } : null
     };
 
-    console.log('Invio Pagamento Diretto:', payloadPagamento);
+    console.log('Invio Pagamento Diretto con Slot Multipli:', payloadPagamento);
     this.isConfirmed = true;
   }
 

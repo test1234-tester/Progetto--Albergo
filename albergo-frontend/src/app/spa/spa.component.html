@@ -4,7 +4,7 @@
     <div class="container text-center">
       <span class="badge"><i class="fa-solid fa-crown"></i> PASS ALL-INCLUSIVE</span>
       <span class="banner-text">
-        <strong>€200 / Persona</strong> — Accesso illimitato e libero a tutte le strutture + Custodia Pet Gratuita inclusa!
+        <strong>€200 / Persona per Slot</strong> — Accesso illimitato e libero a tutte le strutture + Custodia Pet Gratuita inclusa!
       </span>
     </div>
   </div>
@@ -15,7 +15,7 @@
       <span class="sub-title">FINALE LIGURE • LUXURY RESORT</span>
       <h1>L'Oasi del Benessere sul Mare</h1>
       <p class="hero-desc">
-        Un'esperienza esclusiva a percorso libero. Con il Pass da <strong>€200</strong> accedi senza limiti a piscina infinity, idromassaggio vista mare, grotta di sale e trattamenti. E se viaggi con il tuo animale, la nostra <strong>Pet SPA</strong> si prenderà cura di lui gratuitamente mentre ti rilassi!
+        Un'esperienza esclusiva a percorso libero. Con il Pass da <strong>€200</strong> a sessione accedi senza limiti a piscina infinity, idromassaggio vista mare, grotta di sale e trattamenti. E se viaggi con il tuo animale, la nostra <strong>Pet SPA</strong> si prenderà cura di lui gratuitamente mentre ti rilassi!
       </p>
     </div>
   </header>
@@ -114,12 +114,12 @@
           <div class="pricing-cta text-center">
             <div class="price-info">
               <span class="amount">€200</span>
-              <span class="period">/ tutto incluso a persona</span>
+              <span class="period">/ a sessione per persona</span>
             </div>
             <p class="price-sub">Scelta libera di tutti i servizi • Pet SPA inclusa gratis</p>
 
             <button type="button" class="cta-button" (click)="openBookingModal()">
-              <i class="fa-solid fa-calendar-check"></i> PRENOTA IL TUO PASS
+              <i class="fa-solid fa-calendar-check"></i> PRENOTA I TUOI SLOT
             </button>
           </div>
         </div>
@@ -137,10 +137,52 @@
 
         <!-- Form prima dell'invio -->
         <div *ngIf="!isConfirmed">
-          <h2 class="modal-title"><i class="fa-solid fa-spa"></i> Prenota il tuo Pass SPA</h2>
-          <p class="modal-subtitle">Quota fissa €200 tutto incluso con accesso libero a tutti i servizi.</p>
+          <h2 class="modal-title"><i class="fa-solid fa-spa"></i> Prenota i tuoi Slot SPA</h2>
+          <p class="modal-subtitle">Scegli le date e gli orari desiderati (€200 per slot a persona).</p>
 
           <form (ngSubmit)="submitBooking()">
+
+            <!-- NUOVA SEZIONE: Selezione Calendario e Slot Orari -->
+            <div class="slot-selection-box mb-3 p-3 border rounded bg-light text-dark">
+              <h6 class="fw-bold text-dark mb-2">
+                <i class="fa-solid fa-calendar-days text-primary me-1"></i> Aggiungi Date & Orari di Ingresso
+              </h6>
+              
+              <div class="row g-2 mb-2">
+                <div class="form-group col-12 col-md-4">
+                  <label class="small text-dark">Data</label>
+                  <input type="date" [(ngModel)]="nuovoSlot.data" name="slotData" class="form-control">
+                </div>
+                <div class="form-group col-6 col-md-4">
+                  <label class="small text-dark">Ora Inizio</label>
+                  <input type="time" [(ngModel)]="nuovoSlot.orarioInizio" name="slotInizio" class="form-control">
+                </div>
+                <div class="form-group col-6 col-md-4">
+                  <label class="small text-dark">Ora Fine</label>
+                  <input type="time" [(ngModel)]="nuovoSlot.orarioFine" name="slotFine" class="form-control">
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-outline-primary btn-sm w-100 fw-bold" (click)="aggiungiSlot()">
+                <i class="fa-solid fa-plus me-1"></i> Aggiungi Questo Slot
+              </button>
+
+              <!-- Elenco Prenotazioni Inserite (Carrello Slot) -->
+              <div *ngIf="slotSelezionati.length > 0" class="mt-3 pt-2 border-top">
+                <small class="fw-bold d-block text-dark mb-2">Slot Inseriti ({{ slotSelezionati.length }}):</small>
+                <ul class="list-group">
+                  <li *ngFor="let slot of slotSelezionati; let i = index" class="list-group-item d-flex justify-content-between align-items-center p-2">
+                    <span>
+                      <i class="fa-regular fa-clock me-1 text-primary"></i>
+                      <strong>{{ slot.data }}</strong> dalle {{ slot.orarioInizio }} alle {{ slot.orarioFine }}
+                    </span>
+                    <button type="button" class="btn btn-danger btn-sm py-0 px-2" (click)="rimuoviSlot(i)" title="Rimuovi">
+                      &times;
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
 
             <!-- Dati Anagrafici -->
             <div class="form-group mb-2">
@@ -169,7 +211,7 @@
                 <input type="text" [(ngModel)]="bookingData.codicePrenotazione" name="codicePrenotazione" required placeholder="es. HTL-9821" class="form-control">
               </div>
               <small class="help-text text-muted mt-1 d-block">
-                <i class="fa-solid fa-circle-info"></i> L'importo di €200 verrà aggiornato nel tuo conto cliente e addebitato al check-out.
+                <i class="fa-solid fa-circle-info"></i> L'importo totale di €{{ 200 * slotSelezionati.length }} verrà aggiornato nel tuo conto cliente e addebitato al check-out.
               </small>
             </div>
 
@@ -192,9 +234,11 @@
                 </div>
               </div>
 
-              <!-- Form Carta di Credito (Intestatario, Numero, Scadenza, CVC) -->
+              <!-- Form Carta di Credito -->
               <div *ngIf="bookingData.metodoPagamento === 'card'" class="card-form border-top pt-3 mt-2">
-                <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-lock me-1"></i> Dati per il Pagamento Online (€200)</h6>
+                <h6 class="fw-bold text-dark mb-3">
+                  <i class="fa-solid fa-lock me-1"></i> Dati per il Pagamento Online (€{{ 200 * slotSelezionati.length }})
+                </h6>
                 
                 <div class="form-group mb-2">
                   <label class="text-dark">Nome e Cognome Intestatario Carta</label>
@@ -221,10 +265,10 @@
               <!-- Informazioni Bonifico -->
               <div *ngIf="bookingData.metodoPagamento === 'bonifico'" class="bank-form border-top pt-3 mt-2">
                 <div class="alert alert-info p-3 mb-2 text-dark" style="font-size: 0.9rem;">
-                  <strong class="d-block mb-1"><i class="fa-solid fa-university me-1"></i> Coordinate per il Bonifico:</strong>
+                  <strong class="d-block mb-1"><i class="fa-solid fa-university me-1"></i> Coordinate per il Bonifico (€{{ 200 * slotSelezionati.length }}):</strong>
                   <strong>IBAN:</strong> IT60 X 0542 8111 0100 0000 1234 56<br>
                   <strong>Intestatario:</strong> Luxury Resort SPA S.r.l.<br>
-                  <strong>Causale:</strong> Pass SPA - {{ bookingData.nome || 'Nome Ospite' }}
+                  <strong>Causale:</strong> Pass SPA ({{ slotSelezionati.length }} Slot) - {{ bookingData.nome || 'Nome Ospite' }}
                 </div>
               </div>
             </div>
@@ -245,7 +289,7 @@
               </div>
             </div>
 
-            <!-- Form Pet SPA (Tipologia, Nome, Razza, Taglia) -->
+            <!-- Form Pet SPA -->
             <div *ngIf="bookingData.haPet" class="pet-fields p-3 border rounded mb-3 bg-light text-dark">
               <div class="row mb-2">
                 <div class="form-group col-6">
@@ -284,15 +328,15 @@
 
             <!-- Bottoni Dinamici -->
             <button *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'card'" type="submit" class="submit-btn btn btn-primary w-100 mt-2">
-              <i class="fa-solid fa-lock"></i> PAGA ORA (€200)
+              <i class="fa-solid fa-lock"></i> PAGA ORA (€{{ 200 * slotSelezionati.length }})
             </button>
 
             <button *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'bonifico'" type="submit" class="submit-btn btn btn-success w-100 mt-2">
-              <i class="fa-solid fa-calendar-check"></i> PRENOTA ADESSO
+              <i class="fa-solid fa-calendar-check"></i> PRENOTA ADESSO (€{{ 200 * slotSelezionati.length }})
             </button>
 
             <button *ngIf="bookingData.tipoPrenotazione === 'hotel'" type="submit" class="submit-btn btn btn-primary w-100 mt-2">
-              CONFERMA E ADDEBITA IN CAMERA (€200)
+              CONFERMA E ADDEBITA IN CAMERA (€{{ 200 * slotSelezionati.length }})
             </button>
 
           </form>
@@ -309,18 +353,28 @@
 
           <div class="summary-card text-start p-3 border rounded bg-light my-3 text-dark">
             <p *ngIf="bookingData.tipoPrenotazione === 'hotel'">
-              <strong>Modalità:</strong> Addebito su Soggiorno (ID: {{ bookingData.codicePrenotazione }})
+              <strong>Modalità:</strong> Addebito su Soggiorno (ID: {{ bookingData.codicePrenotazione }}) - Totale: €{{ 200 * slotSelezionati.length }}
             </p>
 
             <p *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'card'">
-              <strong>Modalità:</strong> Carta / Bancomat (€200 - Pagato)
+              <strong>Modalità:</strong> Carta / Bancomat (€{{ 200 * slotSelezionati.length }} - Pagato)
             </p>
 
             <div *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'bonifico'">
-              <p class="mb-1"><strong>Modalità:</strong> Bonifico Bancario (€200)</p>
+              <p class="mb-1"><strong>Modalità:</strong> Bonifico Bancario (€{{ 200 * slotSelezionati.length }})</p>
               <small class="text-danger d-block">
                 <i class="fa-solid fa-clock"></i> Effettua il bonifico entro 3 giorni lavorativi.
               </small>
+            </div>
+
+            <!-- Dettaglio Slot Prenotati -->
+            <div class="slots-summary mt-2 pt-2 border-top">
+              <strong><i class="fa-solid fa-calendar-days text-primary"></i> Slot Riservati:</strong>
+              <ul class="mb-0 ps-3">
+                <li *ngFor="let s of slotSelezionati">
+                  Data: <strong>{{ s.data }}</strong> ({{ s.orarioInizio }} - {{ s.orarioFine }})
+                </li>
+              </ul>
             </div>
 
             <!-- Dettagli Pet -->
