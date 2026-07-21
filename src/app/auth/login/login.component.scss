@@ -1,0 +1,21 @@
+.auth-page {
+  min-height: calc(100vh - 220px);
+  padding: 2rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  border: none;
+  border-radius: var(--albergo-radius);
+}
+
+.auth-title {
+  font-size: 1.75rem;
+  text-align: center;
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 0.9rem;
+}
