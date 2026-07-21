@@ -1,0 +1,68 @@
+<!-- Struttura minima: riepilogo/toast definitivi a cura di Sviluppatore 3 -->
+<section class="booking-page">
+  @if (isLoadingRoom()) {
+    <p>Caricamento stanza…</p>
+  } @else if (room()) {
+    <h1>Prenota: {{ room()!.nome }}</h1>
+    <p>Dal {{ checkIn }} al {{ checkOut }}</p>
+
+    <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" novalidate>
+      <h2>Trattamento</h2>
+      <label>
+        Scegli il trattamento
+        <select formControlName="trattamento">
+          <option value="" disabled>Seleziona…</option>
+          <option value="COLAZIONE">Solo colazione</option>
+          <option value="MEZZA_PENSIONE">Mezza pensione</option>
+          <option value="PENSIONE_COMPLETA">Pensione completa</option>
+        </select>
+      </label>
+      @if (bookingForm.controls.trattamento.invalid && bookingForm.controls.trattamento.touched) {
+        <p class="error">Seleziona un trattamento.</p>
+      }
+
+      <label>
+        <input type="checkbox" formControlName="spaAbbinata" />
+        Aggiungi Spa al soggiorno (+200€)
+      </label>
+
+      <p class="total-amount">Totale: {{ totalAmount() }} €</p>
+
+      <h2>Ospiti in arrivo</h2>
+
+      <div formArrayName="guests">
+        @for (guest of guests.controls; track guest; let i = $index) {
+          <fieldset [formGroupName]="i">
+            <legend>Ospite {{ i + 1 }}</legend>
+
+            <label>
+              Nome
+              <input type="text" formControlName="nome" />
+            </label>
+
+            <label>
+              Cognome
+              <input type="text" formControlName="cognome" />
+            </label>
+
+            @if (guests.length > 1) {
+              <button type="button" (click)="removeGuest(i)">Rimuovi ospite</button>
+            }
+          </fieldset>
+        }
+      </div>
+
+      <button type="button" (click)="addGuest()">+ Aggiungi ospite</button>
+
+      @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="isSubmitting() || missingDates">
+        {{ isSubmitting() ? 'Invio in corso…' : 'Conferma prenotazione' }}
+      </button>
+    </form>
+  } @else {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+</section>

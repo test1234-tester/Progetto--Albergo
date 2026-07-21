@@ -1,0 +1,123 @@
+
+<!-- Contenitore principale flessibile per centrare la scheda di registrazione nella pagina -->
+<section class="auth-page d-flex align-items-center justify-content-center">
+  <div class="card auth-card shadow-sm">
+    <div class="card-body p-4 p-md-5">
+      <h1 class="auth-title mb-4">Crea account</h1>
+
+      <!-- Associa il tag HTML al gruppo reattivo registerForm e cattura l'evento di invio -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+        
+        <!-- Campo Ruolo/Tipo Account -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Tipo di Account</label>
+          <select class="form-select" formControlName="ruolo">
+            <option value="CLIENTE">Ospite / Cliente</option>
+            <option value="ADMIN">Personale Staff (Admin)</option>
+          </select>
+        </div>
+
+        <!-- Campo Dinamico Codice Admin: Compare SOLO se si seleziona ADMIN -->
+        @if (registerForm.controls.ruolo.value === 'ADMIN') {
+          <div class="mb-3 p-3 bg-light border rounded">
+            <label class="form-label text-danger fw-bold">Codice di Verifica Staff (Passkey)</label>
+            <input type="password" class="form-control border-danger" formControlName="codiceAdmin" placeholder="Inserisci il codice segreto della struttura" />
+            @if (registerForm.errors?.['adminCodeRequired'] && registerForm.controls.codiceAdmin.touched) {
+              <p class="error mt-1 text-danger small">Il codice segreto è obbligatorio per gli account Staff.</p>
+            }
+          </div>
+        }
+
+
+        <!-- Campo Nome -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-nome">Nome</label>
+          <input id="reg-nome" type="text" class="form-control" formControlName="nome" />
+        </div>
+
+        <!-- Campo Cognome -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-cognome">Cognome</label>
+          <input id="reg-cognome" type="text" class="form-control" formControlName="cognome" />
+        </div>
+
+        <!-- Campo Username -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-username">Username</label>
+          <input id="reg-username" type="text" class="form-control" formControlName="username" />
+        </div>
+
+        <!-- Campo Cellulare -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-cellulare">Cellulare</label>
+          <!-- formControlName collega l'input alla variabile 'cellulare' del TS -->
+          <input id="reg-cellulare" type="tel" class="form-control" formControlName="cellulare" />
+        </div>
+        
+        <!-- Campo Email -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-email">Email</label>
+          <!-- formControlName collega l'input alla variabile 'email' del TS -->
+          <input
+            id="reg-email"
+            type="email"
+            class="form-control"
+            formControlName="email"
+            autocomplete="email"
+            [class.is-invalid]="registerForm.controls.email.invalid && registerForm.controls.email.touched"
+          />
+          @if (registerForm.controls.email.invalid && registerForm.controls.email.touched) {
+            <p class="error">Inserisci un'email valida.</p>
+          }
+        </div>
+
+        <!-- Campo Password -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-password">Password</label>
+          <!-- formControlName collega l'input alla variabile 'password' del TS -->
+          <input
+            id="reg-password"
+            type="password"
+            class="form-control"
+            formControlName="password"
+            autocomplete="new-password"
+            [class.is-invalid]="registerForm.controls.password.invalid && registerForm.controls.password.touched"
+          />
+          @if (registerForm.controls.password.invalid && registerForm.controls.password.touched) {
+            <p class="error">La password deve avere almeno 6 caratteri.</p>
+          }
+        </div>
+
+        <!-- Campo Conferma Password -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-confirm">Conferma password</label>
+          <!-- formControlName collega l'input alla variabile 'confirmPassword' del TS-->
+          <input
+            id="reg-confirm"
+            type="password"
+            class="form-control"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            [class.is-invalid]="registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched"
+          />
+
+          <!-- Errore incrociato: mostra l'avviso se l'intero form ha l'errore 'passwordsMismatch' generato dal validatore custom -->
+          @if (registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched) {
+            <p class="error">Le password non coincidono.</p>
+          }
+        </div>
+
+        <!-- Mostra il messaggio d'errore se il Signal errorMessage contiene testo -->
+        @if (errorMessage()) {
+          <p class="error">{{ errorMessage() }}</p>
+        }
+
+        <button type="submit" class="btn btn-primary w-100 mt-2" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Registrazione in corso…' : 'Registrati' }}
+        </button>
+      </form>
+
+      <p class="auth-switch mt-4 mb-0">Hai già un account? <a routerLink="/login">Accedi</a></p>
+    </div>
+  </div>
+</section>

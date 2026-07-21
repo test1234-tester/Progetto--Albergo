@@ -42,17 +42,3 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
-
-# =========================
-# Backend: Spring Boot / Java / Maven
-# =========================
-target/
-*.class
-*.jar
-*.war
-*.ear
-*.log
-.mvn/wrapper/maven-wrapper.jar
-hs_err_pid*
-application-dev.properties
-application-local.yml
