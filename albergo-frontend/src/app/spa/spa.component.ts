@@ -32,16 +32,28 @@ export class SpaComponent implements OnDestroy {
   isModalOpen: boolean = false;
   isConfirmed: boolean = false;
 
-  // Form Model
+  // Form Model Pulito e Aggiornato
   bookingData = {
     nome: '',
     email: '',
-    tipoPrenotazione: 'hotel', // 'hotel' oppure 'spa-only'
-    numeroCamera: '',
-    codicePrenotazione: '',
+    
+    // Modalità: 'hotel' (Abbina al soggiorno) oppure 'spa-only' (Solo SPA online)
+    tipoPrenotazione: 'hotel', 
+    codicePrenotazione: '', 
+
+    // Pagamento Diretto SPA ('card' oppure 'bonifico')
+    metodoPagamento: 'card', 
+    cardHolder: '',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCvc: '',
+
+    // Gestione Pet SPA
     haPet: false,
+    tipoPet: '',
     nomePet: '',
-    razzaPet: ''
+    razzaPet: '',
+    tagliaPet: ''
   };
 
   // Database Servizi SPA
@@ -164,25 +176,6 @@ export class SpaComponent implements OnDestroy {
     this.currentIndex = (this.currentIndex + direction + len) % len;
   }
 
-  // --- LOGICA HOVER VIDEO TOUR ---
-  startVideoTour(): void {
-    if (this.videoInterval) return;
-    this.savedIndex = this.currentIndex;
-    this.isVideoTourActive = true;
-
-    this.videoInterval = setInterval(() => {
-      this.currentIndex = (this.currentIndex + 1) % this.currentList.length;
-    }, 1200);
-  }
-
-  stopVideoTour(): void {
-    if (this.videoInterval) {
-      clearInterval(this.videoInterval);
-      this.videoInterval = null;
-    }
-    this.isVideoTourActive = false;
-    this.currentIndex = this.savedIndex;
-  }
 
   // --- LOGICA MODAL PRENOTAZIONE ---
   openBookingModal(): void {
@@ -195,6 +188,59 @@ export class SpaComponent implements OnDestroy {
   }
 
   submitBooking(): void {
+    if (this.bookingData.tipoPrenotazione === 'hotel') {
+      
+      // Controllo ID Prenotazione per addebito in camera
+      if (!this.bookingData.codicePrenotazione.trim()) {
+        alert("Per favore, inserisci il tuo Codice/ID Prenotazione dell'Albergo.");
+        return;
+      }
+
+      const payloadSoggiorno = {
+        nomeCliente: this.bookingData.nome,
+        email: this.bookingData.email,
+        idPrenotazioneAlbergo: this.bookingData.codicePrenotazione,
+        importoAddebito: 200,
+        dettagliPet: this.bookingData.haPet ? {
+          tipo: this.bookingData.tipoPet,
+          nome: this.bookingData.nomePet,
+          razza: this.bookingData.razzaPet,
+          taglia: this.bookingData.tagliaPet
+        } : null
+      };
+
+      console.log('Invio Addebito Soggiorno:', payloadSoggiorno);
+      this.isConfirmed = true;
+
+    } else {
+      // Gestione Solo SPA (Carta di Credito o Bonifico)
+      this.gestisciPagamentoDiretto();
+    }
+  }
+
+  private gestisciPagamentoDiretto(): void {
+    if (this.bookingData.metodoPagamento === 'card') {
+      // Validazione basica della carta
+      if (!this.bookingData.cardNumber || !this.bookingData.cardHolder || !this.bookingData.cardCvc) {
+        alert("Compila tutti i campi della carta di credito per proseguire.");
+        return;
+      }
+    }
+
+    const payloadPagamento = {
+      nomeCliente: this.bookingData.nome,
+      email: this.bookingData.email,
+      metodo: this.bookingData.metodoPagamento,
+      importo: 200,
+      dettagliPet: this.bookingData.haPet ? {
+        tipo: this.bookingData.tipoPet,
+        nome: this.bookingData.nomePet,
+        razza: this.bookingData.razzaPet,
+        taglia: this.bookingData.tagliaPet
+      } : null
+    };
+
+    console.log('Invio Pagamento Diretto:', payloadPagamento);
     this.isConfirmed = true;
   }
 

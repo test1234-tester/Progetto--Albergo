@@ -442,3 +442,30 @@
 }
 
 .summary-card p { margin-bottom: 0.5rem; font-size: 0.85rem; }
+
+/* Correzione Contrasto Form Modal */
+.modal-box {
+  color: #212529 !important;
+
+  label, .form-label {
+    color: #1a1a1a !important;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .form-control, .form-select {
+    color: #1a1a1a !important;
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da;
+
+    &::placeholder {
+      color: #6c757d !important;
+      opacity: 0.8;
+    }
+  }
+
+  .bg-light {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+  }
+}

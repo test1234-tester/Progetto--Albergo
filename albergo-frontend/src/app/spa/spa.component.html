@@ -24,12 +24,14 @@
     <!-- Category Selector -->
     <div class="category-tabs text-center mb-4">
       <button
+        type="button"
         class="tab-btn"
         [class.active]="currentCategory === 'human'"
         (click)="switchCategory('human')">
         <i class="fa-solid fa-spa"></i> SPA OSPITI UMANI
       </button>
       <button
+        type="button"
         class="tab-btn"
         [class.active]="currentCategory === 'pet'"
         (click)="switchCategory('pet')">
@@ -37,8 +39,8 @@
       </button>
     </div>
 
-    <!-- Main Section Layout: griglia Bootstrap, coerente col resto del sito -->
-    <div class="row gy-4">
+    <!-- Main Section Layout -->
+    <div class="row gy-4" *ngIf="currentItem">
 
       <!-- Colonna Sinistra: Carousel Galleria -->
       <div class="col-12 col-lg-7">
@@ -51,21 +53,18 @@
               <h3>{{ currentItem.title }}</h3>
             </div>
 
-            <button class="nav-btn prev" (click)="navigateCarousel(-1)" aria-label="Precedente">
+            <button type="button" class="nav-btn prev" (click)="navigateCarousel(-1)" aria-label="Precedente">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <button class="nav-btn next" (click)="navigateCarousel(1)" aria-label="Successivo">
+            <button type="button" class="nav-btn next" (click)="navigateCarousel(1)" aria-label="Successivo">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
-
-            <div *ngIf="isVideoTourActive" class="video-indicator">
-              <span class="pulse-dot"></span> VIDEO TOUR IN CORSO
-            </div>
           </div>
 
           <!-- Thumbnail Strip -->
           <div class="thumbnails-wrapper">
             <button
+              type="button"
               *ngFor="let item of currentList; let i = index"
               (click)="selectSlide(i)"
               class="thumb-btn"
@@ -76,17 +75,9 @@
         </div>
       </div>
 
-      <!-- Colonna Destra: Card Descrizione con Hover Video Tour -->
+      <!-- Colonna Destra: Card Descrizione -->
       <div class="col-12 col-lg-5">
-        <div
-          class="description-card"
-          (mouseenter)="startVideoTour()"
-          (mouseleave)="stopVideoTour()">
-
-          <div class="hover-hint">
-            <i class="fa-solid fa-film"></i> Passa il mouse qui per il Video-Tour Fotografico
-          </div>
-
+        <div class="description-card">
           <div class="card-header">
             <span class="tag-label">{{ currentItem.tag }}</span>
             <h2>{{ currentItem.title }}</h2>
@@ -127,7 +118,7 @@
             </div>
             <p class="price-sub">Scelta libera di tutti i servizi • Pet SPA inclusa gratis</p>
 
-            <button class="cta-button" (click)="openBookingModal()">
+            <button type="button" class="cta-button" (click)="openBookingModal()">
               <i class="fa-solid fa-calendar-check"></i> PRENOTA IL TUO PASS
             </button>
           </div>
@@ -140,96 +131,212 @@
   <!-- Modal Prenotazione -->
   <div class="modal-backdrop" *ngIf="isModalOpen">
     <div class="modal-box">
-      <button class="close-btn" (click)="closeModal()" aria-label="Chiudi">&times;</button>
+      <button type="button" class="close-btn" (click)="closeModal()" aria-label="Chiudi">&times;</button>
 
       <div class="modal-scroll-content">
 
-      <!-- Form prima dell'invio -->
-      <div *ngIf="!isConfirmed">
-        <h2 class="modal-title"><i class="fa-solid fa-spa"></i> Prenota il tuo Pass SPA</h2>
-        <p class="modal-subtitle">Quota fissa €200 tutto incluso con accesso libero a tutti i servizi.</p>
+        <!-- Form prima dell'invio -->
+        <div *ngIf="!isConfirmed">
+          <h2 class="modal-title"><i class="fa-solid fa-spa"></i> Prenota il tuo Pass SPA</h2>
+          <p class="modal-subtitle">Quota fissa €200 tutto incluso con accesso libero a tutti i servizi.</p>
 
-        <form (ngSubmit)="submitBooking()">
+          <form (ngSubmit)="submitBooking()">
 
-          <div class="form-group">
-            <label>Nome e Cognome</label>
-            <input type="text" [(ngModel)]="bookingData.nome" name="nome" required placeholder="Mario Rossi" class="form-control">
-          </div>
+            <!-- Dati Anagrafici -->
+            <div class="form-group mb-2">
+              <label>Nome e Cognome</label>
+              <input type="text" [(ngModel)]="bookingData.nome" name="nome" required placeholder="Mario Rossi" class="form-control">
+            </div>
 
-          <div class="form-group">
-            <label>Email di Contatto</label>
-            <input type="email" [(ngModel)]="bookingData.email" name="email" required placeholder="mario.rossi@email.com" class="form-control">
-          </div>
+            <div class="form-group mb-3">
+              <label>Email di Contatto</label>
+              <input type="email" [(ngModel)]="bookingData.email" name="email" required placeholder="mario.rossi@email.com" class="form-control">
+            </div>
 
-          <div class="form-group">
-            <label>Modalità di Prenotazione</label>
-            <select [(ngModel)]="bookingData.tipoPrenotazione" name="tipoPrenotazione" class="form-control">
-              <option value="hotel">Abbina al soggiorno in Albergo (Addebito in Camera)</option>
-              <option value="spa-only">Solo Servizio SPA (Pagamento Diretto)</option>
-            </select>
-          </div>
+            <!-- Modalità di Prenotazione -->
+            <div class="form-group mb-3">
+              <label>Modalità di Prenotazione</label>
+              <select [(ngModel)]="bookingData.tipoPrenotazione" name="tipoPrenotazione" class="form-control">
+                <option value="hotel">Abbina al soggiorno in Albergo (Addebito sul Conto)</option>
+                <option value="spa-only">Solo Servizio SPA (Pagamento Diretto Online)</option>
+              </select>
+            </div>
 
-          <!-- Campi dinamici per soggiorno in albergo -->
-          <div *ngIf="bookingData.tipoPrenotazione === 'hotel'" class="hotel-fields">
-            <div class="form-row">
-              <div class="form-group col">
-                <label>N° Camera</label>
-                <input type="text" [(ngModel)]="bookingData.numeroCamera" name="numeroCamera" placeholder="es. 304" class="form-control">
+            <!-- CASO 1: ID Prenotazione per chi pernotta in hotel -->
+            <div *ngIf="bookingData.tipoPrenotazione === 'hotel'" class="hotel-fields mb-3 p-3 border rounded bg-light text-dark">
+              <div class="form-group">
+                <label class="text-dark">Codice / ID Prenotazione Albergo</label>
+                <input type="text" [(ngModel)]="bookingData.codicePrenotazione" name="codicePrenotazione" required placeholder="es. HTL-9821" class="form-control">
               </div>
-              <div class="form-group col">
-                <label>Codice Prenotazione</label>
-                <input type="text" [(ngModel)]="bookingData.codicePrenotazione" name="codicePrenotazione" placeholder="es. HTL-9821" class="form-control">
+              <small class="help-text text-muted mt-1 d-block">
+                <i class="fa-solid fa-circle-info"></i> L'importo di €200 verrà aggiornato nel tuo conto cliente e addebitato al check-out.
+              </small>
+            </div>
+
+            <!-- CASO 2: Metodi di Pagamento per Solo SPA -->
+            <div *ngIf="bookingData.tipoPrenotazione === 'spa-only'" class="payment-fields mb-3 p-3 border rounded bg-light text-dark">
+              <label class="fw-bold mb-2 d-block text-dark">Seleziona Metodo di Pagamento</label>
+              
+              <div class="d-flex gap-4 mb-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="metodoPagamento" id="payCard" value="card" [(ngModel)]="bookingData.metodoPagamento">
+                  <label class="form-check-label fw-bold text-dark" for="payCard">
+                    <i class="fa-solid fa-credit-card me-1"></i> Carta / Bancomat
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="metodoPagamento" id="payBank" value="bonifico" [(ngModel)]="bookingData.metodoPagamento">
+                  <label class="form-check-label fw-bold text-dark" for="payBank">
+                    <i class="fa-solid fa-building-columns me-1"></i> Bonifico Bancario
+                  </label>
+                </div>
+              </div>
+
+              <!-- Form Carta di Credito (Intestatario, Numero, Scadenza, CVC) -->
+              <div *ngIf="bookingData.metodoPagamento === 'card'" class="card-form border-top pt-3 mt-2">
+                <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-lock me-1"></i> Dati per il Pagamento Online (€200)</h6>
+                
+                <div class="form-group mb-2">
+                  <label class="text-dark">Nome e Cognome Intestatario Carta</label>
+                  <input type="text" [(ngModel)]="bookingData.cardHolder" name="cardHolder" required placeholder="Mario Rossi" class="form-control">
+                </div>
+
+                <div class="form-group mb-2">
+                  <label class="text-dark">Numero Carta</label>
+                  <input type="text" [(ngModel)]="bookingData.cardNumber" name="cardNumber" required placeholder="0000 0000 0000 0000" maxlength="19" class="form-control">
+                </div>
+
+                <div class="row">
+                  <div class="form-group col-6">
+                    <label class="text-dark">Scadenza</label>
+                    <input type="text" [(ngModel)]="bookingData.cardExpiry" name="cardExpiry" required placeholder="MM/AA" maxlength="5" class="form-control">
+                  </div>
+                  <div class="form-group col-6">
+                    <label class="text-dark">CVC / CVC2</label>
+                    <input type="password" [(ngModel)]="bookingData.cardCvc" name="cardCvc" required placeholder="123" maxlength="4" class="form-control">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Informazioni Bonifico -->
+              <div *ngIf="bookingData.metodoPagamento === 'bonifico'" class="bank-form border-top pt-3 mt-2">
+                <div class="alert alert-info p-3 mb-2 text-dark" style="font-size: 0.9rem;">
+                  <strong class="d-block mb-1"><i class="fa-solid fa-university me-1"></i> Coordinate per il Bonifico:</strong>
+                  <strong>IBAN:</strong> IT60 X 0542 8111 0100 0000 1234 56<br>
+                  <strong>Intestatario:</strong> Luxury Resort SPA S.r.l.<br>
+                  <strong>Causale:</strong> Pass SPA - {{ bookingData.nome || 'Nome Ospite' }}
+                </div>
               </div>
             </div>
-            <small class="help-text"><i class="fa-solid fa-circle-info"></i> L'importo di €200 a persona verrà addebitato sul conto finale della camera.</small>
-          </div>
 
-          <!-- Checkbox Pet -->
-          <div class="form-group checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" [(ngModel)]="bookingData.haPet" name="haPet">
-              Ho un cane o animale domestico da affidare alla Pet SPA (Gratuito)
-            </label>
-          </div>
-
-          <!-- Campi dinamici Pet -->
-          <div *ngIf="bookingData.haPet" class="pet-fields">
-            <div class="form-row">
-              <div class="form-group col">
-                <label>Nome dell'Animale</label>
-                <input type="text" [(ngModel)]="bookingData.nomePet" name="nomePet" placeholder="es. Luna" class="form-control">
-              </div>
-              <div class="form-group col">
-                <label>Razza / Taglia</label>
-                <input type="text" [(ngModel)]="bookingData.razzaPet" name="razzaPet" placeholder="es. Golden Retriever" class="form-control">
+            <!-- Checkbox Pet SPA -->
+            <div class="form-group checkbox-group mb-3 p-2 rounded bg-light border">
+              <div class="form-check m-0">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  id="haPetCheck" 
+                  [(ngModel)]="bookingData.haPet" 
+                  name="haPet">
+                <label class="form-check-label fw-bold text-dark ms-2" for="haPetCheck">
+                  <i class="fa-solid fa-paw me-1 text-primary"></i> 
+                  Ho un cane o animale domestico da affidare alla Pet SPA (Gratuito)
+                </label>
               </div>
             </div>
-          </div>
 
-          <button type="submit" class="submit-btn">CONFERMA PRENOTAZIONE (€200)</button>
-        </form>
-      </div>
+            <!-- Form Pet SPA (Tipologia, Nome, Razza, Taglia) -->
+            <div *ngIf="bookingData.haPet" class="pet-fields p-3 border rounded mb-3 bg-light text-dark">
+              <div class="row mb-2">
+                <div class="form-group col-6">
+                  <label class="text-dark">Tipologia Animale</label>
+                  <select [(ngModel)]="bookingData.tipoPet" name="tipoPet" required class="form-control">
+                    <option value="" disabled selected>Seleziona tipo...</option>
+                    <option value="Cane">Cane</option>
+                    <option value="Gatto">Gatto</option>
+                    <option value="Coniglio">Coniglio</option>
+                    <option value="Altro">Altro</option>
+                  </select>
+                </div>
+                <div class="form-group col-6">
+                  <label class="text-dark">Nome dell'Animale</label>
+                  <input type="text" [(ngModel)]="bookingData.nomePet" name="nomePet" required placeholder="es. Luna" class="form-control">
+                </div>
+              </div>
 
-      <!-- Schermata di conferma -->
-      <div *ngIf="isConfirmed" class="confirmation-box text-center">
-        <div class="check-icon"><i class="fa-solid fa-circle-check"></i></div>
-        <h3>Prenotazione Confermata!</h3>
-        <p>Grazie <strong>{{ bookingData.nome }}</strong>, la tua prenotazione per il Pass All-Inclusive è stata registrata con successo.</p>
+              <div class="row">
+                <div class="form-group col-6">
+                  <label class="text-dark">Razza</label>
+                  <input type="text" [(ngModel)]="bookingData.razzaPet" name="razzaPet" required placeholder="es. Golden Retriever" class="form-control">
+                </div>
+                <div class="form-group col-6">
+                  <label class="text-dark">Taglia</label>
+                  <select [(ngModel)]="bookingData.tagliaPet" name="tagliaPet" required class="form-control">
+                    <option value="" disabled selected>Seleziona taglia...</option>
+                    <option value="Piccola">Piccola (fino a 10kg)</option>
+                    <option value="Media">Media (10kg - 25kg)</option>
+                    <option value="Grande">Grande (25kg - 40kg)</option>
+                    <option value="Gigante">Gigante (oltre 40kg)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
 
-        <div class="summary-card">
-          <p *ngIf="bookingData.tipoPrenotazione === 'hotel'">
-            <strong>Modalità:</strong> Addebito sulla Camera N° {{ bookingData.numeroCamera || 'Da verificare al check-in' }}
-          </p>
-          <p *ngIf="bookingData.tipoPrenotazione === 'spa-only'">
-            <strong>Modalità:</strong> Pagamento Diretto in Struttura (€200)
-          </p>
-          <p *ngIf="bookingData.haPet">
-            <strong>Pet Custody:</strong> Attivo per {{ bookingData.nomePet || 'il tuo pet' }} (Incluso gratuitamente)
-          </p>
+            <!-- Bottoni Dinamici -->
+            <button *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'card'" type="submit" class="submit-btn btn btn-primary w-100 mt-2">
+              <i class="fa-solid fa-lock"></i> PAGA ORA (€200)
+            </button>
+
+            <button *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'bonifico'" type="submit" class="submit-btn btn btn-success w-100 mt-2">
+              <i class="fa-solid fa-calendar-check"></i> PRENOTA ADESSO
+            </button>
+
+            <button *ngIf="bookingData.tipoPrenotazione === 'hotel'" type="submit" class="submit-btn btn btn-primary w-100 mt-2">
+              CONFERMA E ADDEBITA IN CAMERA (€200)
+            </button>
+
+          </form>
         </div>
 
-        <button class="cta-button" (click)="closeModal()">CHIUDI</button>
-      </div>
+        <!-- Schermata di Conferma -->
+        <div *ngIf="isConfirmed" class="confirmation-box text-center">
+          <div class="check-icon text-success mb-2" style="font-size: 3rem;"><i class="fa-solid fa-circle-check"></i></div>
+          
+          <h3 *ngIf="bookingData.metodoPagamento === 'card' || bookingData.tipoPrenotazione === 'hotel'">Pagamento e Prenotazione avvenuti con successo!</h3>
+          <h3 *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'bonifico'">Prenotazione Registrata in Attesa di Bonifico!</h3>
+
+          <p>Grazie <strong>{{ bookingData.nome }}</strong>, la tua richiesta è stata completata con successo.</p>
+
+          <div class="summary-card text-start p-3 border rounded bg-light my-3 text-dark">
+            <p *ngIf="bookingData.tipoPrenotazione === 'hotel'">
+              <strong>Modalità:</strong> Addebito su Soggiorno (ID: {{ bookingData.codicePrenotazione }})
+            </p>
+
+            <p *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'card'">
+              <strong>Modalità:</strong> Carta / Bancomat (€200 - Pagato)
+            </p>
+
+            <div *ngIf="bookingData.tipoPrenotazione === 'spa-only' && bookingData.metodoPagamento === 'bonifico'">
+              <p class="mb-1"><strong>Modalità:</strong> Bonifico Bancario (€200)</p>
+              <small class="text-danger d-block">
+                <i class="fa-solid fa-clock"></i> Effettua il bonifico entro 3 giorni lavorativi.
+              </small>
+            </div>
+
+            <!-- Dettagli Pet -->
+            <div *ngIf="bookingData.haPet" class="pet-summary mt-2 pt-2 border-top">
+              <strong><i class="fa-solid fa-dog"></i> Pet Custody Gratuita:</strong>
+              <ul class="mb-0 ps-3">
+                <li><strong>Tipo:</strong> {{ bookingData.tipoPet }}</li>
+                <li><strong>Nome:</strong> {{ bookingData.nomePet }}</li>
+                <li><strong>Razza:</strong> {{ bookingData.razzaPet }}</li>
+                <li><strong>Taglia:</strong> {{ bookingData.tagliaPet }}</li>
+              </ul>
+            </div>
+          </div>
+
+          <button type="button" class="cta-button btn btn-dark" (click)="closeModal()">CHIUDI</button>
+        </div>
 
       </div>
 
