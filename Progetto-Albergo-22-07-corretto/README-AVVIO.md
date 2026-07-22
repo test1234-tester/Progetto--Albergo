@@ -1,38 +1,34 @@
-# Avvio rapido
+# Avvio
 
-## 1. Backend
+## Backend
 
-In Spring Tool Suite importa esclusivamente la cartella `backend` come Existing Maven Project.
+Importare in Spring Tool Suite come Existing Maven Project:
 
-Poi:
+`backend`
 
-1. Maven -> Update Project
-2. avvia `ProgettoalbergoApplication` come Spring Boot App
-3. apri `http://localhost:8080/health`
+Avviare `ProgettoalbergoApplication` come Spring Boot App.
 
-Credenziali staff demo:
+Controllo database:
 
-- `reception@albergo.it`
-- `Staff123!`
+`http://localhost:8080/health`
 
-## 2. Frontend
+## Frontend
 
-PowerShell:
+Da PowerShell:
 
 ```powershell
-Set-Location "C:\percorso\Progetto-Albergo-22-07-corretto\frontend"
+Set-Location "C:\percorso\Progetto-Albergo-collega-ospite\frontend"
 npm.cmd install
 npm.cmd start
 ```
 
-CMD:
+Aprire:
 
-```cmd
-cd /d C:\percorso\Progetto-Albergo-22-07-corretto\frontend
-npm install
-npm start
-```
+`http://localhost:4200`
 
-Apri `http://localhost:4200`.
+Il comando `npm start` usa `proxy.conf.json` per inoltrare `/api` a Spring Boot sulla porta 8080.
 
-Se avevi già effettuato il login con una vecchia versione, fai logout e login di nuovo.
+## Staff demo
+
+- Email: `reception@albergo.it`
+- Password: `Staff123!`

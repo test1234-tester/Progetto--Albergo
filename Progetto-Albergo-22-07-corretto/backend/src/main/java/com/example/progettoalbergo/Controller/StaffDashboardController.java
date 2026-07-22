@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.example.progettoalbergo.Model.Camera;
+import com.example.progettoalbergo.Model.Ospite;
 import com.example.progettoalbergo.Model.PrenotazioneAlbergo;
 import com.example.progettoalbergo.Model.Utente;
 import com.example.progettoalbergo.Repository.CameraRepository;
+import com.example.progettoalbergo.Repository.OspiteRepository;
 import com.example.progettoalbergo.Repository.PagamentoRepository;
 import com.example.progettoalbergo.Repository.PrenotazioneAlbergoRepository;
 import com.example.progettoalbergo.Repository.UtenteRepository;
@@ -34,17 +36,20 @@ public class StaffDashboardController {
     private final CameraRepository cameraRepository;
     private final PrenotazioneAlbergoRepository prenotazioneRepository;
     private final UtenteRepository utenteRepository;
+    private final OspiteRepository ospiteRepository;
     private final PagamentoRepository pagamentoRepository;
     private final JwtUtil jwtUtil;
 
     public StaffDashboardController(CameraRepository cameraRepository,
             PrenotazioneAlbergoRepository prenotazioneRepository,
             UtenteRepository utenteRepository,
+            OspiteRepository ospiteRepository,
             PagamentoRepository pagamentoRepository,
             JwtUtil jwtUtil) {
         this.cameraRepository = cameraRepository;
         this.prenotazioneRepository = prenotazioneRepository;
         this.utenteRepository = utenteRepository;
+        this.ospiteRepository = ospiteRepository;
         this.pagamentoRepository = pagamentoRepository;
         this.jwtUtil = jwtUtil;
     }
@@ -120,12 +125,20 @@ public class StaffDashboardController {
                 : cameraRepository.findById(booking.getIdCamera()).orElse(null);
         Utente user = booking.getidUtente() == null ? null
                 : utenteRepository.findById(booking.getidUtente()).orElse(null);
+        Ospite guest = booking.getIdOspite() == null ? null
+                : ospiteRepository.findById(booking.getIdOspite()).orElse(null);
+
+        String cliente = user != null ? fullName(user)
+                : guest != null ? fullName(guest) : "Cliente non disponibile";
+        String email = user != null ? user.getEmail()
+                : guest != null ? guest.getEmail() : "";
 
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("id", booking.getIdPrenotazioneAlbergo());
         response.put("idUtente", booking.getidUtente());
-        response.put("cliente", user == null ? "Utente non disponibile" : fullName(user));
-        response.put("email", user == null ? "" : user.getEmail());
+        response.put("idOspite", booking.getIdOspite());
+        response.put("cliente", cliente);
+        response.put("email", email);
         response.put("camera", camera == null ? "Camera non disponibile" : camera.getNome());
         response.put("numeroCamera", booking.getIdCamera());
         response.put("dataArrivo", booking.getDataArrivo());
@@ -159,6 +172,11 @@ public class StaffDashboardController {
     private String fullName(Utente user) {
         return ((user.getNome() == null ? "" : user.getNome()) + " "
                 + (user.getCognome() == null ? "" : user.getCognome())).trim();
+    }
+
+    private String fullName(Ospite guest) {
+        return ((guest.getNome() == null ? "" : guest.getNome()) + " "
+                + (guest.getCognome() == null ? "" : guest.getCognome())).trim();
     }
 
     private boolean asBoolean(Object value) {

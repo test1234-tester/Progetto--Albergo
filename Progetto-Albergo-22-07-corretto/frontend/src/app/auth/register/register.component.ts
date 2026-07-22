@@ -32,6 +32,16 @@ export class RegisterComponent {
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly showPassword = signal(false);
+  readonly showConfirmPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update((value) => !value);
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword.update((value) => !value);
+  }
 
   readonly registerForm = this.fb.nonNullable.group(
     {

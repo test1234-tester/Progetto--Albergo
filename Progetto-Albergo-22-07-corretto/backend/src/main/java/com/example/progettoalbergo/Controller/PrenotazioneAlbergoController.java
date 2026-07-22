@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.example.progettoalbergo.Model.Ospite;
 import com.example.progettoalbergo.Model.PrenotazioneAlbergo;
 import com.example.progettoalbergo.Repository.CameraRepository;
+import com.example.progettoalbergo.Repository.OspiteRepository;
 import com.example.progettoalbergo.Repository.PrenotazioneAlbergoRepository;
 import com.example.progettoalbergo.Security.JwtUtil;
 import com.example.progettoalbergo.Services.PrenotazioneAlbergoHib;
@@ -35,15 +37,18 @@ public class PrenotazioneAlbergoController {
     private final PrenotazioneAlbergoHib service;
     private final PrenotazioneAlbergoRepository repository;
     private final CameraRepository cameraRepository;
+    private final OspiteRepository ospiteRepository;
     private final JwtUtil jwtUtil;
 
     public PrenotazioneAlbergoController(PrenotazioneAlbergoHib service,
             PrenotazioneAlbergoRepository repository,
             CameraRepository cameraRepository,
+            OspiteRepository ospiteRepository,
             JwtUtil jwtUtil) {
         this.service = service;
         this.repository = repository;
         this.cameraRepository = cameraRepository;
+        this.ospiteRepository = ospiteRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -88,6 +93,7 @@ public class PrenotazioneAlbergoController {
 
         PrenotazioneAlbergo booking = new PrenotazioneAlbergo();
         booking.setidUtente(userId);
+        booking.setIdOspite(null);
         booking.setIdCamera(roomId);
         booking.setDataPrenotazione(LocalDate.now());
         booking.setDataArrivo(checkIn);
@@ -104,6 +110,82 @@ public class PrenotazioneAlbergoController {
         response.put("checkOut", saved.getDataPartenza());
         response.put("guests", guests);
         response.put("stato", "IN_ATTESA");
+        return response;
+    }
+
+    // Prenotazione online senza account.
+    // Nessun DTO: il JSON viene letto come Map e l'ospite viene salvato nella tabella ospite.
+    @PostMapping("/prenotazioni/ospite")
+    public Map<String, Object> createGuestBooking(@RequestBody Map<String, Object> payload) {
+        Long roomId = asLong(payload == null ? null : payload.get("roomId"));
+        LocalDate checkIn = asDate(payload == null ? null : payload.get("checkIn"));
+        LocalDate checkOut = asDate(payload == null ? null : payload.get("checkOut"));
+        List<Map<String, String>> guests = guests(payload == null ? null : payload.get("guests"));
+        Map<String, String> guestData = stringMap(payload == null ? null : payload.get("ospite"));
+
+        if (roomId == null || checkIn == null || checkOut == null || !checkOut.isAfter(checkIn)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Date o camera non valide");
+        }
+        if (!cameraRepository.existsById(roomId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Camera non trovata");
+        }
+
+        String nome = clean(guestData.get("nome"));
+        String cognome = clean(guestData.get("cognome"));
+        String cellulare = clean(guestData.get("cellulare"));
+        String email = clean(guestData.get("email"));
+        if (nome.isBlank() || cognome.isBlank() || cellulare.isBlank() || email.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Nome, cognome, cellulare ed email sono obbligatori");
+        }
+
+        boolean occupied = repository.findAll().stream()
+                .filter(item -> roomId.equals(item.getIdCamera()))
+                .filter(item -> item.getDataArrivo() != null && item.getDataPartenza() != null)
+                .anyMatch(item -> item.getDataArrivo().isBefore(checkOut)
+                        && item.getDataPartenza().isAfter(checkIn));
+        if (occupied) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Camera gia' prenotata nelle date selezionate");
+        }
+
+        String nominativo = guests.stream()
+                .map(guest -> (clean(guest.get("nome")) + " " + clean(guest.get("cognome"))).trim())
+                .filter(value -> !value.isBlank())
+                .reduce((first, second) -> first + ", " + second)
+                .orElse("");
+        if (nominativo.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Inserisci almeno un ospite");
+        }
+
+        Ospite ospite = new Ospite();
+        ospite.setNome(nome);
+        ospite.setCognome(cognome);
+        ospite.setCellulare(cellulare);
+        ospite.setEmail(email.toLowerCase());
+        Ospite savedGuest = ospiteRepository.save(ospite);
+
+        PrenotazioneAlbergo booking = new PrenotazioneAlbergo();
+        booking.setidUtente(null);
+        booking.setIdOspite(savedGuest.getIdOspite());
+        booking.setIdCamera(roomId);
+        booking.setDataPrenotazione(LocalDate.now());
+        booking.setDataArrivo(checkIn);
+        booking.setDataPartenza(checkOut);
+        booking.setNominativo(nominativo);
+        booking.setStato(false);
+
+        PrenotazioneAlbergo saved = repository.save(booking);
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("id", saved.getIdPrenotazioneAlbergo());
+        response.put("roomId", saved.getIdCamera());
+        response.put("checkIn", saved.getDataArrivo());
+        response.put("checkOut", saved.getDataPartenza());
+        response.put("guests", guests);
+        response.put("stato", "IN_ATTESA");
+        response.put("ospiteId", savedGuest.getIdOspite());
         return response;
     }
 
@@ -202,6 +284,16 @@ public class PrenotazioneAlbergoController {
             guest.put("cognome", rawMap.get("cognome") == null ? "" : String.valueOf(rawMap.get("cognome")));
             result.add(guest);
         }
+        return result;
+    }
+
+    private Map<String, String> stringMap(Object value) {
+        if (!(value instanceof Map<?, ?> rawMap)) {
+            return Map.of();
+        }
+        Map<String, String> result = new LinkedHashMap<>();
+        rawMap.forEach((key, rawValue) ->
+                result.put(String.valueOf(key), rawValue == null ? "" : String.valueOf(rawValue)));
         return result;
     }
 

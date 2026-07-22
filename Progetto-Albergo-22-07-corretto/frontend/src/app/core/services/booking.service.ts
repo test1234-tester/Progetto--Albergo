@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Booking, BookingRequest } from '../models/booking.model';
+import { Booking, BookingRequest, GuestBookingRequest } from '../models/booking.model';
 
 @Injectable({ providedIn: 'root' })
 export class BookingService {
@@ -12,5 +12,9 @@ export class BookingService {
 
   createBooking(payload: BookingRequest): Observable<Booking> {
     return this.http.post<Booking>(this.baseUrl, payload);
+  }
+
+  createGuestBooking(payload: GuestBookingRequest): Observable<Booking> {
+    return this.http.post<Booking>(`${this.baseUrl}/ospite`, payload);
   }
 }

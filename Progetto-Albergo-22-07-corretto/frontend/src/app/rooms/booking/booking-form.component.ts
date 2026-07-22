@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { Room } from '../../core/models/room.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -13,7 +13,7 @@ import { RoomService } from '../../core/services/room.service';
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './booking-form.component.html',
   styleUrl: './booking-form.component.scss'
 })
@@ -29,7 +29,17 @@ export class BookingFormComponent implements OnInit {
   private readonly roomId = Number(this.route.snapshot.paramMap.get('id'));
   readonly checkIn = this.route.snapshot.queryParamMap.get('checkIn') ?? '';
   readonly checkOut = this.route.snapshot.queryParamMap.get('checkOut') ?? '';
+  readonly requestedAdults = Math.max(
+    1,
+    Number(this.route.snapshot.queryParamMap.get('adulti') ?? 1) || 1
+  );
+  readonly requestedChildren = Math.max(
+    0,
+    Number(this.route.snapshot.queryParamMap.get('bambini') ?? 0) || 0
+  );
+  readonly requestedGuestCount = Math.min(8, this.requestedAdults + this.requestedChildren);
   readonly nights = this.pricingService.nightsBetween(this.checkIn, this.checkOut);
+  readonly isCustomer = this.authService.isCustomer;
 
   readonly room = signal<Room | null>(null);
   readonly isLoadingRoom = signal(true);
@@ -38,9 +48,16 @@ export class BookingFormComponent implements OnInit {
   readonly missingDates = !this.checkIn || !this.checkOut;
 
   readonly bookingForm = this.fb.group({
-    trattamento: ['', Validators.required],
+    trattamento: ['COLAZIONE', Validators.required],
     spaAbbinata: [false],
     guests: this.fb.array([this.createGuestGroup()])
+  });
+
+  readonly anonymousForm = this.fb.nonNullable.group({
+    nome: ['', Validators.required],
+    cognome: ['', Validators.required],
+    cellulare: ['', [Validators.required, Validators.minLength(6)]],
+    email: ['', [Validators.required, Validators.email]]
   });
 
   get guests(): FormArray {
@@ -60,6 +77,10 @@ export class BookingFormComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    for (let index = 1; index < this.requestedGuestCount; index += 1) {
+      this.guests.push(this.createGuestGroup());
+    }
+
     this.roomService.getRoomById(this.roomId).subscribe({
       next: (room) => {
         this.room.set(room);
@@ -72,15 +93,10 @@ export class BookingFormComponent implements OnInit {
     });
   }
 
-  private createGuestGroup(): FormGroup {
-    return this.fb.group({
-      nome: ['', Validators.required],
-      cognome: ['', Validators.required]
-    });
-  }
-
   addGuest(): void {
-    this.guests.push(this.createGuestGroup());
+    if (this.guests.length < 8) {
+      this.guests.push(this.createGuestGroup());
+    }
   }
 
   removeGuest(index: number): void {
@@ -90,13 +106,10 @@ export class BookingFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.authService.isCustomer()) {
-      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
-      return;
-    }
-
-    if (this.bookingForm.invalid || this.missingDates) {
+    const anonymousInvalid = !this.isCustomer() && this.anonymousForm.invalid;
+    if (this.bookingForm.invalid || anonymousInvalid || this.missingDates) {
       this.bookingForm.markAllAsTouched();
+      if (!this.isCustomer()) this.anonymousForm.markAllAsTouched();
       if (this.missingDates) {
         this.errorMessage.set('Date mancanti: torna alla ricerca camere e riprova.');
       }
@@ -104,15 +117,24 @@ export class BookingFormComponent implements OnInit {
     }
 
     const guests = this.bookingForm.getRawValue().guests as { nome: string; cognome: string }[];
-    this.isSubmitting.set(true);
-    this.errorMessage.set(null);
-
-    this.bookingService.createBooking({
+    const basePayload = {
       roomId: this.roomId,
       checkIn: this.checkIn,
       checkOut: this.checkOut,
       guests
-    }).subscribe({
+    };
+
+    this.isSubmitting.set(true);
+    this.errorMessage.set(null);
+
+    const request$ = this.isCustomer()
+      ? this.bookingService.createBooking(basePayload)
+      : this.bookingService.createGuestBooking({
+          ...basePayload,
+          ospite: this.anonymousForm.getRawValue()
+        });
+
+    request$.subscribe({
       next: (booking) => {
         this.isSubmitting.set(false);
         this.router.navigate(['/prenotazioni', booking.id, 'pagamento'], {
@@ -123,12 +145,21 @@ export class BookingFormComponent implements OnInit {
         this.isSubmitting.set(false);
         if (error.status === 409) {
           this.errorMessage.set('Questa camera è già prenotata nelle date selezionate.');
+        } else if (error.status === 400) {
+          this.errorMessage.set('Controlla i dati inseriti e riprova.');
         } else if (error.status === 401 || error.status === 403) {
-          this.errorMessage.set('Sessione non valida: esci e rifai il login come cliente.');
+          this.errorMessage.set('Sessione non valida. Puoi uscire oppure continuare come ospite.');
         } else {
           this.errorMessage.set('Non è stato possibile salvare la prenotazione nel database.');
         }
       }
+    });
+  }
+
+  private createGuestGroup(): FormGroup {
+    return this.fb.group({
+      nome: ['', Validators.required],
+      cognome: ['', Validators.required]
     });
   }
 }

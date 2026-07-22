@@ -4,4 +4,6 @@ export interface Room {
   descrizione: string;
   immagine: string;
   prezzoPerNotte?: number;
+  stato?: boolean;
+  occupanti?: number;
 }

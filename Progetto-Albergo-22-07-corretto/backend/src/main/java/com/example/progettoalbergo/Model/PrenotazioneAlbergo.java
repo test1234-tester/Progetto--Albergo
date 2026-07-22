@@ -17,7 +17,12 @@ public class PrenotazioneAlbergo {
 	private Long idPrenotazioneAlbergo;
 	
 	@Column(name = "fk_prenotazione_utente")		//nome del campo nel db
-	private Long idUtente; 
+	private Long idUtente;
+
+	// Valorizzato solo per le prenotazioni online effettuate senza account.
+	@Column(name = "fk_prenotazione_ospite")
+	private Long idOspite;
+
 	@Column(name = "fk_prenotazione_camera")
 	private Long idCamera;	
 	@Column(name = "data_pr")
@@ -58,6 +63,14 @@ public class PrenotazioneAlbergo {
 
 	public void setidUtente(Long idUtente) {
 		this.idUtente = idUtente;
+	}
+
+	public Long getIdOspite() {
+		return idOspite;
+	}
+
+	public void setIdOspite(Long idOspite) {
+		this.idOspite = idOspite;
 	}
 
 	public Long getIdCamera() {

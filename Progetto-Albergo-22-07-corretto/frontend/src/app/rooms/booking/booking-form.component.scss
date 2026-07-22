@@ -1,0 +1,28 @@
+.booking-page {
+  min-height: calc(100vh - 72px);
+}
+
+.booking-card,
+.booking-summary {
+  border-radius: 14px;
+}
+
+.booking-summary {
+  position: sticky;
+  top: 1rem;
+}
+
+.guest-booking-note {
+  background: #f6f2e8;
+  border: 1px solid #dfd5bf;
+}
+
+.guest-card {
+  background: #fbfaf8;
+}
+
+@media (max-width: 991.98px) {
+  .booking-summary {
+    position: static;
+  }
+}

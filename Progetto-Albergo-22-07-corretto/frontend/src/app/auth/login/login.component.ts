@@ -26,6 +26,11 @@ export class LoginComponent {
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly showPassword = signal(false);
+
+  togglePassword(): void {
+    this.showPassword.update((value) => !value);
+  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {

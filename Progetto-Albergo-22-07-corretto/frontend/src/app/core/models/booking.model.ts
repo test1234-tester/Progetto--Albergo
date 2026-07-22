@@ -3,15 +3,22 @@ export interface Guest {
   cognome: string;
 }
 
-// Payload inviato a POST /prenotazioni
 export interface BookingRequest {
   roomId: number;
-  checkIn: string; // formato ISO yyyy-MM-dd
+  checkIn: string;
   checkOut: string;
   guests: Guest[];
 }
 
-// Stato gestito lato backend (scheduler annullamento 48h, Giorno 4)
+export interface GuestBookingRequest extends BookingRequest {
+  ospite: {
+    nome: string;
+    cognome: string;
+    cellulare: string;
+    email: string;
+  };
+}
+
 export type BookingStatus = 'IN_ATTESA' | 'CONFERMATA' | 'SCADUTA' | 'ANNULLATA';
 
 export interface Booking {

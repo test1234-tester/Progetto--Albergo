@@ -25,9 +25,16 @@
 
         <div class="mb-3">
           <label class="form-label" for="login-password">Password</label>
-          <input id="login-password" type="password" class="form-control" formControlName="password"
-            autocomplete="current-password"
-            [class.is-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched" />
+          <div class="password-field">
+            <input id="login-password" [type]="showPassword() ? 'text' : 'password'" class="form-control" formControlName="password"
+              autocomplete="current-password"
+              [class.is-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched" />
+            <button type="button" class="password-toggle" (click)="togglePassword()"
+              [attr.aria-label]="showPassword() ? 'Nascondi password' : 'Mostra password'"
+              [attr.title]="showPassword() ? 'Nascondi password' : 'Mostra password'">
+              {{ showPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
           @if (loginForm.controls.password.invalid && loginForm.controls.password.touched) {
             <p class="error">La password deve avere almeno 6 caratteri.</p>
           }

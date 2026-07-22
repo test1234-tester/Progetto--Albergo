@@ -31,13 +31,11 @@ export const routes: Routes = [
     path: 'stanze/:id/prenota',
     loadComponent: () =>
       import('./rooms/booking/booking-form.component').then((m) => m.BookingFormComponent),
-    canActivate: [authGuard, customerGuard],
     title: 'Prenota camera'
   },
   {
     path: 'prenotazioni/:id/pagamento',
     loadComponent: () => import('./payment/payment.component').then((m) => m.PaymentComponent),
-    canActivate: [authGuard, customerGuard],
     title: 'Pagamento caparra'
   },
   {

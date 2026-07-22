@@ -37,9 +37,16 @@
 
         <div class="mb-3">
           <label class="form-label" for="reg-password">Password</label>
-          <input id="reg-password" type="password" class="form-control" formControlName="password"
-            autocomplete="new-password"
-            [class.is-invalid]="registerForm.controls.password.invalid && registerForm.controls.password.touched" />
+          <div class="password-field">
+            <input id="reg-password" [type]="showPassword() ? 'text' : 'password'" class="form-control" formControlName="password"
+              autocomplete="new-password"
+              [class.is-invalid]="registerForm.controls.password.invalid && registerForm.controls.password.touched" />
+            <button type="button" class="password-toggle" (click)="togglePassword()"
+              [attr.aria-label]="showPassword() ? 'Nascondi password' : 'Mostra password'"
+              [attr.title]="showPassword() ? 'Nascondi password' : 'Mostra password'">
+              {{ showPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
           @if (registerForm.controls.password.invalid && registerForm.controls.password.touched) {
             <p class="error">La password deve avere almeno 6 caratteri.</p>
           }
@@ -47,9 +54,16 @@
 
         <div class="mb-3">
           <label class="form-label" for="reg-confirm">Conferma password</label>
-          <input id="reg-confirm" type="password" class="form-control" formControlName="confirmPassword"
-            autocomplete="new-password"
-            [class.is-invalid]="registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched" />
+          <div class="password-field">
+            <input id="reg-confirm" [type]="showConfirmPassword() ? 'text' : 'password'" class="form-control" formControlName="confirmPassword"
+              autocomplete="new-password"
+              [class.is-invalid]="registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched" />
+            <button type="button" class="password-toggle" (click)="toggleConfirmPassword()"
+              [attr.aria-label]="showConfirmPassword() ? 'Nascondi conferma password' : 'Mostra conferma password'"
+              [attr.title]="showConfirmPassword() ? 'Nascondi conferma password' : 'Mostra conferma password'">
+              {{ showConfirmPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
           @if (registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched) {
             <p class="error">Le password non coincidono.</p>
           }
