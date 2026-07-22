@@ -1,0 +1,52 @@
+<section class="auth-page d-flex align-items-center justify-content-center">
+  <div class="card auth-card shadow-sm">
+    <div class="card-body p-4 p-md-5">
+      <h1 class="auth-title mb-2">Accedi</h1>
+      <p class="text-center text-muted mb-4">Scegli l'area corretta prima di accedere.</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="access-switch mb-4" role="group" aria-label="Tipo di accesso">
+          <input id="area-cliente" type="radio" class="btn-check" formControlName="area" value="CLIENTE" />
+          <label class="btn btn-outline-dark" for="area-cliente">Cliente</label>
+
+          <input id="area-staff" type="radio" class="btn-check" formControlName="area" value="STAFF" />
+          <label class="btn btn-outline-dark" for="area-staff">Staff</label>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="login-email">Email</label>
+          <input id="login-email" type="email" class="form-control" formControlName="email"
+            autocomplete="email"
+            [class.is-invalid]="loginForm.controls.email.invalid && loginForm.controls.email.touched" />
+          @if (loginForm.controls.email.invalid && loginForm.controls.email.touched) {
+            <p class="error">Inserisci un'email valida.</p>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="login-password">Password</label>
+          <input id="login-password" type="password" class="form-control" formControlName="password"
+            autocomplete="current-password"
+            [class.is-invalid]="loginForm.controls.password.invalid && loginForm.controls.password.touched" />
+          @if (loginForm.controls.password.invalid && loginForm.controls.password.touched) {
+            <p class="error">La password deve avere almeno 6 caratteri.</p>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-danger py-2" role="alert">{{ errorMessage() }}</div>
+        }
+
+        <button type="submit" class="btn btn-primary w-100 mt-2" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Accesso in corso…' : 'Accedi' }}
+        </button>
+      </form>
+
+      @if (loginForm.controls.area.value === 'CLIENTE') {
+        <p class="auth-switch mt-4 mb-0">Non hai un account? <a routerLink="/register">Registrati</a></p>
+      } @else {
+        <p class="auth-switch mt-4 mb-0 text-muted">Accesso riservato al personale autorizzato.</p>
+      }
+    </div>
+  </div>
+</section>

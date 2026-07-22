@@ -1,0 +1,62 @@
+<section class="container py-5" style="max-width: 600px;">
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      
+      <h2 class="mb-4 fw-bold">Gestione Prenotazioni</h2>
+      
+      <!-- RIEPILOGO DATI BLINDATO (Sola Lettura) -->
+      <!-- Mostra le informazioni della camera e del soggiorno prendendole dal Signal -->
+      <div class="alert alert-dark bg-light border-0 text-dark mb-4">
+        <h5 class="fw-bold mb-1">{{ prenotazione().camera }}</h5>
+        <p class="mb-1 text-muted">Periodo: Dal {{ prenotazione().checkIn }} al {{ prenotazione().checkOut }}</p>
+        <p class="mb-1 text-muted">Importo Totale: <strong>{{ prenotazione().prezzoTotale }} €</strong></p>
+        <p class="mb-0 text-success fw-semibold">Stato: ● {{ prenotazione().stato }}</p>
+      </div>
+
+      <!-- BANNER DEL REGOLAMENTO AZIENDALE -->
+      <div class="bg-light p-3 rounded small border text-muted mb-4">
+        <strong>Regolamento Struttura:</strong> In conformità con le policy, è consentito esclusivamente il cambio del nominativo dell'ospite. Date, orari e tipologia di camera non sono modificabili. Qualora la prenotazione venga ceduta a una terza persona, perderai definitivamente ogni diritto di modifica sulla stessa.
+      </div>
+
+      <!-- MESSAGGIO DI FEEDBACK (Compare solo se c'è un testo nel Signal) -->
+      @if (messaggioInfo()) {
+        <div class="alert alert-info" role="alert">
+          {{ messaggioInfo() }}
+        </div>
+      }
+
+      <!-- BLOCCO CONDIZIONALE PRINCIPALE -->
+      <!-- SE l'utente ha ancora i diritti di proprietà, mostra il Form di modifica -->
+      @if (haDiritti()) {
+        <form [formGroup]="updateNameForm" (ngSubmit)="onUpdateNominativo()">
+          <h4 class="h6 fw-bold mb-3 text-uppercase tracking-wider text-muted">Cedi o Modifica Nominativo</h4>
+          
+          <div class="row g-3">
+            <!-- Campo Input Nuovo Nome -->
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Nuovo Nome</label>
+              <input type="text" class="form-control" formControlName="nuovoNome" placeholder="Es. Giovanni">
+            </div>
+            <!-- Campo Input Nuovo Cognome -->
+            <div class="col-6">
+              <label class="form-label small fw-semibold">Nuovo Cognome</label>
+              <input type="text" class="form-control" formControlName="nuovoCognome" placeholder="Es. Bianchi">
+            </div>
+          </div>
+
+          <!-- Pulsante di conferma: si disabilita se il form è vuoto o se sta già caricando -->
+          <button type="submit" class="btn btn-dark w-100 mt-4" [disabled]="updateNameForm.invalid || isSubmitting()">
+            {{ isSubmitting() ? 'Aggiornamento in corso...' : 'Conferma cambio ospite' }}
+          </button>
+        </form>
+      } 
+      <!-- ALTRIMENTI (Se haDiritti è diventato false), nascondi il form e mostra il lucchetto di blocco -->
+      @else {
+        <div class="alert alert-warning text-center mt-3" role="alert">
+          🔒 <strong>Accesso Bloccato:</strong> Hai trasferito questa prenotazione a terzi. Non hai più le autorizzazioni per accedere alle modifiche di questo soggiorno.
+        </div>
+      }
+
+    </div>
+  </div>
+</section>
