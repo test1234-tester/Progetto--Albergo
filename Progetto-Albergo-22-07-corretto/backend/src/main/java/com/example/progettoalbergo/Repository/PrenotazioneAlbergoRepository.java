@@ -9,4 +9,5 @@ import com.example.progettoalbergo.Model.PrenotazioneAlbergo;
 public interface PrenotazioneAlbergoRepository extends JpaRepository<PrenotazioneAlbergo, Long> {
     List<PrenotazioneAlbergo> findByIdUtenteOrderByDataArrivoDesc(Long idUtente);
     List<PrenotazioneAlbergo> findAllByOrderByDataArrivoAsc();
+    long countByIdOspite(Long idOspite);
 }

@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import {
-  FormArray,
+  AbstractControl,
   FormBuilder,
   FormGroup,
   FormsModule,
@@ -61,14 +61,18 @@ export class RoomsComponent implements OnInit {
   readonly filteredRooms = signal<RoomCard[]>([]);
 
   readonly guestContactForm = this.fb.nonNullable.group({
-    nome: ['', Validators.required],
-    cognome: ['', Validators.required],
-    cellulare: ['', [Validators.required, Validators.minLength(6)]],
+    nome: ['', [Validators.required, Validators.minLength(2)]],
+    cognome: ['', [Validators.required, Validators.minLength(2)]],
+    cellulare: ['', [Validators.required, Validators.pattern(/^[0-9+ ()-]{6,20}$/)]],
     email: ['', [Validators.required, Validators.email]]
   });
 
-  readonly guestsForm = this.fb.group({
-    guests: this.fb.array([this.createGuestGroup()])
+  // Dati carta usati solo per validazione dell'interfaccia: non vengono inviati al backend né salvati nel DB.
+  readonly cardPaymentForm = this.fb.nonNullable.group({
+    intestatario: ['', [Validators.required, Validators.minLength(2)]],
+    numeroCarta: ['', [Validators.required, Validators.pattern(/^(?:\d[ -]*?){13,19}$/)]],
+    scadenza: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]],
+    cvc: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]]
   });
 
   readonly serviziOpzionaliDisponibili: ServizioOpzionale[] = [
@@ -80,9 +84,6 @@ export class RoomsComponent implements OnInit {
     { id: 6, nome: 'Bottiglia di Champagne di Benvenuto', prezzo: 60 }
   ];
 
-  get guests(): FormArray {
-    return this.guestsForm.get('guests') as FormArray;
-  }
 
   readonly notti = computed(() => {
     if (!this.searchForm) return 1;
@@ -132,19 +133,27 @@ export class RoomsComponent implements OnInit {
       pacchettoSpa: [false]
     });
 
-    this.syncGuestFields(2);
     this.loadRooms();
   }
 
   onSearch(): void {
+    const checkOutControl = this.searchForm.get('checkOut');
+    if (checkOutControl?.hasError('dateOrder')) {
+      const { dateOrder: _dateOrder, ...remaining } = checkOutControl.errors ?? {};
+      checkOutControl.setErrors(Object.keys(remaining).length ? remaining : null);
+    }
+
     if (this.searchForm.invalid) {
       this.searchForm.markAllAsTouched();
+      this.errorMessage.set('Controlla i campi evidenziati in rosso.');
       return;
     }
 
     const checkIn = new Date(this.searchForm.get('checkIn')?.value);
     const checkOut = new Date(this.searchForm.get('checkOut')?.value);
     if (checkOut <= checkIn) {
+      checkOutControl?.setErrors({ ...(checkOutControl.errors ?? {}), dateOrder: true });
+      checkOutControl?.markAsTouched();
       this.errorMessage.set('La data di check-out deve essere successiva al check-in.');
       return;
     }
@@ -153,7 +162,6 @@ export class RoomsComponent implements OnInit {
     this.selectedRoom.set(null);
 
     const totaleOspiti = this.requestedGuests();
-    this.syncGuestFields(totaleOspiti);
     this.filteredRooms.set(this.allRooms().filter((room) => room.capienza >= totaleOspiti));
   }
 
@@ -161,12 +169,6 @@ export class RoomsComponent implements OnInit {
     this.selectedRoom.set(room);
     this.serviziOpzionaliScelti.set([]);
     this.errorMessage.set(null);
-    this.syncGuestFields(this.requestedGuests());
-
-    const user = this.authService.currentUser();
-    if (user && this.guests.length > 0) {
-      this.guests.at(0).patchValue({ nome: user.nome ?? '', cognome: user.cognome ?? '' });
-    }
   }
 
   deselezionaStanza(): void {
@@ -191,26 +193,37 @@ export class RoomsComponent implements OnInit {
     const room = this.selectedRoom();
     if (!room) return;
 
-    const anonymousInvalid = !this.authService.isCustomer() && this.guestContactForm.invalid;
-    if (this.guestsForm.invalid || anonymousInvalid) {
-      this.guestsForm.markAllAsTouched();
-      if (!this.authService.isCustomer()) this.guestContactForm.markAllAsTouched();
-      this.errorMessage.set('Compila i dati obbligatori prima di confermare la prenotazione.');
+    const isCustomer = this.authService.isCustomer();
+    if (!isCustomer && this.guestContactForm.invalid) {
+      this.guestContactForm.markAllAsTouched();
+      this.errorMessage.set('Controlla i campi evidenziati in rosso prima di confermare la prenotazione.');
+      return;
+    }
+
+    if (this.metodoPagamento() === 'carta' && this.cardPaymentForm.invalid) {
+      this.cardPaymentForm.markAllAsTouched();
+      this.errorMessage.set('Controlla i dati della carta evidenziati in rosso.');
       return;
     }
 
     const checkIn = String(this.searchForm.get('checkIn')?.value ?? '');
     const checkOut = String(this.searchForm.get('checkOut')?.value ?? '');
-    const guests = this.guestsForm.getRawValue().guests as { nome: string; cognome: string }[];
-    const basePayload = { roomId: room.idCamera, checkIn, checkOut, guests };
 
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
 
-    const request$ = this.authService.isCustomer()
-      ? this.bookingService.createBooking(basePayload)
+    const request$ = isCustomer
+      ? this.bookingService.createBooking({
+          roomId: room.idCamera,
+          checkIn,
+          checkOut,
+          numeroOspiti: this.requestedGuests()
+        })
       : this.bookingService.createGuestBooking({
-          ...basePayload,
+          roomId: room.idCamera,
+          checkIn,
+          checkOut,
+          numeroOspiti: this.requestedGuests(),
           ospite: this.guestContactForm.getRawValue()
         });
 
@@ -228,7 +241,11 @@ export class RoomsComponent implements OnInit {
         if (error.status === 409) {
           this.errorMessage.set('Questa camera non è più disponibile nelle date selezionate.');
         } else if (error.status === 400) {
-          this.errorMessage.set('Controlla i dati inseriti e riprova.');
+          if (!isCustomer) {
+            this.guestContactForm.markAllAsTouched();
+            this.applyServerFieldErrors(error);
+          }
+          this.errorMessage.set('Controlla i campi evidenziati in rosso e riprova.');
         } else if (error.status === 401 || error.status === 403) {
           this.errorMessage.set('La sessione non è valida. Esci oppure prenota senza account.');
         } else {
@@ -244,7 +261,7 @@ export class RoomsComponent implements OnInit {
     this.serviziOpzionaliScelti.set([]);
     this.errorMessage.set(null);
     this.guestContactForm.reset();
-    this.syncGuestFields(this.requestedGuests());
+    this.cardPaymentForm.reset();
   }
 
   onImgError(event: Event): void {
@@ -301,21 +318,24 @@ export class RoomsComponent implements OnInit {
     });
   }
 
-  private requestedGuests(): number {
+  requestedGuests(): number {
     const adulti = Number(this.searchForm?.get('adulti')?.value) || 1;
     const bambini = Number(this.searchForm?.get('bambini')?.value) || 0;
     return Math.max(1, Math.min(8, adulti + bambini));
   }
 
-  private syncGuestFields(count: number): void {
-    while (this.guests.length < count) this.guests.push(this.createGuestGroup());
-    while (this.guests.length > count) this.guests.removeAt(this.guests.length - 1);
+  isInvalid(control: AbstractControl | null): boolean {
+    return !!control && control.invalid && (control.touched || control.dirty);
   }
 
-  private createGuestGroup(): FormGroup {
-    return this.fb.group({
-      nome: ['', Validators.required],
-      cognome: ['', Validators.required]
-    });
+  private applyServerFieldErrors(error: HttpErrorResponse): void {
+    const message = String(error.error?.message ?? error.error?.detail ?? error.message ?? '').toLowerCase();
+    const fields: Array<keyof typeof this.guestContactForm.controls> = ['nome', 'cognome', 'cellulare', 'email'];
+
+    for (const field of fields) {
+      if (!message.includes(field)) continue;
+      const control = this.guestContactForm.controls[field];
+      control.setErrors({ ...(control.errors ?? {}), server: true });
+    }
   }
 }

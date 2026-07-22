@@ -1,16 +1,15 @@
-export interface Guest {
-  nome: string;
-  cognome: string;
-}
-
 export interface BookingRequest {
   roomId: number;
   checkIn: string;
   checkOut: string;
-  guests: Guest[];
+  numeroOspiti: number;
 }
 
-export interface GuestBookingRequest extends BookingRequest {
+export interface GuestBookingRequest {
+  roomId: number;
+  checkIn: string;
+  checkOut: string;
+  numeroOspiti: number;
   ospite: {
     nome: string;
     cognome: string;
@@ -26,6 +25,7 @@ export interface Booking {
   roomId: number;
   checkIn: string;
   checkOut: string;
-  guests: Guest[];
+  numeroOspiti?: number;
+  origine?: 'ONLINE_UTENTE' | 'ONLINE_OSPITE' | 'STRUTTURA';
   stato: BookingStatus;
 }

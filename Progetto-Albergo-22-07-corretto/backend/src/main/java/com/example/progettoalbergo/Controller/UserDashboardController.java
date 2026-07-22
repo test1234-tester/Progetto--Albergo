@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +22,12 @@ import com.example.progettoalbergo.Model.PrenotazioneAlbergo;
 import com.example.progettoalbergo.Model.Utente;
 import com.example.progettoalbergo.Repository.CameraRepository;
 import com.example.progettoalbergo.Repository.PrenotazioneAlbergoRepository;
+import com.example.progettoalbergo.Repository.PrenotazioneServizioRepository;
 import com.example.progettoalbergo.Repository.UtenteRepository;
 import com.example.progettoalbergo.Security.JwtUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -33,15 +36,18 @@ public class UserDashboardController {
 
     private final UtenteRepository utenteRepository;
     private final PrenotazioneAlbergoRepository prenotazioneRepository;
+    private final PrenotazioneServizioRepository prenotazioneServizioRepository;
     private final CameraRepository cameraRepository;
     private final JwtUtil jwtUtil;
 
     public UserDashboardController(UtenteRepository utenteRepository,
             PrenotazioneAlbergoRepository prenotazioneRepository,
+            PrenotazioneServizioRepository prenotazioneServizioRepository,
             CameraRepository cameraRepository,
             JwtUtil jwtUtil) {
         this.utenteRepository = utenteRepository;
         this.prenotazioneRepository = prenotazioneRepository;
+        this.prenotazioneServizioRepository = prenotazioneServizioRepository;
         this.cameraRepository = cameraRepository;
         this.jwtUtil = jwtUtil;
     }
@@ -81,17 +87,30 @@ public class UserDashboardController {
             @RequestBody Map<String, Object> payload,
             HttpServletRequest request) {
         Long userId = authenticatedCustomerId(request);
+        PrenotazioneAlbergo booking = ownedBooking(bookingId, userId);
+
+        booking.setNominativo(required(text(payload, "nominativo"), "Il nominativo e' obbligatorio"));
+        return bookingResponse(prenotazioneRepository.save(booking));
+    }
+
+    @Transactional
+    @DeleteMapping("/bookings/{bookingId}")
+    public void deleteBooking(@PathVariable Long bookingId, HttpServletRequest request) {
+        Long userId = authenticatedCustomerId(request);
+        PrenotazioneAlbergo booking = ownedBooking(bookingId, userId);
+        prenotazioneServizioRepository.deleteByIdPrenotazioneAlbergo(bookingId);
+        prenotazioneRepository.delete(booking);
+    }
+
+    private PrenotazioneAlbergo ownedBooking(Long bookingId, Long userId) {
         PrenotazioneAlbergo booking = prenotazioneRepository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Prenotazione non trovata"));
-
         if (!userId.equals(booking.getidUtente())) {
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "Non puoi modificare questa prenotazione");
         }
-
-        booking.setNominativo(required(text(payload, "nominativo"), "Il nominativo e' obbligatorio"));
-        return bookingResponse(prenotazioneRepository.save(booking));
+        return booking;
     }
 
     private Long authenticatedCustomerId(HttpServletRequest request) {
@@ -145,6 +164,8 @@ public class UserDashboardController {
         response.put("dataArrivo", booking.getDataArrivo());
         response.put("dataPartenza", booking.getDataPartenza());
         response.put("nominativo", booking.getNominativo());
+        response.put("numeroOspiti", booking.getNumeroOspiti() > 0 ? booking.getNumeroOspiti() : 1);
+        response.put("origine", booking.getOrigine() == null ? "ONLINE_UTENTE" : booking.getOrigine());
         response.put("confermata", booking.isStato());
         response.put("prezzoPerNotte", pricePerNight);
         response.put("totaleStimato", estimatedTotal);

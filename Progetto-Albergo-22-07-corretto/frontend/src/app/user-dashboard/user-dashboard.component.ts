@@ -1,20 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 
 import {
   UserDashboardBooking,
   UserDashboardData
 } from '../core/models/user-dashboard.model';
-import { UserDashboardService } from '../core/services/user-dashboard.service';
 import { AuthService } from '../core/services/auth.service';
+import { UserDashboardService } from '../core/services/user-dashboard.service';
 
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, MatButtonModule],
   templateUrl: './user-dashboard.component.html',
   styleUrl: './user-dashboard.component.scss'
 })
@@ -27,6 +28,7 @@ export class UserDashboardComponent implements OnInit {
   readonly isLoading = signal(true);
   readonly isSavingProfile = signal(false);
   readonly isSavingBooking = signal(false);
+  readonly deletingBookingId = signal<number | null>(null);
   readonly editingBookingId = signal<number | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
@@ -43,18 +45,22 @@ export class UserDashboardComponent implements OnInit {
   );
 
   readonly profileForm = this.fb.nonNullable.group({
-    nome: ['', Validators.required],
-    cognome: ['', Validators.required],
-    username: ['', Validators.required],
-    cellulare: ['']
+    nome: ['', [Validators.required, Validators.minLength(2)]],
+    cognome: ['', [Validators.required, Validators.minLength(2)]],
+    username: ['', [Validators.required, Validators.minLength(3)]],
+    cellulare: ['', Validators.pattern(/^[0-9+ ()-]{6,20}$/)]
   });
 
   readonly bookingNameForm = this.fb.nonNullable.group({
-    nominativo: ['', Validators.required]
+    nominativo: ['', [Validators.required, Validators.minLength(2)]]
   });
 
   ngOnInit(): void {
     this.loadDashboard();
+  }
+
+  isInvalid(control: AbstractControl | null): boolean {
+    return !!control && control.invalid && (control.touched || control.dirty);
   }
 
   loadDashboard(): void {
@@ -88,8 +94,10 @@ export class UserDashboardComponent implements OnInit {
   }
 
   saveProfile(): void {
+    this.clearProfileServerErrors();
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
+      this.errorMessage.set('Controlla i campi evidenziati in rosso.');
       return;
     }
 
@@ -103,8 +111,13 @@ export class UserDashboardComponent implements OnInit {
         this.successMessage.set('Profilo aggiornato nel database.');
         this.isSavingProfile.set(false);
       },
-      error: () => {
-        this.errorMessage.set('Non è stato possibile aggiornare il profilo.');
+      error: (error: HttpErrorResponse) => {
+        if (error.status === 400) {
+          this.applyProfileServerErrors(error);
+          this.errorMessage.set('Controlla i campi evidenziati in rosso.');
+        } else {
+          this.errorMessage.set('Non è stato possibile aggiornare il profilo.');
+        }
         this.isSavingProfile.set(false);
       }
     });
@@ -124,6 +137,7 @@ export class UserDashboardComponent implements OnInit {
   saveBookingName(bookingId: number): void {
     if (this.bookingNameForm.invalid) {
       this.bookingNameForm.markAllAsTouched();
+      this.errorMessage.set('Controlla il nominativo evidenziato in rosso.');
       return;
     }
 
@@ -145,14 +159,71 @@ export class UserDashboardComponent implements OnInit {
               : current
           );
           this.editingBookingId.set(null);
-          this.successMessage.set('Nominativo aggiornato nel database.');
+          this.successMessage.set('Prenotazione aggiornata nel database.');
           this.isSavingBooking.set(false);
         },
-        error: () => {
-          this.errorMessage.set('Non è stato possibile modificare questa prenotazione.');
+        error: (error: HttpErrorResponse) => {
+          if (error.status === 400) {
+            this.bookingNameForm.controls.nominativo.setErrors({
+              ...(this.bookingNameForm.controls.nominativo.errors ?? {}),
+              server: true
+            });
+            this.errorMessage.set('Controlla il nominativo evidenziato in rosso.');
+          } else {
+            this.errorMessage.set('Non è stato possibile modificare questa prenotazione.');
+          }
           this.isSavingBooking.set(false);
         }
       });
+  }
+
+  deleteBooking(booking: UserDashboardBooking): void {
+    const confirmed = window.confirm(
+      `Vuoi cancellare definitivamente la prenotazione #${booking.id} per ${booking.camera}?`
+    );
+    if (!confirmed) return;
+
+    this.deletingBookingId.set(booking.id);
+    this.clearMessages();
+    this.dashboardService.deleteBooking(booking.id).subscribe({
+      next: () => {
+        this.dashboard.update((current) =>
+          current
+            ? { ...current, bookings: current.bookings.filter((item) => item.id !== booking.id) }
+            : current
+        );
+        this.editingBookingId.set(null);
+        this.deletingBookingId.set(null);
+        this.successMessage.set('Prenotazione cancellata definitivamente dal database.');
+      },
+      error: (error: HttpErrorResponse) => {
+        this.deletingBookingId.set(null);
+        this.errorMessage.set(
+          error.status === 409
+            ? 'La prenotazione non può essere cancellata perché contiene dati collegati.'
+            : 'Non è stato possibile cancellare la prenotazione.'
+        );
+      }
+    });
+  }
+
+  private applyProfileServerErrors(error: HttpErrorResponse): void {
+    const message = String(error.error?.message ?? error.error?.detail ?? error.message ?? '').toLowerCase();
+    const fields: Array<keyof typeof this.profileForm.controls> = ['nome', 'cognome', 'username', 'cellulare'];
+    for (const field of fields) {
+      if (message.includes(field)) {
+        const control = this.profileForm.controls[field];
+        control.setErrors({ ...(control.errors ?? {}), server: true });
+      }
+    }
+  }
+
+  private clearProfileServerErrors(): void {
+    for (const control of Object.values(this.profileForm.controls)) {
+      if (!control.errors?.['server']) continue;
+      const { server: _server, ...remaining } = control.errors;
+      control.setErrors(Object.keys(remaining).length ? remaining : null);
+    }
   }
 
   private clearMessages(): void {

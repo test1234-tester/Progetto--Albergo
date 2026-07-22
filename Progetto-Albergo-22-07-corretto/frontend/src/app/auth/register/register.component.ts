@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
@@ -7,6 +8,7 @@ import {
   ValidatorFn,
   Validators
 } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -21,7 +23,7 @@ function passwordsMatchValidator(): ValidatorFn {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MatButtonModule],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
@@ -45,10 +47,10 @@ export class RegisterComponent {
 
   readonly registerForm = this.fb.nonNullable.group(
     {
-      nome: ['', Validators.required],
-      cognome: ['', Validators.required],
-      username: ['', Validators.required],
-      cellulare: ['', Validators.required],
+      nome: ['', [Validators.required, Validators.minLength(2)]],
+      cognome: ['', [Validators.required, Validators.minLength(2)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      cellulare: ['', [Validators.required, Validators.pattern(/^[0-9+ ()-]{6,20}$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required]
@@ -71,14 +73,40 @@ export class RegisterComponent {
         this.isSubmitting.set(false);
         this.router.navigate(['/area-personale']);
       },
-      error: (error) => {
+      error: (error: HttpErrorResponse) => {
         this.isSubmitting.set(false);
+        this.applyServerErrors(error);
         this.errorMessage.set(
           error.status === 409
             ? 'Questa email è già registrata.'
-            : 'Registrazione non riuscita. Controlla i dati o la connessione.'
+            : error.status === 400
+              ? 'Controlla i campi evidenziati in rosso.'
+              : 'Registrazione non riuscita. Controlla i dati o la connessione.'
         );
       }
     });
   }
+  private applyServerErrors(error: HttpErrorResponse): void {
+    const message = String(error.error?.message ?? error.error?.detail ?? error.message ?? '').toLowerCase();
+
+    if (error.status === 409 || message.includes('email')) {
+      this.registerForm.controls.email.setErrors({
+        ...(this.registerForm.controls.email.errors ?? {}),
+        server: true
+      });
+      this.registerForm.controls.email.markAsTouched();
+    }
+
+    const fields: Array<keyof typeof this.registerForm.controls> = [
+      'nome', 'cognome', 'username', 'cellulare', 'email', 'password'
+    ];
+    for (const field of fields) {
+      if (message.includes(field)) {
+        const control = this.registerForm.controls[field];
+        control.setErrors({ ...(control.errors ?? {}), server: true });
+        control.markAsTouched();
+      }
+    }
+  }
+
 }

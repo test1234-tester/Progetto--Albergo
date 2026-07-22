@@ -29,4 +29,8 @@ export class UserDashboardService {
       { nominativo }
     );
   }
+
+  deleteBooking(bookingId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/bookings/${bookingId}`);
+  }
 }

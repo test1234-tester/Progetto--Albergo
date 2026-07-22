@@ -1,8 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 
 import { Room } from '../../core/models/room.model';
 import { AuthService } from '../../core/services/auth.service';
@@ -13,7 +15,7 @@ import { RoomService } from '../../core/services/room.service';
 @Component({
   selector: 'app-booking-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, MatButtonModule],
   templateUrl: './booking-form.component.html',
   styleUrl: './booking-form.component.scss'
 })
@@ -29,14 +31,8 @@ export class BookingFormComponent implements OnInit {
   private readonly roomId = Number(this.route.snapshot.paramMap.get('id'));
   readonly checkIn = this.route.snapshot.queryParamMap.get('checkIn') ?? '';
   readonly checkOut = this.route.snapshot.queryParamMap.get('checkOut') ?? '';
-  readonly requestedAdults = Math.max(
-    1,
-    Number(this.route.snapshot.queryParamMap.get('adulti') ?? 1) || 1
-  );
-  readonly requestedChildren = Math.max(
-    0,
-    Number(this.route.snapshot.queryParamMap.get('bambini') ?? 0) || 0
-  );
+  readonly requestedAdults = Math.max(1, Number(this.route.snapshot.queryParamMap.get('adulti') ?? 1) || 1);
+  readonly requestedChildren = Math.max(0, Number(this.route.snapshot.queryParamMap.get('bambini') ?? 0) || 0);
   readonly requestedGuestCount = Math.min(8, this.requestedAdults + this.requestedChildren);
   readonly nights = this.pricingService.nightsBetween(this.checkIn, this.checkOut);
   readonly isCustomer = this.authService.isCustomer;
@@ -49,20 +45,15 @@ export class BookingFormComponent implements OnInit {
 
   readonly bookingForm = this.fb.group({
     trattamento: ['COLAZIONE', Validators.required],
-    spaAbbinata: [false],
-    guests: this.fb.array([this.createGuestGroup()])
+    spaAbbinata: [false]
   });
 
   readonly anonymousForm = this.fb.nonNullable.group({
-    nome: ['', Validators.required],
-    cognome: ['', Validators.required],
-    cellulare: ['', [Validators.required, Validators.minLength(6)]],
+    nome: ['', [Validators.required, Validators.minLength(2)]],
+    cognome: ['', [Validators.required, Validators.minLength(2)]],
+    cellulare: ['', [Validators.required, Validators.pattern(/^[0-9+ ()-]{6,20}$/)]],
     email: ['', [Validators.required, Validators.email]]
   });
-
-  get guests(): FormArray {
-    return this.bookingForm.get('guests') as FormArray;
-  }
 
   private readonly spaAbbinata = toSignal(this.bookingForm.controls.spaAbbinata.valueChanges, {
     initialValue: false
@@ -77,10 +68,6 @@ export class BookingFormComponent implements OnInit {
   );
 
   ngOnInit(): void {
-    for (let index = 1; index < this.requestedGuestCount; index += 1) {
-      this.guests.push(this.createGuestGroup());
-    }
-
     this.roomService.getRoomById(this.roomId).subscribe({
       next: (room) => {
         this.room.set(room);
@@ -93,44 +80,43 @@ export class BookingFormComponent implements OnInit {
     });
   }
 
-  addGuest(): void {
-    if (this.guests.length < 8) {
-      this.guests.push(this.createGuestGroup());
-    }
-  }
-
-  removeGuest(index: number): void {
-    if (this.guests.length > 1) {
-      this.guests.removeAt(index);
-    }
+  isInvalid(control: AbstractControl | null): boolean {
+    return !!control && control.invalid && (control.touched || control.dirty);
   }
 
   onSubmit(): void {
-    const anonymousInvalid = !this.isCustomer() && this.anonymousForm.invalid;
-    if (this.bookingForm.invalid || anonymousInvalid || this.missingDates) {
-      this.bookingForm.markAllAsTouched();
-      if (!this.isCustomer()) this.anonymousForm.markAllAsTouched();
-      if (this.missingDates) {
-        this.errorMessage.set('Date mancanti: torna alla ricerca camere e riprova.');
-      }
+    const isCustomer = this.isCustomer();
+
+    if (this.missingDates) {
+      this.errorMessage.set('Date mancanti: torna alla ricerca camere e riprova.');
       return;
     }
 
-    const guests = this.bookingForm.getRawValue().guests as { nome: string; cognome: string }[];
-    const basePayload = {
-      roomId: this.roomId,
-      checkIn: this.checkIn,
-      checkOut: this.checkOut,
-      guests
-    };
+    if (this.bookingForm.invalid || (!isCustomer && this.anonymousForm.invalid)) {
+      this.bookingForm.markAllAsTouched();
+      if (!isCustomer) {
+        this.anonymousForm.markAllAsTouched();
+      }
+      this.errorMessage.set('Controlla i campi evidenziati in rosso.');
+      return;
+    }
 
     this.isSubmitting.set(true);
     this.errorMessage.set(null);
+    this.clearServerErrors();
 
-    const request$ = this.isCustomer()
-      ? this.bookingService.createBooking(basePayload)
+    const request$ = isCustomer
+      ? this.bookingService.createBooking({
+          roomId: this.roomId,
+          checkIn: this.checkIn,
+          checkOut: this.checkOut,
+          numeroOspiti: this.requestedGuestCount
+        })
       : this.bookingService.createGuestBooking({
-          ...basePayload,
+          roomId: this.roomId,
+          checkIn: this.checkIn,
+          checkOut: this.checkOut,
+          numeroOspiti: this.requestedGuestCount,
           ospite: this.anonymousForm.getRawValue()
         });
 
@@ -143,23 +129,58 @@ export class BookingFormComponent implements OnInit {
       },
       error: (error: HttpErrorResponse) => {
         this.isSubmitting.set(false);
+
         if (error.status === 409) {
           this.errorMessage.set('Questa camera è già prenotata nelle date selezionate.');
-        } else if (error.status === 400) {
-          this.errorMessage.set('Controlla i dati inseriti e riprova.');
-        } else if (error.status === 401 || error.status === 403) {
-          this.errorMessage.set('Sessione non valida. Puoi uscire oppure continuare come ospite.');
-        } else {
-          this.errorMessage.set('Non è stato possibile salvare la prenotazione nel database.');
+          return;
         }
+
+        if (error.status === 401 || error.status === 403) {
+          this.errorMessage.set('Sessione non valida. Esci e accedi di nuovo, oppure continua come ospite.');
+          return;
+        }
+
+        if (error.status === 400) {
+          if (!isCustomer) {
+            this.anonymousForm.markAllAsTouched();
+            this.applyServerFieldErrors(error);
+          }
+          this.errorMessage.set('Controlla i campi evidenziati in rosso e riprova.');
+          return;
+        }
+
+        this.errorMessage.set('Non è stato possibile salvare la prenotazione nel database.');
       }
     });
   }
 
-  private createGuestGroup(): FormGroup {
-    return this.fb.group({
-      nome: ['', Validators.required],
-      cognome: ['', Validators.required]
-    });
+  private applyServerFieldErrors(error: HttpErrorResponse): void {
+    const message = String(error.error?.message ?? error.error?.detail ?? error.message ?? '').toLowerCase();
+    const fields: Array<keyof typeof this.anonymousForm.controls> = ['nome', 'cognome', 'cellulare', 'email'];
+
+    let matched = false;
+    for (const field of fields) {
+      if (message.includes(field)) {
+        const control = this.anonymousForm.controls[field];
+        control.setErrors({ ...(control.errors ?? {}), server: true });
+        matched = true;
+      }
+    }
+
+    // Se il backend non indica il campo preciso, evidenziamo solo quelli già invalidi.
+    // Se tutti sono formalmente validi, segnaliamo l'intero blocco senza inventare un campo.
+    if (!matched) {
+      this.anonymousForm.updateValueAndValidity({ emitEvent: false });
+    }
+  }
+
+  private clearServerErrors(): void {
+    for (const control of Object.values(this.anonymousForm.controls)) {
+      if (!control.errors?.['server']) {
+        continue;
+      }
+      const { server: _server, ...remainingErrors } = control.errors;
+      control.setErrors(Object.keys(remainingErrors).length ? remainingErrors : null);
+    }
   }
 }

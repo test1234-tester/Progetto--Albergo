@@ -9,16 +9,16 @@
       <div>
         <span class="eyebrow">Area cliente</span>
         <h1 class="mb-1">Bentornato/a, {{ data.profile.nome }}</h1>
-        <p class="text-muted mb-0">Qui trovi il tuo profilo e soltanto le tue prenotazioni.</p>
+        <p class="text-muted mb-0">Qui trovi il tuo profilo e soltanto le prenotazioni collegate al tuo account.</p>
       </div>
-      <a class="btn btn-dark" routerLink="/stanze">Prenota una camera</a>
+      <a mat-flat-button class="hotel-primary" routerLink="/stanze">Prenota una camera</a>
     </header>
 
     @if (errorMessage()) {
-      <div class="alert alert-danger">{{ errorMessage() }}</div>
+      <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div>
     }
     @if (successMessage()) {
-      <div class="alert alert-success">{{ successMessage() }}</div>
+      <div class="alert alert-success" role="status">{{ successMessage() }}</div>
     }
 
     <div class="summary-grid mb-4">
@@ -30,25 +30,50 @@
     <div class="dashboard-layout">
       <aside class="dashboard-card profile-card">
         <span class="eyebrow">Dati personali</span>
-        <h2 class="h4 mb-4">Il mio profilo</h2>
+        <h2 class="h4 mb-2">Il mio profilo</h2>
+        <p class="required-note"><span class="required-star">*</span> Campi obbligatori</p>
 
-        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
           <div class="row g-3">
             <div class="col-md-6">
-              <label class="form-label" for="dashboard-nome">Nome</label>
-              <input id="dashboard-nome" class="form-control" formControlName="nome" />
+              <label class="form-label" for="dashboard-nome">Nome <span class="required-star">*</span></label>
+              <input id="dashboard-nome" class="form-control" [class.is-invalid]="isInvalid(profileForm.controls.nome)" formControlName="nome" />
+              @if (isInvalid(profileForm.controls.nome)) {
+                <div class="invalid-feedback d-block">
+                  @if (profileForm.controls.nome.hasError('required')) { Il nome è obbligatorio. }
+                  @else if (profileForm.controls.nome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                  @else { Controlla il nome inserito. }
+                </div>
+              }
             </div>
             <div class="col-md-6">
-              <label class="form-label" for="dashboard-cognome">Cognome</label>
-              <input id="dashboard-cognome" class="form-control" formControlName="cognome" />
+              <label class="form-label" for="dashboard-cognome">Cognome <span class="required-star">*</span></label>
+              <input id="dashboard-cognome" class="form-control" [class.is-invalid]="isInvalid(profileForm.controls.cognome)" formControlName="cognome" />
+              @if (isInvalid(profileForm.controls.cognome)) {
+                <div class="invalid-feedback d-block">
+                  @if (profileForm.controls.cognome.hasError('required')) { Il cognome è obbligatorio. }
+                  @else if (profileForm.controls.cognome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                  @else { Controlla il cognome inserito. }
+                </div>
+              }
             </div>
             <div class="col-12">
-              <label class="form-label" for="dashboard-username">Username</label>
-              <input id="dashboard-username" class="form-control" formControlName="username" />
+              <label class="form-label" for="dashboard-username">Username <span class="required-star">*</span></label>
+              <input id="dashboard-username" class="form-control" [class.is-invalid]="isInvalid(profileForm.controls.username)" formControlName="username" />
+              @if (isInvalid(profileForm.controls.username)) {
+                <div class="invalid-feedback d-block">
+                  @if (profileForm.controls.username.hasError('required')) { Lo username è obbligatorio. }
+                  @else if (profileForm.controls.username.hasError('minlength')) { Inserisci almeno 3 caratteri. }
+                  @else { Controlla lo username inserito. }
+                </div>
+              }
             </div>
             <div class="col-12">
               <label class="form-label" for="dashboard-cellulare">Cellulare</label>
-              <input id="dashboard-cellulare" class="form-control" formControlName="cellulare" />
+              <input id="dashboard-cellulare" class="form-control" [class.is-invalid]="isInvalid(profileForm.controls.cellulare)" formControlName="cellulare" />
+              @if (isInvalid(profileForm.controls.cellulare)) {
+                <div class="invalid-feedback d-block">Inserisci un numero di telefono valido.</div>
+              }
             </div>
             <div class="col-12">
               <label class="form-label">Email</label>
@@ -56,7 +81,7 @@
             </div>
           </div>
 
-          <button class="btn btn-dark w-100 mt-4" type="submit" [disabled]="isSavingProfile()">
+          <button mat-flat-button class="hotel-primary w-100 mt-4" type="submit" [disabled]="isSavingProfile()">
             {{ isSavingProfile() ? 'Salvataggio…' : 'Salva modifiche' }}
           </button>
         </form>
@@ -71,8 +96,8 @@
         @if (data.bookings.length === 0) {
           <div class="dashboard-card empty-state">
             <h3 class="h5">Nessuna prenotazione salvata</h3>
-            <p class="text-muted">Le nuove prenotazioni effettuate dal sito compariranno qui.</p>
-            <a class="btn btn-dark" routerLink="/stanze">Consulta le camere</a>
+            <p class="text-muted">Le nuove prenotazioni effettuate con questo account compariranno qui.</p>
+            <a mat-stroked-button routerLink="/stanze">Consulta le camere</a>
           </div>
         } @else {
           <div class="booking-list">
@@ -104,24 +129,48 @@
                     </div>
 
                     <div class="booking-details">
-                      <span><strong>Ospiti:</strong> {{ booking.nominativo || '—' }}</span>
+                      <span><strong>Intestatario:</strong> {{ booking.nominativo || '—' }}</span>
                       <span><strong>Camera:</strong> #{{ booking.idCamera ?? '—' }}</span>
                       <span><strong>Totale:</strong> {{ booking.totaleStimato == null ? '—' : (booking.totaleStimato | currency: 'EUR') }}</span>
                     </div>
 
                     @if (editingBookingId() === booking.id) {
-                      <form class="booking-edit" [formGroup]="bookingNameForm" (ngSubmit)="saveBookingName(booking.id)">
-                        <label class="form-label" [for]="'booking-name-' + booking.id">Modifica nominativo ospiti</label>
-                        <div class="input-group">
-                          <input [id]="'booking-name-' + booking.id" class="form-control" formControlName="nominativo" />
-                          <button class="btn btn-dark" type="submit" [disabled]="isSavingBooking()">Salva</button>
-                          <button class="btn btn-outline-secondary" type="button" (click)="cancelBookingEdit()">Annulla</button>
+                      <form class="booking-edit" [formGroup]="bookingNameForm" (ngSubmit)="saveBookingName(booking.id)" novalidate>
+                        <label class="form-label" [for]="'booking-name-' + booking.id">
+                          Nominativo prenotazione <span class="required-star">*</span>
+                        </label>
+                        <input
+                          [id]="'booking-name-' + booking.id"
+                          class="form-control"
+                          [class.is-invalid]="isInvalid(bookingNameForm.controls.nominativo)"
+                          formControlName="nominativo"
+                        />
+                        @if (isInvalid(bookingNameForm.controls.nominativo)) {
+                          <div class="invalid-feedback d-block mb-3">
+                            @if (bookingNameForm.controls.nominativo.hasError('required')) { Il nominativo è obbligatorio. }
+                            @else { Inserisci un nominativo valido. }
+                          </div>
+                        }
+                        <div class="booking-actions">
+                          <button mat-flat-button class="hotel-primary" type="submit" [disabled]="isSavingBooking()">Salva</button>
+                          <button mat-stroked-button type="button" (click)="cancelBookingEdit()">Annulla</button>
                         </div>
                       </form>
                     } @else {
-                      <button class="btn btn-sm btn-outline-dark" type="button" (click)="startBookingEdit(booking)">
-                        Modifica nominativo
-                      </button>
+                      <div class="booking-actions">
+                        <button mat-stroked-button type="button" (click)="startBookingEdit(booking)">
+                          Modifica prenotazione
+                        </button>
+                        <button
+                          mat-flat-button
+                          class="hotel-danger"
+                          type="button"
+                          [disabled]="deletingBookingId() === booking.id"
+                          (click)="deleteBooking(booking)"
+                        >
+                          {{ deletingBookingId() === booking.id ? 'Cancellazione…' : 'Cancella prenotazione' }}
+                        </button>
+                      </div>
                     }
                   </div>
                 </div>

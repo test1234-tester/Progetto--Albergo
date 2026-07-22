@@ -6,9 +6,12 @@ export interface StaffStats {
   pagamentiInPendenza: number;
 }
 
+export type BookingOrigin = 'ONLINE_UTENTE' | 'ONLINE_OSPITE' | 'STRUTTURA' | 'NON_SPECIFICATA';
+
 export interface StaffBooking {
   id: number;
   idUtente: number | null;
+  idOspite?: number | null;
   cliente: string;
   email: string;
   camera: string;
@@ -16,6 +19,8 @@ export interface StaffBooking {
   dataArrivo: string | null;
   dataPartenza: string | null;
   nominativo: string;
+  numeroOspiti: number;
+  origine: BookingOrigin;
   confermata: boolean;
 }
 
@@ -41,4 +46,26 @@ export interface StaffDashboard {
   bookings: StaffBooking[];
   rooms: StaffRoom[];
   users: StaffUser[];
+}
+
+export interface PhysicalBookingRequest {
+  roomId: number;
+  checkIn: string;
+  checkOut: string;
+  numeroOspiti: number;
+  ospite: {
+    nome: string;
+    cognome: string;
+    cellulare: string;
+    email: string;
+  };
+}
+
+export interface StaffBookingUpdate {
+  roomId: number;
+  checkIn: string;
+  checkOut: string;
+  numeroOspiti: number;
+  nominativo: string;
+  confermata: boolean;
 }

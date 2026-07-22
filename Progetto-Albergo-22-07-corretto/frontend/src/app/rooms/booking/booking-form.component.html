@@ -21,49 +21,127 @@
           @if (!isCustomer()) {
             <div class="guest-booking-note mb-4 p-3 rounded">
               <strong>Prenota senza registrarti</strong>
-              <p class="mb-1 small">Non serve creare un account. Inserisci soltanto i dati di contatto per la prenotazione.</p>
+              <p class="mb-1 small">Inserisci soltanto i dati dell'intestatario. Non chiediamo i dati personali degli altri partecipanti.</p>
               <small>Hai già un account? <a routerLink="/login">Accedi</a> per ritrovare la prenotazione nella tua Area personale.</small>
             </div>
 
-            <form [formGroup]="anonymousForm" class="mb-4">
-              <h2 class="h5 fw-bold">Dati di contatto</h2>
+            <form [formGroup]="anonymousForm" class="mb-4" novalidate>
+              <h2 class="h5 fw-bold">Dati dell'intestatario</h2>
+              <p class="required-note"><span class="required-star">*</span> Campi obbligatori</p>
+
               <div class="row g-3">
                 <div class="col-12 col-md-6">
-                  <label class="form-label" for="guest-name">Nome</label>
-                  <input id="guest-name" class="form-control" type="text" formControlName="nome" />
+                  <label class="form-label" for="guest-name">Nome <span class="required-star" aria-hidden="true">*</span></label>
+                  <input
+                    id="guest-name"
+                    class="form-control"
+                    [class.is-invalid]="isInvalid(anonymousForm.controls.nome)"
+                    type="text"
+                    formControlName="nome"
+                    autocomplete="given-name"
+                  />
+                  @if (isInvalid(anonymousForm.controls.nome)) {
+                    <div class="invalid-feedback d-block">
+                      @if (anonymousForm.controls.nome.hasError('required')) { Il nome è obbligatorio. }
+                      @else if (anonymousForm.controls.nome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                      @else { Controlla il nome inserito. }
+                    </div>
+                  }
                 </div>
+
                 <div class="col-12 col-md-6">
-                  <label class="form-label" for="guest-surname">Cognome</label>
-                  <input id="guest-surname" class="form-control" type="text" formControlName="cognome" />
+                  <label class="form-label" for="guest-surname">Cognome <span class="required-star" aria-hidden="true">*</span></label>
+                  <input
+                    id="guest-surname"
+                    class="form-control"
+                    [class.is-invalid]="isInvalid(anonymousForm.controls.cognome)"
+                    type="text"
+                    formControlName="cognome"
+                    autocomplete="family-name"
+                  />
+                  @if (isInvalid(anonymousForm.controls.cognome)) {
+                    <div class="invalid-feedback d-block">
+                      @if (anonymousForm.controls.cognome.hasError('required')) { Il cognome è obbligatorio. }
+                      @else if (anonymousForm.controls.cognome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                      @else { Controlla il cognome inserito. }
+                    </div>
+                  }
                 </div>
+
                 <div class="col-12 col-md-6">
-                  <label class="form-label" for="guest-email">Email</label>
-                  <input id="guest-email" class="form-control" type="email" formControlName="email" autocomplete="email" />
+                  <label class="form-label" for="guest-email">Email <span class="required-star" aria-hidden="true">*</span></label>
+                  <input
+                    id="guest-email"
+                    class="form-control"
+                    [class.is-invalid]="isInvalid(anonymousForm.controls.email)"
+                    type="email"
+                    formControlName="email"
+                    autocomplete="email"
+                  />
+                  @if (isInvalid(anonymousForm.controls.email)) {
+                    <div class="invalid-feedback d-block">
+                      @if (anonymousForm.controls.email.hasError('required')) { L'email è obbligatoria. }
+                      @else if (anonymousForm.controls.email.hasError('email')) { Inserisci un indirizzo email valido. }
+                      @else { Controlla l'email inserita. }
+                    </div>
+                  }
                 </div>
+
                 <div class="col-12 col-md-6">
-                  <label class="form-label" for="guest-phone">Cellulare</label>
-                  <input id="guest-phone" class="form-control" type="tel" formControlName="cellulare" />
+                  <label class="form-label" for="guest-phone">Cellulare <span class="required-star" aria-hidden="true">*</span></label>
+                  <input
+                    id="guest-phone"
+                    class="form-control"
+                    [class.is-invalid]="isInvalid(anonymousForm.controls.cellulare)"
+                    type="tel"
+                    formControlName="cellulare"
+                    autocomplete="tel"
+                  />
+                  @if (isInvalid(anonymousForm.controls.cellulare)) {
+                    <div class="invalid-feedback d-block">
+                      @if (anonymousForm.controls.cellulare.hasError('required')) { Il cellulare è obbligatorio. }
+                      @else if (anonymousForm.controls.cellulare.hasError('pattern')) { Inserisci un numero di telefono valido. }
+                      @else { Controlla il cellulare inserito. }
+                    </div>
+                  }
                 </div>
               </div>
-              @if (anonymousForm.invalid && anonymousForm.touched) {
-                <p class="text-danger small mt-2 mb-0">Compila correttamente tutti i dati di contatto.</p>
-              }
             </form>
           } @else {
             <div class="alert alert-success mb-4 py-2">
-              Prenotazione collegata al tuo account: sarà visibile nell'Area personale.
+              La prenotazione verrà collegata al tuo account e sarà visibile nell'Area personale.
             </div>
           }
 
           <form [formGroup]="bookingForm" (ngSubmit)="onSubmit()" novalidate>
+            <div class="guest-card border rounded p-3 mb-4">
+              <h2 class="h5 fw-bold mb-2">Numero di persone</h2>
+              <p class="mb-1">
+                Soggiorno per <strong>{{ requestedGuestCount }} {{ requestedGuestCount === 1 ? 'persona' : 'persone' }}</strong>.
+              </p>
+              <p class="small text-muted mb-0">
+                {{ requestedAdults }} adulti
+                @if (requestedChildren > 0) { <span> · {{ requestedChildren }} bambini</span> }
+                · non sono richiesti i dati personali degli accompagnatori.
+              </p>
+            </div>
+
             <div class="row g-3 mb-4">
               <div class="col-12 col-md-7">
-                <label class="form-label fw-semibold" for="treatment">Trattamento</label>
-                <select id="treatment" class="form-select" formControlName="trattamento">
+                <label class="form-label fw-semibold" for="treatment">Trattamento <span class="required-star" aria-hidden="true">*</span></label>
+                <select
+                  id="treatment"
+                  class="form-select"
+                  [class.is-invalid]="isInvalid(bookingForm.controls.trattamento)"
+                  formControlName="trattamento"
+                >
                   <option value="COLAZIONE">Solo colazione</option>
                   <option value="MEZZA_PENSIONE">Mezza pensione</option>
                   <option value="PENSIONE_COMPLETA">Pensione completa</option>
                 </select>
+                @if (isInvalid(bookingForm.controls.trattamento)) {
+                  <div class="invalid-feedback d-block">Seleziona un trattamento.</div>
+                }
               </div>
               <div class="col-12 col-md-5 d-flex align-items-end">
                 <div class="form-check form-switch pb-2">
@@ -73,45 +151,12 @@
               </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <h2 class="h5 fw-bold mb-0">Ospiti in arrivo</h2>
-              <span class="badge text-bg-light">{{ guests.length }} ospiti</span>
-            </div>
-
-            <div formArrayName="guests" class="d-flex flex-column gap-3">
-              @for (guest of guests.controls; track guest; let i = $index) {
-                <fieldset [formGroupName]="i" class="guest-card border rounded p-3">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <legend class="h6 fw-bold mb-0">Ospite {{ i + 1 }}</legend>
-                    @if (guests.length > 1) {
-                      <button class="btn btn-sm btn-outline-secondary" type="button" (click)="removeGuest(i)">Rimuovi</button>
-                    }
-                  </div>
-
-                  <div class="row g-2">
-                    <div class="col-12 col-md-6">
-                      <label class="form-label small">Nome</label>
-                      <input class="form-control" type="text" formControlName="nome" />
-                    </div>
-                    <div class="col-12 col-md-6">
-                      <label class="form-label small">Cognome</label>
-                      <input class="form-control" type="text" formControlName="cognome" />
-                    </div>
-                  </div>
-                </fieldset>
-              }
-            </div>
-
-            <button class="btn btn-outline-secondary mt-3" type="button" (click)="addGuest()" [disabled]="guests.length >= 8">
-              + Aggiungi ospite
-            </button>
-
             @if (errorMessage()) {
-              <div class="alert alert-danger mt-3 mb-0">{{ errorMessage() }}</div>
+              <div class="alert alert-danger mt-3 mb-0" role="alert">{{ errorMessage() }}</div>
             }
 
             <div class="d-grid mt-4">
-              <button class="btn btn-primary btn-lg" type="submit" [disabled]="isSubmitting() || missingDates">
+              <button mat-flat-button class="hotel-primary btn-lg" type="submit" [disabled]="isSubmitting() || missingDates">
                 {{ isSubmitting() ? 'Salvataggio in corso…' : (isCustomer() ? 'Conferma prenotazione' : 'Prenota senza account') }}
               </button>
             </div>
@@ -124,12 +169,19 @@
           <h2 class="h5 fw-bold">Riepilogo</h2>
           <p class="mb-1"><strong>{{ room()!.nome }}</strong></p>
           <p class="small text-muted">{{ checkIn }} → {{ checkOut }}</p>
+          <p class="small mb-1"><strong>Ospiti:</strong> {{ requestedGuestCount }}</p>
           <hr />
           <div class="d-flex justify-content-between"><span>Soggiorno</span><strong>{{ totalAmount() }} €</strong></div>
           <p class="small text-muted mt-2 mb-0">La caparra del 10% viene mostrata nella schermata successiva.</p>
         </div>
       </aside>
     </div>
+
+    @if (!isCustomer()) {
+      <div class="anonymous-policy-notice mt-4" role="note">
+        <strong>Importante:</strong> una prenotazione effettuata senza login non viene collegata a un account e non potrà essere modificata dall’Area personale. Per eventuali variazioni o cancellazioni sarà necessario contattare direttamente la struttura.
+      </div>
+    }
   } @else {
     <div class="alert alert-danger">{{ errorMessage() }}</div>
   }

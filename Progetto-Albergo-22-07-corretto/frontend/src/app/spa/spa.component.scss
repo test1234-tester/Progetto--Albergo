@@ -1,1 +1,464 @@
-// Styling a cura di Sviluppatore 3
+/* Styling Generale della Pagina SPA - allineato al tema Albergo Online */
+.spa-page {
+  background-color: var(--albergo-navy-dark);
+  color: var(--albergo-cream);
+  font-family: var(--albergo-font-body);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.text-center { text-align: center; }
+.py-4 { padding-top: 2rem; padding-bottom: 2rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+/* Top Banner */
+.top-banner {
+  background: linear-gradient(90deg, var(--albergo-gold, #d97706), var(--albergo-gold-light));
+  color: var(--albergo-navy-dark);
+  padding: 0.75rem 0;
+  font-size: 0.95rem;
+}
+
+.badge {
+  background-color: var(--albergo-navy-dark);
+  color: var(--albergo-gold-light);
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+/* Hero Section */
+.hero-section {
+  padding: 3rem 1rem 1.5rem;
+}
+
+.sub-title {
+  color: var(--albergo-gold-light);
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.hero-section h1 {
+  font-family: var(--albergo-font-heading, var(--albergo-font-body));
+  font-size: 2.5rem;
+  color: var(--albergo-cream);
+  margin-bottom: 1rem;
+}
+
+.hero-desc {
+  max-width: 800px;
+  margin: 0 auto;
+  color: rgba(250, 247, 242, 0.7);
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+/* Category Tabs */
+.tab-btn {
+  background-color: rgba(250, 247, 242, 0.05);
+  color: rgba(250, 247, 242, 0.7);
+  border: 1px solid rgba(250, 247, 242, 0.15);
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  margin: 0 0.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  background-color: var(--albergo-gold-light);
+  color: var(--albergo-navy-dark);
+  border-color: var(--albergo-gold-light);
+}
+
+/* Carousel Section */
+.carousel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent);
+}
+
+.tag-badge {
+  background-color: var(--albergo-gold-light);
+  color: var(--albergo-navy-dark);
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.image-overlay h3 {
+  color: var(--albergo-cream);
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+}
+
+/* Nav Buttons */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(15, 23, 42, 0.6);
+  color: var(--albergo-cream);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.3s;
+}
+
+.nav-btn:hover { background-color: var(--albergo-gold-light); color: var(--albergo-navy-dark); }
+.nav-btn.prev { left: 1rem; }
+.nav-btn.next { right: 1rem; }
+
+.video-indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(220, 38, 38, 0.85);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* Thumbnails */
+.thumbnails-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.thumb-btn {
+  flex: 0 0 90px;
+  height: 60px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  transition: all 0.3s;
+}
+
+.thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-btn.active {
+  border-color: var(--albergo-gold-light);
+  transform: scale(1.03);
+}
+
+/* Card Descrizione */
+.description-card {
+  background-color: rgba(250, 247, 242, 0.04);
+  border: 1px solid rgba(250, 247, 242, 0.15);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  transition: border-color 0.3s;
+}
+
+.description-card:hover {
+  border-color: var(--albergo-gold-light);
+}
+
+.hover-hint {
+  font-size: 0.75rem;
+  color: var(--albergo-gold-light);
+  text-align: right;
+  margin-bottom: 0.5rem;
+}
+
+.tag-label {
+  color: var(--albergo-gold-light);
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.card-header h2 {
+  font-family: var(--albergo-font-heading, var(--albergo-font-body));
+  font-size: 1.8rem;
+  color: var(--albergo-cream);
+  margin-top: 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.stats-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--albergo-navy-dark);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  flex: 1;
+}
+
+.stat-box i { font-size: 1.25rem; color: var(--albergo-gold-light); }
+.stat-box small { display: block; color: rgba(250, 247, 242, 0.5); font-size: 0.75rem; }
+.stat-box strong { color: var(--albergo-cream); font-size: 0.95rem; }
+
+.description-text {
+  color: rgba(250, 247, 242, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.features-block {
+  background-color: var(--albergo-navy-dark);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.features-block h4 {
+  color: var(--albergo-gold-light);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.features-block ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-block li {
+  color: rgba(250, 247, 242, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.features-block li i { color: #10b981; margin-right: 0.4rem; }
+
+/* Pricing CTA */
+.pricing-cta {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(250, 247, 242, 0.15);
+}
+
+.amount { font-size: 2.2rem; font-weight: bold; color: var(--albergo-cream); }
+.period { color: rgba(250, 247, 242, 0.7); font-size: 0.9rem; }
+.price-sub { color: var(--albergo-gold-light); font-size: 0.85rem; margin-top: 0.25rem; margin-bottom: 1rem; }
+
+.cta-button {
+  background: linear-gradient(135deg, var(--albergo-gold-light), var(--albergo-gold, #d97706));
+  color: var(--albergo-navy-dark);
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.3s;
+}
+
+.cta-button:hover { opacity: 0.9; }
+
+/* Modal Component */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-box {
+  background-color: var(--albergo-navy-dark);
+  border: 1px solid rgba(250, 247, 242, 0.15);
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // il box stesso non scrolla: scrolla solo il contenuto interno
+}
+
+.modal-scroll-content {
+  overflow-y: auto;
+  padding-right: 0.5rem; // spazio per non far coprire il testo dalla scrollbar
+  margin-top: 0.5rem; // evita che il testo parta troppo vicino al bottone-X
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: rgba(250, 247, 242, 0.7);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1; // resta sempre sopra al contenuto che scrolla
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--albergo-gold-light);
+}
+
+.modal-title {
+  font-family: var(--albergo-font-heading, var(--albergo-font-body));
+  color: var(--albergo-cream);
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+.modal-subtitle { color: rgba(250, 247, 242, 0.7); font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; color: rgba(250, 247, 242, 0.8); font-size: 0.85rem; margin-bottom: 0.4rem; }
+
+.form-control {
+  width: 100%;
+  background-color: var(--albergo-navy-dark);
+  border: 1px solid rgba(250, 247, 242, 0.15);
+  color: var(--albergo-cream);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+}
+
+.form-control:focus { border-color: var(--albergo-gold-light); outline: none; }
+
+.form-row { display: flex; gap: 1rem; }
+.col { flex: 1; }
+
+.hotel-fields,
+.pet-fields {
+  background-color: var(--albergo-navy-dark);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px dashed rgba(250, 247, 242, 0.15);
+}
+
+.help-text { color: var(--albergo-gold-light); font-size: 0.75rem; display: block; margin-top: 0.5rem; }
+
+.checkbox-label { color: rgba(250, 247, 242, 0.8); font-size: 0.85rem; cursor: pointer; }
+
+.submit-btn {
+  background-color: var(--albergo-gold-light);
+  color: var(--albergo-navy-dark);
+  font-weight: bold;
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* Confirmation Box */
+.check-icon { font-size: 3.5rem; color: #10b981; margin-bottom: 1rem; }
+.confirmation-box h3 { color: var(--albergo-cream); margin-bottom: 0.5rem; }
+.confirmation-box p { color: rgba(250, 247, 242, 0.8); font-size: 0.95rem; }
+
+.summary-card {
+  background-color: var(--albergo-navy-dark);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.summary-card p { margin-bottom: 0.5rem; font-size: 0.85rem; }
+/* Icone locali: la pagina originale usava classi Font Awesome senza includere
+   la libreria. Questi fallback mantengono le icone visibili anche offline. */
+.spa-page i[class*="fa-"] {
+  display: inline-block;
+  width: 1.25em;
+  text-align: center;
+  font-style: normal;
+}
+.spa-page .fa-crown::before { content: "♛"; }
+.spa-page .fa-spa::before { content: "✦"; }
+.spa-page .fa-dog::before { content: "🐾"; }
+.spa-page .fa-chevron-left::before { content: "‹"; }
+.spa-page .fa-chevron-right::before { content: "›"; }
+.spa-page .fa-film::before { content: "▶"; }
+.spa-page .fa-clock::before { content: "◷"; }
+.spa-page .fa-temperature-three-quarters::before { content: "♨"; }
+.spa-page .fa-check::before { content: "✓"; }
+.spa-page .fa-calendar-check::before { content: "✓"; }
+.spa-page .fa-circle-info::before { content: "ⓘ"; }
+.spa-page .fa-circle-check::before { content: "✓"; }

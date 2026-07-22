@@ -1,182 +1,207 @@
-/* =========================================================================
-   🌿 CONFIGURAZIONE CROMATICA & MATERICA (BOUTIQUE HOTEL & SPA)
-   ========================================================================= */
+/* ========================================================================== 
+   TEMA GRAND HOTEL / SPA — contrasto elevato e componenti accessibili
+   ========================================================================== */
 :root {
-  --bs-primary: #cfa87b;          /* Oro caldo delle luci soffuse */
-  --bs-dark: #232625;             /* Antracite profondo della pietra ardesia */
-  --bs-body-bg: #f5f2eb;          /* Caldo color travertino/lino grezzo per lo sfondo */
-  --bs-body-color: #232625;       /* Forza il testo principale ad essere scuro e leggibile */
-  
-  --albergo-stone-text: #3c403e;  /* Colore ad alto contrasto per le scritte nei form */
-  --albergo-muted-earth: #6b665d; /* Grigio fango caldo per i testi secondari */
-  --albergo-radius: 4px;
+  --albergo-navy-dark: #102a2b;
+  --albergo-navy: #183f3b;
+  --albergo-cream: #fffdf7;
+  --albergo-surface: #f7f4ee;
+  --albergo-surface-warm: #f2e7d5;
+  --albergo-gold: #7b4e13;
+  --albergo-gold-light: #d7b26d;
+  --albergo-stone-text: #212121;
+  --albergo-muted: #5a4632;
+  --albergo-muted-earth: #5a4632;
+  --albergo-danger: #6b1f2a;
+  --albergo-success: #1f5a39;
+  --albergo-border: #786f62;
+  --albergo-radius: 0.75rem;
+  --albergo-shadow: 0 16px 40px rgba(16, 42, 43, 0.12);
+  --albergo-font-heading: Georgia, 'Times New Roman', serif;
+  --albergo-font-body: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --bs-primary: #355c4d;
+  --bs-primary-rgb: 53, 92, 77;
+  --bs-body-bg: #fffdf7;
+  --bs-body-color: #212121;
+  --bs-link-color: #355c4d;
+  --bs-link-hover-color: #102a2b;
+  --bs-danger: #6b1f2a;
+  --bs-danger-rgb: 107, 31, 42;
+  --bs-success: #1f5a39;
+  --bs-success-rgb: 31, 90, 57;
 }
 
-/* =========================================================================
-   ✍️ TIPOGRAFIA EDITORIALE VALORIZZATA
-   ========================================================================= */
-body, h1, h2, h3, h4, .text-serif {
-  font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif !important;
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--albergo-stone-text);
+  background:
+    radial-gradient(circle at 85% 10%, rgba(215, 178, 109, 0.12), transparent 28rem),
+    linear-gradient(180deg, var(--albergo-cream) 0%, var(--albergo-surface) 100%);
+  font-family: var(--albergo-font-body);
+  line-height: 1.55;
+}
+
+h1, h2, h3, h4, h5, h6,
+.text-serif {
+  color: var(--albergo-navy-dark);
+  font-family: var(--albergo-font-heading);
+}
+
+a {
+  color: #355c4d;
+  text-underline-offset: 0.18em;
+}
+
+a:hover {
+  color: var(--albergo-navy-dark);
+}
+
+/* Focus always visible for keyboard users. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid #7b4e13 !important;
+  outline-offset: 3px;
+}
+
+.form-label {
+  color: var(--albergo-stone-text);
+  font-weight: 650;
+}
+
+.form-control,
+.form-select {
+  min-height: 44px;
+  color: var(--albergo-stone-text) !important;
+  background-color: #ffffff !important;
+  border: 1px solid #786f62 !important;
+  border-radius: 0.6rem !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #355c4d !important;
+  box-shadow: 0 0 0 0.2rem rgba(53, 92, 77, 0.22) !important;
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  color: #4b443d !important;
+  background: #ece8df !important;
+  opacity: 1;
+}
+
+/* Error states: color + border + message, never color alone. */
+.required-star,
+.required-note,
+.invalid-feedback,
+.error {
+  color: var(--albergo-danger) !important;
+}
+
+.required-note {
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid,
+.was-validated .form-control:invalid,
+.was-validated .form-select:invalid {
+  border: 2px solid var(--albergo-danger) !important;
+  background-image: none !important;
+}
+
+.invalid-feedback,
+.error {
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+
+.alert-danger {
+  color: #fffdf7 !important;
+  background: var(--albergo-danger) !important;
+  border-color: var(--albergo-danger) !important;
+}
+
+.alert-success {
+  color: #fffdf7 !important;
+  background: var(--albergo-success) !important;
+  border-color: var(--albergo-success) !important;
+}
+
+.text-muted {
+  color: var(--albergo-muted) !important;
+}
+
+/* Angular Material action classes used in dashboards and booking. */
+.hotel-primary.mat-mdc-button-base,
+.spa-material-button.mat-mdc-button-base {
+  --mdc-filled-button-container-color: #355c4d;
+  --mdc-filled-button-label-text-color: #fffdf7;
+  --mdc-outlined-button-label-text-color: #355c4d;
+  --mdc-outlined-button-outline-color: #355c4d;
+  min-height: 44px;
+  font-weight: 700;
   letter-spacing: 0.02em;
 }
 
-input, select, textarea, button, .btn {
-  font-family: 'Inter', system-ui, sans-serif !important;
+.hotel-danger.mat-mdc-button-base {
+  --mdc-filled-button-container-color: #6b1f2a;
+  --mdc-filled-button-label-text-color: #fffdf7;
+  min-height: 44px;
+  font-weight: 700;
 }
 
-/* =========================================================================
-   🌊 SFONDO AVVOLGENTE (EFFETTO PIETRA CALCAREA E NEBBIA SALINA)
-   ========================================================================= */
-body {
-  background-image: 
-    radial-gradient(circle at 80% 20%, rgba(237, 230, 218, 0.7) 0%, rgba(245, 242, 235, 0.4) 100%),
-    linear-gradient(to bottom, #f5f2eb 0%, #e3ded5 100%);
-  background-attachment: fixed;
-  color: var(--bs-dark) !important;
+.mat-mdc-outlined-button {
+  --mdc-outlined-button-label-text-color: #355c4d;
+  --mdc-outlined-button-outline-color: #355c4d;
+  min-height: 44px;
+  font-weight: 700;
 }
 
-/* =========================================================================
-   🛡️ FIX BLOCCO BIANCO SU BIANCO (MASSIMO CONTRASTO NELLE PAGINE)
-   Forziamo tutte le scritte interne a form, label e card ad essere scure
-   ========================================================================= */
-.card, .search-form, .bg-light, main, section {
-  color: var(--bs-dark) !important;
+/* Bootstrap primary actions aligned with the Material palette. */
+.btn-primary {
+  --bs-btn-bg: #355c4d;
+  --bs-btn-border-color: #355c4d;
+  --bs-btn-color: #fffdf7;
+  --bs-btn-hover-bg: #102a2b;
+  --bs-btn-hover-border-color: #102a2b;
+  --bs-btn-hover-color: #fffdf7;
+  --bs-btn-active-bg: #102a2b;
+  --bs-btn-active-border-color: #102a2b;
+  min-height: 44px;
+  font-weight: 700;
+}
 
-  label, .form-label, p, span, h1, h2, h3, h4, th, td {
-    color: var(--albergo-stone-text) !important; /* Elimina definitivamente il bianco su bianco */
+.card {
+  border-color: rgba(90, 70, 50, 0.22);
+  border-radius: var(--albergo-radius);
+}
+
+/* High-contrast helper used for anonymous booking policy notices. */
+.anonymous-policy-notice,
+.guest-booking-note,
+.spa-booking-info {
+  color: var(--albergo-navy-dark);
+  background: var(--albergo-surface-warm);
+  border: 1px solid #7b4e13;
+  border-left: 5px solid #7b4e13;
+  border-radius: var(--albergo-radius);
+  padding: 1rem 1.1rem;
+}
+
+/* Avoid motion where the user explicitly asks for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
-
-  .text-muted {
-    color: var(--albergo-muted-earth) !important; /* Rende i sottotitoli leggibili e caldi */
-  }
-}
-
-/* Campi di input ad alta leggibilità */
-.form-control, .form-select {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(35, 38, 37, 0.25) !important;
-  color: var(--bs-dark) !important;
-  border-radius: var(--albergo-radius) !important;
-}
-.form-control:focus, .form-select:focus {
-  border-color: var(--bs-primary) !important;
-  box-shadow: 0 0 0 3px rgba(207, 168, 123, 0.2) !important;
-}
-
-/* =========================================================================
-   🚨 FIX HOMEPAGE: ISOLAMENTO PULSANTE HERO
-   Assicura che sulla Home il testo e i bottoni leggano perfettamente sopra l'immagine
-   ========================================================================= */
-.homepage, .hero-section, .hero-content, header.hero {
-  h1, h2, p, span {
-    color: #ffffff !important; /* Qui il bianco serve perché lo sfondo sotto è scuro! */
-    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.6) !important;
-  }
-
-  /* Il pulsante "Prenota una stanza" della Home diventa visibilissimo */
-  .btn, .btn-primary, [routerLink*="stanze"] {
-    background-color: var(--bs-dark) !important;
-    color: #ffffff !important;
-    border: 2px solid var(--bs-primary) !important;
-    font-weight: 700 !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
-    text-shadow: none !important;
-  }
-  .btn:hover {
-    background-color: var(--bs-primary) !important;
-    color: var(--bs-dark) !important;
-  }
-}
-
-/* =========================================================================
-   🌿 ARRICCHIMENTI GRAFICI NATURALI (DECORAZIONI A FOGLIE D'ULIVO)
-   ========================================================================= */
-
-/* 1. Rametti d'ulivo decorativi posizionati negli angoli delle schede e dei form */
-.card, .search-form {
-  position: relative;
-  background-color: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid rgba(115, 110, 101, 0.18) !important;
-  border-radius: var(--albergo-radius) !important;
-  box-shadow: 0 15px 40px rgba(35, 38, 37, 0.04) !important;
-  padding: 3rem 2.5rem !important;
-
-  /* Decorazione foglia in alto a destra */
-  &::before {
-    content: "";
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 45px;
-    height: 45px;
-    opacity: 0.25;
-    pointer-events: none;
-    /* Disegno SVG di un elegante rametto con tre foglie */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b665d'%3E%3Cpath d='M21 3s-3.5 0-7 3.5c-2.7 2.7-3.2 6.5-3.2 6.5s-2.3-1.3-4.3.7c-1.5 1.5-1.5 4.3-1.5 4.3s2.8 0 4.3-1.5c2-2 .7-4.3.7-4.3s3.8.5 6.5-3.2C21 6.5 21 3 21 3zm-6.2 6.8c-.8.8-2 .8-2.8 0-.8-.8-.8-2 0-2.8.8-.8 2-.8 2.8 0 .8.8.8 2 0 2.8z'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-}
-
-/* 2. Divisore botanico (Foglia d'ulivo centrale) sotto i titoli grandi */
-h1.display-4, h2.h1 {
-  position: relative;
-  padding-bottom: 25px;
-  text-align: center;
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 20px;
-    opacity: 0.4;
-    /* Icona di una foglia biologica centrale */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cfa87b'%3E%3Cpath d='M17 8C14.2 8 8 11.2 8 15C8 17.8 11.2 18 13 18C15.8 18 22 14.8 22 11C22 8.2 18.8 8 17 8ZM12 16C10.2 16 4 13.8 4 11C4 8.2 7.2 8 9 8C11.8 8 18 10.2 18 13C18 15.8 13.8 16 12 16Z'/%3E%3C/svg%3E");
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-}
-
-/* =========================================================================
-   🎛️ BOTTONI ARTIGIANALI CON CONTORNO DECORATO
-   ========================================================================= */
-.btn-primary, .btn-dark, button[type="submit"], .treatment-list a {
-  background-color: var(--bs-dark) !important;
-  border: 1px solid var(--bs-dark) !important;
-  color: #f5f2eb !important;
-  text-uppercase: uppercase;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  padding: 0.9rem 2.2rem;
-  border-radius: var(--albergo-radius) !important;
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
-  
-  /* Cornice decorativa interna e sottilissima color oro */
-  outline: 1px solid rgba(207, 168, 123, 0.3) !important;
-  outline-offset: -5px;
-}
-
-.btn-primary:hover, .btn-dark:hover, button[type="submit"]:hover, .treatment-list a:hover {
-  background-color: #2e3331 !important;
-  border-color: var(--bs-primary) !important;
-  color: var(--bs-primary) !important;
-  letter-spacing: 0.18em; /* Il testo respira elegantemente al passaggio del mouse */
-  box-shadow: 0 8px 25px rgba(35, 38, 37, 0.15) !important;
-  
-  /* La cornice interna si illumina di oro intenso al passaggio */
-  outline-color: var(--bs-primary) !important;
-}
-
-/* Ottimizzazione dei link di navigazione della Spa */
-.treatment-list li {
-  border-bottom: 1px solid rgba(115, 110, 101, 0.15) !important;
-  padding: 1rem 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }

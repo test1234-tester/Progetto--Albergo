@@ -10,29 +10,45 @@
       <!-- COLONNA SINISTRA: Form Filtri -->
       <div class="col-12 col-lg-4 col-xl-3">
         <div class="card search-sidebar-card shadow-sm border-0 p-3">
-          <h4 class="card-title fw-bold mb-3 text-primary">
+          <h4 class="card-title fw-bold mb-2 text-primary">
             <i class="fa-solid fa-magnifying-glass me-2"></i>Cerca disponibilità
           </h4>
+          <p class="required-note mb-3"><span class="required-star">*</span> Campi obbligatori</p>
 
           <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form d-flex flex-column gap-3">
             <div>
-              <label class="form-label fw-semibold" for="checkIn">Check-in</label>
-              <input id="checkIn" type="date" class="form-control" formControlName="checkIn" />
+              <label class="form-label fw-semibold" for="checkIn">Check-in <span class="required-star">*</span></label>
+              <input id="checkIn" type="date" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('checkIn'))" formControlName="checkIn" />
+              @if (isInvalid(searchForm.get('checkIn'))) {
+                <div class="invalid-feedback d-block">Inserisci una data di check-in valida.</div>
+              }
             </div>
 
             <div>
-              <label class="form-label fw-semibold" for="checkOut">Check-out</label>
-              <input id="checkOut" type="date" class="form-control" formControlName="checkOut" />
+              <label class="form-label fw-semibold" for="checkOut">Check-out <span class="required-star">*</span></label>
+              <input id="checkOut" type="date" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('checkOut'))" formControlName="checkOut" />
+              @if (isInvalid(searchForm.get('checkOut'))) {
+                <div class="invalid-feedback d-block">
+                  @if (searchForm.get('checkOut')?.hasError('dateOrder')) { Il check-out deve essere successivo al check-in. }
+                  @else { Inserisci una data di check-out valida. }
+                </div>
+              }
             </div>
 
             <div class="row g-2">
               <div class="col-6">
-                <label class="form-label fw-semibold" for="adulti">Adulti</label>
-                <input id="adulti" type="number" min="1" class="form-control" formControlName="adulti" />
+                <label class="form-label fw-semibold" for="adulti">Adulti <span class="required-star">*</span></label>
+                <input id="adulti" type="number" min="1" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('adulti'))" formControlName="adulti" />
+                @if (isInvalid(searchForm.get('adulti'))) {
+                  <div class="invalid-feedback d-block">Inserisci almeno 1 adulto.</div>
+                }
               </div>
               <div class="col-6">
                 <label class="form-label fw-semibold" for="bambini">Bambini</label>
-                <input id="bambini" type="number" min="0" class="form-control" formControlName="bambini" />
+                <input id="bambini" type="number" min="0" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('bambini'))" formControlName="bambini" />
+                @if (isInvalid(searchForm.get('bambini'))) {
+                  <div class="invalid-feedback d-block">Il numero di bambini non può essere negativo.</div>
+                }
               </div>
             </div>
 
@@ -147,22 +163,51 @@
                 <h5 class="fw-bold mb-2"><i class="fa-solid fa-user me-2"></i>Prenota senza registrarti</h5>
                 <p class="small text-muted mb-3">Non serve creare un account: inserisci i dati di contatto a cui inviare la conferma.</p>
 
-                <form [formGroup]="guestContactForm" class="row g-3">
+                <p class="small text-muted mb-2"><span class="required-star">*</span> Campi obbligatori</p>
+                <form [formGroup]="guestContactForm" class="row g-3" novalidate>
                   <div class="col-12 col-md-6">
-                    <label class="form-label small fw-semibold" for="guest-name">Nome</label>
-                    <input id="guest-name" type="text" class="form-control" formControlName="nome" />
+                    <label class="form-label small fw-semibold" for="guest-name">Nome <span class="required-star">*</span></label>
+                    <input id="guest-name" type="text" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.nome)" formControlName="nome" autocomplete="given-name" />
+                    @if (isInvalid(guestContactForm.controls.nome)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.nome.hasError('required')) { Il nome è obbligatorio. }
+                        @else if (guestContactForm.controls.nome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                        @else { Controlla il nome inserito. }
+                      </div>
+                    }
                   </div>
                   <div class="col-12 col-md-6">
-                    <label class="form-label small fw-semibold" for="guest-surname">Cognome</label>
-                    <input id="guest-surname" type="text" class="form-control" formControlName="cognome" />
+                    <label class="form-label small fw-semibold" for="guest-surname">Cognome <span class="required-star">*</span></label>
+                    <input id="guest-surname" type="text" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.cognome)" formControlName="cognome" autocomplete="family-name" />
+                    @if (isInvalid(guestContactForm.controls.cognome)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.cognome.hasError('required')) { Il cognome è obbligatorio. }
+                        @else if (guestContactForm.controls.cognome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                        @else { Controlla il cognome inserito. }
+                      </div>
+                    }
                   </div>
                   <div class="col-12 col-md-6">
-                    <label class="form-label small fw-semibold" for="guest-email">Email</label>
-                    <input id="guest-email" type="email" class="form-control" formControlName="email" autocomplete="email" />
+                    <label class="form-label small fw-semibold" for="guest-email">Email <span class="required-star">*</span></label>
+                    <input id="guest-email" type="email" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.email)" formControlName="email" autocomplete="email" />
+                    @if (isInvalid(guestContactForm.controls.email)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.email.hasError('required')) { L'email è obbligatoria. }
+                        @else if (guestContactForm.controls.email.hasError('email')) { Inserisci un indirizzo email valido. }
+                        @else { Controlla l'email inserita. }
+                      </div>
+                    }
                   </div>
                   <div class="col-12 col-md-6">
-                    <label class="form-label small fw-semibold" for="guest-phone">Cellulare</label>
-                    <input id="guest-phone" type="tel" class="form-control" formControlName="cellulare" />
+                    <label class="form-label small fw-semibold" for="guest-phone">Cellulare <span class="required-star">*</span></label>
+                    <input id="guest-phone" type="tel" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.cellulare)" formControlName="cellulare" autocomplete="tel" />
+                    @if (isInvalid(guestContactForm.controls.cellulare)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.cellulare.hasError('required')) { Il cellulare è obbligatorio. }
+                        @else if (guestContactForm.controls.cellulare.hasError('pattern')) { Inserisci un numero di telefono valido. }
+                        @else { Controlla il cellulare inserito. }
+                      </div>
+                    }
                   </div>
                 </form>
 
@@ -174,21 +219,14 @@
               </div>
             }
 
-            <div class="guest-list-box p-3 bg-light rounded mb-4 border" [formGroup]="guestsForm">
-              <h5 class="fw-bold mb-3"><i class="fa-solid fa-users me-2 text-primary"></i>Ospiti in arrivo</h5>
-              <div formArrayName="guests" class="row g-3">
-                @for (guest of guests.controls; track guest; let i = $index) {
-                  <div class="col-12 col-md-6" [formGroupName]="i">
-                    <div class="border rounded p-3 bg-white h-100">
-                      <div class="fw-semibold mb-2">Ospite {{ i + 1 }}</div>
-                      <label class="form-label small mb-1">Nome</label>
-                      <input type="text" class="form-control form-control-sm mb-2" formControlName="nome" />
-                      <label class="form-label small mb-1">Cognome</label>
-                      <input type="text" class="form-control form-control-sm" formControlName="cognome" />
-                    </div>
-                  </div>
-                }
-              </div>
+            <div class="guest-list-box p-3 bg-light rounded mb-4 border">
+              <h5 class="fw-bold mb-2"><i class="fa-solid fa-users me-2 text-primary"></i>Numero di persone</h5>
+              <p class="mb-1">La prenotazione è per <strong>{{ requestedGuests() }} {{ requestedGuests() === 1 ? 'persona' : 'persone' }}</strong>.</p>
+              <p class="small text-muted mb-0">
+                {{ searchForm.get('adulti')?.value }} adulti
+                @if ((searchForm.get('bambini')?.value ?? 0) > 0) { <span> · {{ searchForm.get('bambini')?.value }} bambini</span> }
+                · non sono richiesti i dati personali degli accompagnatori.
+              </p>
             </div>
 
             <!-- SERVIZI OPZIONALI -->
@@ -263,46 +301,56 @@
 
                 <!-- FORM CARTA DI CREDITO -->
                 @if (metodoPagamento() === 'carta') {
-                  <div class="card-form-box p-3 bg-white rounded border mb-3 shadow-sm">
-                    <h6 class="fw-bold text-dark mb-3"><i class="fa-regular fa-credit-card me-2 text-primary"></i>Dati della Carta di Credito</h6>
+                  <form class="card-form-box p-3 bg-white rounded border mb-3 shadow-sm" [formGroup]="cardPaymentForm" novalidate>
+                    <h6 class="fw-bold text-dark mb-1"><i class="fa-regular fa-credit-card me-2 text-primary"></i>Dati della Carta di Credito</h6>
+                    <p class="required-note mb-3"><span class="required-star">*</span> Campi obbligatori</p>
                     <div class="row g-3">
                       <div class="col-12">
-                        <label class="form-label small fw-semibold mb-1">Nome e Cognome Intestatario</label>
-                        <input type="text" class="form-control" placeholder="es. Mario Rossi" required />
+                        <label class="form-label small fw-semibold mb-1" for="card-holder">Nome e Cognome Intestatario <span class="required-star">*</span></label>
+                        <input id="card-holder" type="text" class="form-control" placeholder="es. Mario Rossi" formControlName="intestatario" [class.is-invalid]="isInvalid(cardPaymentForm.controls.intestatario)" autocomplete="cc-name" />
+                        @if (isInvalid(cardPaymentForm.controls.intestatario)) { <div class="invalid-feedback d-block">Inserisci il nome dell'intestatario.</div> }
                       </div>
                       <div class="col-12">
-                        <label class="form-label small fw-semibold mb-1">Numero Carta</label>
+                        <label class="form-label small fw-semibold mb-1" for="card-number">Numero Carta <span class="required-star">*</span></label>
                         <div class="input-group">
-                          <input type="text" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19" required />
+                          <input id="card-number" type="text" inputmode="numeric" class="form-control" placeholder="1234 5678 9012 3456" maxlength="23" formControlName="numeroCarta" [class.is-invalid]="isInvalid(cardPaymentForm.controls.numeroCarta)" autocomplete="cc-number" />
                           <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
                         </div>
+                        @if (isInvalid(cardPaymentForm.controls.numeroCarta)) { <div class="invalid-feedback d-block">Inserisci un numero carta valido (13–19 cifre).</div> }
                       </div>
                       <div class="col-6">
-                        <label class="form-label small fw-semibold mb-1">Scadenza (MM/AA)</label>
-                        <input type="text" class="form-control" placeholder="MM/AA" maxlength="5" required />
+                        <label class="form-label small fw-semibold mb-1" for="card-expiry">Scadenza (MM/AA) <span class="required-star">*</span></label>
+                        <input id="card-expiry" type="text" inputmode="numeric" class="form-control" placeholder="MM/AA" maxlength="5" formControlName="scadenza" [class.is-invalid]="isInvalid(cardPaymentForm.controls.scadenza)" autocomplete="cc-exp" />
+                        @if (isInvalid(cardPaymentForm.controls.scadenza)) { <div class="invalid-feedback d-block">Usa il formato MM/AA.</div> }
                       </div>
                       
                       <!-- CAMPO CVC CON MASCHERAMENTO E TOGGLE OCCHIO -->
                       <div class="col-6">
-                        <label class="form-label small fw-semibold mb-1">CVC / CVV</label>
+                        <label class="form-label small fw-semibold mb-1" for="card-cvc">CVC / CVV <span class="required-star">*</span></label>
                         <div class="input-group">
                           <input 
+                            id="card-cvc"
                             [type]="mostraCvc() ? 'text' : 'password'" 
+                            inputmode="numeric"
                             class="form-control" 
+                            [class.is-invalid]="isInvalid(cardPaymentForm.controls.cvc)"
                             placeholder="•••" 
                             maxlength="4" 
-                            required />
+                            formControlName="cvc"
+                            autocomplete="cc-csc" />
                           <button 
                             type="button" 
                             class="btn btn-outline-secondary" 
                             (click)="toggleMostraCvc()"
-                            title="Mostra/Nascondi CVC">
+                            [attr.aria-label]="mostraCvc() ? 'Nascondi CVC' : 'Mostra CVC'"
+                            [attr.title]="mostraCvc() ? 'Nascondi CVC' : 'Mostra CVC'">
                             <i class="fa-solid" [class.fa-eye]="!mostraCvc()" [class.fa-eye-slash]="mostraCvc()"></i>
                           </button>
                         </div>
+                        @if (isInvalid(cardPaymentForm.controls.cvc)) { <div class="invalid-feedback d-block">Inserisci 3 o 4 cifre.</div> }
                       </div>
                     </div>
-                  </div>
+                  </form>
 
                   @if (errorMessage()) {
                     <div class="alert alert-danger mt-3">{{ errorMessage() }}</div>
@@ -361,6 +409,12 @@
 
       </div>
     </div>
+
+    @if (!authService.isCustomer()) {
+      <div class="anonymous-policy-notice mt-4" role="note">
+        <strong>Importante:</strong> una prenotazione effettuata senza login non viene collegata a un account e non potrà essere modificata dall’Area personale. Per eventuali variazioni o cancellazioni sarà necessario contattare direttamente la struttura.
+      </div>
+    }
   }
 
   <!-- ========================================== -->

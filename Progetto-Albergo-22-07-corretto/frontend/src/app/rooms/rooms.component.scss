@@ -77,3 +77,18 @@
 .guest-list-box {
   border-radius: 12px;
 }
+
+/* Validazione prenotazione */
+.required-star {
+  color: #c62828;
+  font-weight: 700;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-width: 2px;
+}
+
+.invalid-feedback {
+  font-size: 0.82rem;
+}

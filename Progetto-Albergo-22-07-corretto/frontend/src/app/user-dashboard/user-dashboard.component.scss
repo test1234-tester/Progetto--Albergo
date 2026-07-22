@@ -158,3 +158,40 @@
     max-height: 210px;
   }
 }
+
+.required-star {
+  color: #7a2e2e;
+  font-weight: 800;
+}
+
+.required-note {
+  color: #4a4f52;
+  font-size: 0.85rem;
+}
+
+.form-control.is-invalid {
+  border: 2px solid #7a2e2e !important;
+  background-image: none;
+}
+
+.invalid-feedback {
+  color: #7a2e2e;
+  font-weight: 600;
+}
+
+.booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.hotel-primary {
+  background: #172a3a !important;
+  color: #ffffff !important;
+}
+
+.hotel-danger {
+  background: #7a2e2e !important;
+  color: #ffffff !important;
+}

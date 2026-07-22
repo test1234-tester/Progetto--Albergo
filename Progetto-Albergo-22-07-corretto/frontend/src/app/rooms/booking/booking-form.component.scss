@@ -21,8 +21,42 @@
   background: #fbfaf8;
 }
 
+.required-star {
+  color: #c62828;
+  font-weight: 700;
+}
+
+.required-note {
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-width: 2px;
+}
+
+.invalid-feedback {
+  font-size: 0.85rem;
+}
+
 @media (max-width: 991.98px) {
   .booking-summary {
     position: static;
   }
+}
+
+.hotel-primary {
+  background: #172a3a !important;
+  color: #ffffff !important;
+}
+
+.anonymous-policy-notice {
+  background: #fff8e8;
+  border: 2px solid #6a4300;
+  border-radius: 0.75rem;
+  color: #172a3a;
+  padding: 1rem 1.2rem;
+  line-height: 1.55;
 }

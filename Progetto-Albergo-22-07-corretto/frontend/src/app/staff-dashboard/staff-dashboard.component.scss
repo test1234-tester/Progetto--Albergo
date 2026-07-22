@@ -239,3 +239,22 @@
     grid-template-columns: 1fr;
   }
 }
+
+.physical-booking-form {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.physical-booking-form .form-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.required-star { color: #7a2e2e; font-weight: 800; }
+.required-note { color: #4a4f52; font-size: 0.85rem; }
+.form-control.is-invalid, .form-select.is-invalid { border: 2px solid #7a2e2e !important; background-image: none; }
+.invalid-feedback { color: #7a2e2e; font-weight: 600; }
+.booking-editor { background: #f7f3ea; border: 1px solid #b7aa94; border-radius: 0.8rem; padding: 1.25rem; }
+.edit-row > td { background: #f7f3ea !important; }
+.action-group { display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; }
+.hotel-primary { background: #172a3a !important; color: #fff !important; }
+.hotel-danger { background: #7a2e2e !important; color: #fff !important; }

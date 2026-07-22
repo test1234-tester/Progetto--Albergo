@@ -2,7 +2,8 @@
   <div class="card auth-card shadow-sm">
     <div class="card-body p-4 p-md-5">
       <h1 class="auth-title mb-2">Accedi</h1>
-      <p class="text-center text-muted mb-4">Scegli l'area corretta prima di accedere.</p>
+      <p class="text-center text-muted mb-2">Scegli l'area corretta prima di accedere.</p>
+      <p class="required-note text-center mb-4"><span class="required-star">*</span> Campi obbligatori</p>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
         <div class="access-switch mb-4" role="group" aria-label="Tipo di accesso">
@@ -14,17 +15,20 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="login-email">Email</label>
+          <label class="form-label" for="login-email">Email <span class="required-star">*</span></label>
           <input id="login-email" type="email" class="form-control" formControlName="email"
             autocomplete="email"
             [class.is-invalid]="loginForm.controls.email.invalid && loginForm.controls.email.touched" />
           @if (loginForm.controls.email.invalid && loginForm.controls.email.touched) {
-            <p class="error">Inserisci un'email valida.</p>
+            <div class="invalid-feedback d-block">
+              @if (loginForm.controls.email.hasError('required')) { L'email è obbligatoria. }
+              @else { Inserisci un indirizzo email valido. }
+            </div>
           }
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="login-password">Password</label>
+          <label class="form-label" for="login-password">Password <span class="required-star">*</span></label>
           <div class="password-field">
             <input id="login-password" [type]="showPassword() ? 'text' : 'password'" class="form-control" formControlName="password"
               autocomplete="current-password"
@@ -36,7 +40,10 @@
             </button>
           </div>
           @if (loginForm.controls.password.invalid && loginForm.controls.password.touched) {
-            <p class="error">La password deve avere almeno 6 caratteri.</p>
+            <div class="invalid-feedback d-block">
+              @if (loginForm.controls.password.hasError('required')) { La password è obbligatoria. }
+              @else { La password deve avere almeno 6 caratteri. }
+            </div>
           }
         </div>
 
@@ -44,7 +51,7 @@
           <div class="alert alert-danger py-2" role="alert">{{ errorMessage() }}</div>
         }
 
-        <button type="submit" class="btn btn-primary w-100 mt-2" [disabled]="isSubmitting()">
+        <button mat-flat-button class="hotel-primary w-100 mt-2" type="submit" [disabled]="isSubmitting()">
           {{ isSubmitting() ? 'Accesso in corso…' : 'Accedi' }}
         </button>
       </form>
