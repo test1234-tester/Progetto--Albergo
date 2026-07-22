@@ -1,0 +1,121 @@
+/* ========================================================================== 
+   FOOTER — GUIDA DIDATTICA STILI
+   --------------------------------------------------------------------------
+   Il footer rimane scuro in entrambi i temi, come la navbar: crea una cornice
+   visiva stabile e consente di usare sempre la stessa coppia testo/sfondo.
+   ========================================================================== */
+
+/* BLOCCO 1 — SUPERFICIE GENERALE */
+.app-footer {
+  margin-top: 0;
+  padding: clamp(3.5rem, 7vw, 6rem) 0 1.4rem;
+  color: rgba(255, 255, 255, 0.88);
+  background:
+    radial-gradient(circle at 80% 0%, rgba(215, 178, 109, 0.11), transparent 24rem),
+    #0b2425;
+}
+
+/* BLOCCO 2 — GRIGLIA SUPERIORE */
+.footer-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(140px, 0.55fr) minmax(190px, 0.7fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  padding-bottom: 3rem;
+}
+
+.footer-intro {
+  max-width: 620px;
+}
+
+/* BLOCCO 3 — TITOLI E TESTO EDITORIALE */
+.footer-kicker,
+.footer-heading {
+  margin: 0 0 0.8rem;
+  color: #f6d89a;
+  font-family: var(--albergo-font-body);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.footer-brand {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(2rem, 3.4vw, 3.5rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.footer-description {
+  margin: 1.25rem 0 0;
+  color: #d9e1df;
+  line-height: 1.75;
+}
+
+/* BLOCCO 4 — LINK E CONTATTI */
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-style: normal;
+}
+
+.footer-links a {
+  width: fit-content;
+  color: #ffffff;
+  font-weight: 650;
+  text-decoration-color: rgba(246, 216, 154, 0.65);
+  text-decoration-thickness: 1px;
+}
+
+.footer-links a:hover {
+  color: #f6d89a;
+}
+
+.footer-address span {
+  color: #d9e1df;
+}
+
+/* BLOCCO 5 — BARRA FINALE */
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  color: #c8d2cf;
+  font-size: 0.78rem;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+/* BLOCCO 6 — RESPONSIVE */
+@media (max-width: 800px) {
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer-intro {
+    grid-column: 1 / -1;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-intro {
+    grid-column: auto;
+  }
+}

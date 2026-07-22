@@ -1,0 +1,330 @@
+/* ========================================================================== 
+   GESTIONALE STAFF — GUIDA DIDATTICA STILI
+   --------------------------------------------------------------------------
+   Il pannello è volutamente più "applicativo" del resto del sito: molte tabelle,
+   statistiche e form. I token globali mantengono comunque la stessa identità
+   visiva e rendono tutto compatibile con light/dark mode.
+   ========================================================================== */
+
+/* BLOCCO 1 — CONTENITORE E HEADER */
+.staff-page {
+  max-width: 1500px;
+  color: var(--albergo-text);
+}
+
+.staff-header,
+.panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.staff-header h1,
+.panel-title h2 {
+  margin: 0;
+}
+
+.eyebrow {
+  display: block;
+  color: var(--albergo-muted-earth);
+  font-family: var(--albergo-font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* BLOCCO 2 — NAVIGAZIONE INTERNA DEL GESTIONALE */
+.staff-nav {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0.35rem;
+  background: var(--albergo-card-translucent);
+  border: 1px solid var(--albergo-border-soft);
+  border-radius: 0.85rem;
+}
+
+.staff-nav button,
+.text-button {
+  border: 0;
+  background: transparent;
+  color: var(--albergo-text);
+  font-family: var(--albergo-font-body);
+}
+
+.staff-nav button {
+  min-width: 125px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  font-weight: 700;
+}
+
+.staff-nav button.active {
+  background: #183f3b;
+  color: #ffffff;
+}
+
+:host-context(html[data-theme='dark']) .staff-nav button.active {
+  background: #a9d8c5;
+  color: #10201f;
+}
+
+/* BLOCCO 3 — STATISTICHE */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.stat-box,
+.staff-panel {
+  background: var(--albergo-card-translucent);
+  border: 1px solid var(--albergo-border-soft);
+  border-radius: 0.9rem;
+  box-shadow: var(--albergo-shadow-soft);
+}
+
+.stat-box {
+  padding: 1.3rem;
+}
+
+.stat-box span,
+.stat-box small {
+  display: block;
+  font-family: var(--albergo-font-body);
+}
+
+.stat-box span,
+.stat-box small {
+  color: var(--albergo-muted-earth) !important;
+}
+
+.stat-box span {
+  font-size: 0.82rem;
+}
+
+.stat-box strong {
+  display: block;
+  margin: 0.2rem 0;
+  color: var(--albergo-heading);
+  font-size: 2rem;
+}
+
+.stat-box.warning {
+  border-top: 3px solid var(--albergo-gold);
+}
+
+/* BLOCCO 4 — PANORAMICA A DUE COLONNE */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1rem;
+}
+
+.staff-panel {
+  padding: 1.5rem;
+}
+
+.table-panel {
+  min-height: 420px;
+}
+
+.text-button {
+  color: var(--albergo-gold);
+  font-weight: 700;
+}
+
+/* BLOCCO 5 — LISTE COMPATTE */
+.compact-list {
+  margin-top: 1rem;
+}
+
+.compact-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid var(--albergo-border-soft);
+}
+
+.compact-row:last-child {
+  border-bottom: 0;
+}
+
+.compact-row strong,
+.compact-row span {
+  display: block;
+}
+
+.compact-row div > span {
+  color: var(--albergo-muted-earth) !important;
+  font-family: var(--albergo-font-body);
+  font-size: 0.8rem;
+}
+
+/* BLOCCO 6 — BADGE DI STATO */
+.status-dot {
+  display: inline-block;
+  border-radius: 999px;
+  background: var(--albergo-surface-warm);
+  color: var(--albergo-gold) !important;
+  font-family: var(--albergo-font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  white-space: nowrap;
+}
+
+.status-dot.ok {
+  background: color-mix(in srgb, var(--albergo-success) 18%, var(--albergo-surface-raised));
+  color: var(--albergo-success) !important;
+}
+
+/* BLOCCO 7 — MINI MAPPA CAMERE */
+.room-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.55rem;
+  margin: 1.25rem 0;
+}
+
+.room-mini-grid span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid var(--albergo-border-soft);
+  background: color-mix(in srgb, var(--albergo-success) 16%, var(--albergo-surface-raised));
+  color: var(--albergo-text);
+  font-family: var(--albergo-font-body);
+  font-weight: 700;
+}
+
+.room-mini-grid span.occupied,
+.legend i.occupied {
+  background: color-mix(in srgb, var(--albergo-gold) 28%, var(--albergo-surface-raised));
+}
+
+.legend {
+  color: var(--albergo-muted-earth) !important;
+  font-family: var(--albergo-font-body);
+  font-size: 0.8rem;
+}
+
+.legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 0.25rem 0 0.75rem;
+  background: color-mix(in srgb, var(--albergo-success) 16%, var(--albergo-surface-raised));
+}
+
+/* BLOCCO 8 — TABELLE */
+.table {
+  margin-top: 1.25rem;
+  font-family: var(--albergo-font-body);
+}
+
+.table th {
+  color: var(--albergo-muted-earth) !important;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.table td small,
+.record-count {
+  color: var(--albergo-muted-earth) !important;
+}
+
+.record-count {
+  font-family: var(--albergo-font-body);
+  font-size: 0.85rem;
+}
+
+/* BLOCCO 9 — FORM PRENOTAZIONE IN STRUTTURA */
+.physical-booking-form {
+  font-family: var(--albergo-font-body);
+}
+
+.physical-booking-form .form-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* BLOCCO 10 — VALIDAZIONE */
+.required-star {
+  color: var(--albergo-danger);
+  font-weight: 800;
+}
+
+.required-note {
+  color: var(--albergo-muted);
+  font-size: 0.85rem;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border: 2px solid var(--albergo-danger) !important;
+  background-image: none;
+}
+
+.invalid-feedback {
+  color: var(--albergo-danger);
+  font-weight: 600;
+}
+
+/* BLOCCO 11 — EDITOR PRENOTAZIONE */
+.booking-editor,
+.edit-row > td {
+  background: var(--albergo-surface-warm) !important;
+}
+
+.booking-editor {
+  border: 1px solid var(--albergo-border);
+  border-radius: 0.8rem;
+  padding: 1.25rem;
+}
+
+.action-group {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+/* Azioni distruttive mantengono colori fissi ad alto contrasto. */
+.hotel-primary {
+  background: #183f3b !important;
+  color: #ffffff !important;
+}
+
+.hotel-danger {
+  background: #6b1f2a !important;
+  color: #ffffff !important;
+}
+
+/* BLOCCO 12 — RESPONSIVE */
+@media (max-width: 1050px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .staff-header,
+  .panel-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

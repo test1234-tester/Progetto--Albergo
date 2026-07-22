@@ -1,0 +1,247 @@
+<!--
+  GUIDA DIDATTICA TEMPLATE
+  Template SPA: categoria, carosello, schede e modale di prenotazione.
+  Le direttive @if/@for sono il control flow di Angular; formControlName collega
+  i campi HTML ai Reactive Forms definiti nel file TypeScript.
+-->
+<div class="spa-page">
+  <!-- BLOCCO 1 — TOP BANNER DEL PASS ALL-INCLUSIVE -->
+  <div class="top-banner">
+    <div class="container text-center">
+      <span class="badge"><i class="fa-solid fa-crown"></i> PASS ALL-INCLUSIVE</span>
+      <span class="banner-text">
+        <strong>€200 / Persona</strong> — Accesso illimitato e libero a tutte le strutture + Custodia Pet Gratuita inclusa!
+      </span>
+    </div>
+  </div>
+
+  <!-- BLOCCO 2 — INTRODUZIONE / HERO SPA -->
+  <header class="hero-section text-center">
+    <div class="container">
+      <span class="sub-title">FINALE LIGURE • LUXURY RESORT</span>
+      <h1>L'Oasi del Benessere sul Mare</h1>
+      <p class="hero-desc">
+        Un'esperienza esclusiva a percorso libero. Con il Pass da <strong>€200</strong> accedi senza limiti a piscina infinity, idromassaggio vista mare, grotta di sale e trattamenti. E se viaggi con il tuo animale, la nostra <strong>Pet SPA</strong> si prenderà cura di lui gratuitamente mentre ti rilassi!
+      </p>
+    </div>
+  </header>
+
+  <!-- BLOCCO 3 — CATALOGO E CAROSELLO DELLE ESPERIENZE SPA -->
+  <main class="container py-4">
+    <!-- BLOCCO 3A — SELETTORE SPA UMANA / PET SPA -->
+    <div class="category-tabs text-center mb-4">
+      <button
+        class="tab-btn"
+        [class.active]="currentCategory === 'human'"
+        (click)="switchCategory('human')">
+        <i class="fa-solid fa-spa"></i> SPA OSPITI UMANI
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="currentCategory === 'pet'"
+        (click)="switchCategory('pet')">
+        <i class="fa-solid fa-dog"></i> PET SPA CANI & ANIMALI
+      </button>
+    </div>
+
+    <!-- BLOCCO 3B — GRIGLIA PRINCIPALE: GALLERIA + DESCRIZIONE -->
+    <div class="row gy-4">
+
+      <!-- BLOCCO 3C — CAROSELLO FOTOGRAFICO -->
+      <div class="col-12 col-lg-7">
+        <div class="carousel-container">
+          <div class="main-image-wrapper">
+            <img [src]="'/' + currentItem.img" [alt]="currentItem.title" class="main-img">
+
+            <div class="image-overlay">
+              <span class="tag-badge">{{ currentItem.tag }}</span>
+              <h3>{{ currentItem.title }}</h3>
+            </div>
+
+            <button class="nav-btn prev" (click)="navigateCarousel(-1)" aria-label="Precedente">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button class="nav-btn next" (click)="navigateCarousel(1)" aria-label="Successivo">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+            <div *ngIf="isVideoTourActive" class="video-indicator">
+              <span class="pulse-dot"></span> VIDEO TOUR IN CORSO
+            </div>
+          </div>
+
+          <!-- BLOCCO 3D — MINIATURE DEL CAROSELLO -->
+          <div class="thumbnails-wrapper">
+            <button
+              *ngFor="let item of currentList; let i = index"
+              (click)="selectSlide(i)"
+              class="thumb-btn"
+              [class.active]="i === currentIndex">
+              <img [src]="'/' + item.img" [alt]="item.title">
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLOCCO 3E — DETTAGLI DEL TRATTAMENTO E PREZZO -->
+      <div class="col-12 col-lg-5">
+        <div
+          class="description-card"
+          (mouseenter)="startVideoTour()"
+          (mouseleave)="stopVideoTour()">
+
+          <div class="hover-hint">
+            <i class="fa-solid fa-film"></i> Passa il mouse qui per il Video-Tour Fotografico
+          </div>
+
+          <div class="card-header">
+            <span class="tag-label">{{ currentItem.tag }}</span>
+            <h2>{{ currentItem.title }}</h2>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-box">
+              <i class="fa-regular fa-clock"></i>
+              <div>
+                <small>Durata Consigliata</small>
+                <strong>{{ currentItem.duration }}</strong>
+              </div>
+            </div>
+            <div class="stat-box">
+              <i class="fa-solid fa-temperature-three-quarters"></i>
+              <div>
+                <small>Temperatura</small>
+                <strong>{{ currentItem.temp }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <p class="description-text">{{ currentItem.text }}</p>
+
+          <div class="features-block">
+            <h4><i class="fa-solid fa-circle-check"></i> Cosa include questo servizio:</h4>
+            <ul>
+              <li *ngFor="let feat of currentItem.features">
+                <i class="fa-solid fa-check"></i> {{ feat }}
+              </li>
+            </ul>
+          </div>
+
+          <div class="pricing-cta text-center">
+            <div class="price-info">
+              <span class="amount">€200</span>
+              <span class="period">/ tutto incluso a persona</span>
+            </div>
+            <p class="price-sub">Scelta libera di tutti i servizi • Pet SPA inclusa gratis</p>
+
+            <button class="cta-button" (click)="openBookingModal()">
+              <i class="fa-solid fa-calendar-check"></i> PRENOTA IL TUO PASS
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- BLOCCO 4 — MODALE PRENOTAZIONE PASS SPA -->
+  <div class="modal-backdrop" *ngIf="isModalOpen">
+    <div class="modal-box">
+      <button class="close-btn" (click)="closeModal()" aria-label="Chiudi">&times;</button>
+
+      <div class="modal-scroll-content">
+
+      <!-- BLOCCO 4A — FORM PRIMA DELL'INVIO -->
+      <div *ngIf="!isConfirmed">
+        <h2 class="modal-title"><i class="fa-solid fa-spa"></i> Prenota il tuo Pass SPA</h2>
+        <p class="modal-subtitle">Quota fissa €200 tutto incluso con accesso libero a tutti i servizi.</p>
+
+        <!-- BLOCCO 4B — DATI CONTATTO: la camera NON viene selezionata qui. -->
+        <form #spaForm="ngForm" (ngSubmit)="submitBooking(spaForm)" novalidate>
+
+          <p class="required-note"><span class="required-star">*</span> Campi obbligatori</p>
+
+          <div class="form-group">
+            <label for="spa-name">Nome e Cognome <span class="required-star">*</span></label>
+            <input
+              id="spa-name"
+              type="text"
+              [(ngModel)]="bookingData.nome"
+              name="nome"
+              #nomeCtrl="ngModel"
+              required
+              minlength="2"
+              placeholder="Mario Rossi"
+              class="form-control"
+              [class.is-invalid]="nomeCtrl.invalid && (nomeCtrl.touched || spaForm.submitted)"
+            >
+            <div *ngIf="nomeCtrl.invalid && (nomeCtrl.touched || spaForm.submitted)" class="invalid-feedback d-block">Inserisci nome e cognome.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="spa-email">Email di Contatto <span class="required-star">*</span></label>
+            <input
+              id="spa-email"
+              type="email"
+              [(ngModel)]="bookingData.email"
+              name="email"
+              #emailCtrl="ngModel"
+              required
+              email
+              placeholder="mario.rossi@email.com"
+              class="form-control"
+              [class.is-invalid]="emailCtrl.invalid && (emailCtrl.touched || spaForm.submitted)"
+            >
+            <div *ngIf="emailCtrl.invalid && (emailCtrl.touched || spaForm.submitted)" class="invalid-feedback d-block">Inserisci un indirizzo email valido.</div>
+          </div>
+
+          <div class="spa-booking-info" role="note">
+            Il Pass SPA viene prenotato separatamente. L'eventuale camera viene già gestita nella prenotazione del soggiorno.
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="bookingData.haPet" name="haPet">
+              Ho un cane o animale domestico da affidare alla Pet SPA (Gratuito)
+            </label>
+          </div>
+
+          <div *ngIf="bookingData.haPet" class="pet-fields">
+            <div class="form-row">
+              <div class="form-group col">
+                <label>Nome dell'Animale</label>
+                <input type="text" [(ngModel)]="bookingData.nomePet" name="nomePet" placeholder="es. Luna" class="form-control">
+              </div>
+              <div class="form-group col">
+                <label>Razza / Taglia</label>
+                <input type="text" [(ngModel)]="bookingData.razzaPet" name="razzaPet" placeholder="es. Golden Retriever" class="form-control">
+              </div>
+            </div>
+          </div>
+
+          <button mat-flat-button class="spa-material-button" type="submit">CONFERMA PRENOTAZIONE (€200)</button>
+        </form>
+      </div>
+
+      <!-- BLOCCO 5 — CONFERMA FRONTEND DELLA PRENOTAZIONE SPA -->
+      <div *ngIf="isConfirmed" class="confirmation-box text-center">
+        <div class="check-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h3>Prenotazione Confermata!</h3>
+        <p>Grazie <strong>{{ bookingData.nome }}</strong>, la tua prenotazione per il Pass All-Inclusive è stata registrata con successo.</p>
+
+        <div class="summary-card">
+          <p><strong>Pass:</strong> All-Inclusive SPA (€200)</p>
+          <p><strong>Pagamento:</strong> Diretto in struttura</p>
+          <p *ngIf="bookingData.haPet">
+            <strong>Pet Custody:</strong> Attivo per {{ bookingData.nomePet || 'il tuo pet' }} (Incluso gratuitamente)
+          </p>
+        </div>
+
+        <button class="cta-button" (click)="closeModal()">CHIUDI</button>
+      </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

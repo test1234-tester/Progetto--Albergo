@@ -1,0 +1,93 @@
+/* GUIDA DIDATTICA STILI
+ * Pagina di autenticazione: Bootstrap gestisce form/layout, Angular Material
+ * il bottone principale. I colori usano i token globali e quindi seguono
+ * automaticamente light/dark mode. Ogni sezione è commentata per studio.
+ */
+/* BLOCCO 1 — SFONDO DELLA PAGINA */
+.auth-page {
+  min-height: calc(100vh - 180px);
+  padding: clamp(2.5rem, 7vw, 6rem) 1rem;
+  background:
+    radial-gradient(circle at 15% 15%, color-mix(in srgb, var(--albergo-gold) 18%, transparent), transparent 24rem),
+    linear-gradient(145deg, var(--albergo-bg-alt) 0%, var(--albergo-bg) 58%, var(--albergo-surface-warm) 100%);
+}
+
+/* BLOCCO 2 — CARD CENTRALE DEL FORM */
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  overflow: hidden;
+  border: 1px solid var(--albergo-border-soft);
+  border-radius: 1.5rem;
+  background: var(--albergo-card-translucent);
+  box-shadow: var(--albergo-shadow) !important;
+}
+
+/* BLOCCO 2A — ACCENTO CROMATICO SUPERIORE */
+.auth-card::before {
+  content: '';
+  display: block;
+  height: 5px;
+  background: linear-gradient(90deg, var(--albergo-navy), var(--albergo-gold-light));
+}
+
+/* BLOCCO 3 — TITOLO E LINK DI CAMBIO SCHERMATA */
+.auth-title {
+  margin-bottom: 0.5rem;
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  text-align: center;
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* BLOCCO 4 — SWITCH CLIENTE / STAFF (login) */
+.access-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.access-switch .btn {
+  min-height: 44px;
+  border-color: var(--albergo-primary);
+  color: var(--albergo-heading);
+  font-weight: 700;
+}
+
+.btn-check:checked + .btn {
+  color: #ffffff;
+  background: #355c4d;
+  border-color: #355c4d;
+}
+
+/* BLOCCO 5 — CAMPO PASSWORD + TOGGLE VISIBILITÀ */
+.password-field {
+  position: relative;
+}
+
+.password-field .form-control {
+  padding-right: 3.25rem;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.55rem;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+/* BLOCCO 6 — FEEDBACK HOVER DEL PULSANTE OCCHIO */
+.password-toggle:hover {
+  background: var(--albergo-surface-warm);
+}

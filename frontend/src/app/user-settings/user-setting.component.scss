@@ -1,0 +1,20 @@
+/* ========================================================================== 
+   IMPOSTAZIONI UTENTE — GUIDA DIDATTICA STILI
+   --------------------------------------------------------------------------
+   Componente prototipo: usa una sola card centrale. Anche qui i token globali
+   garantiscono compatibilità light/dark senza regole duplicate.
+   ========================================================================== */
+
+/* BLOCCO 1 — CARD PRINCIPALE */
+.card {
+  color: var(--albergo-text);
+  background: var(--albergo-surface-raised);
+  border: 1px solid var(--albergo-border-soft);
+  border-radius: var(--albergo-radius-lg);
+  box-shadow: var(--albergo-shadow-soft);
+}
+
+/* BLOCCO 2 — TESTO SECONDARIO */
+.text-muted {
+  color: var(--albergo-muted) !important;
+}

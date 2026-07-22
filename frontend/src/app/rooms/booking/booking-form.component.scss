@@ -1,0 +1,82 @@
+/* ========================================================================== 
+   FORM PRENOTAZIONE CAMERA — GUIDA DIDATTICA STILI
+   --------------------------------------------------------------------------
+   Questa pagina viene usata per la conferma di una camera specifica. I token
+   globali permettono a card, avvisi e form di seguire light/dark mode.
+   ========================================================================== */
+
+/* BLOCCO 1 — CONTENITORE GENERALE */
+.booking-page {
+  min-height: calc(100vh - 72px);
+  color: var(--albergo-text);
+}
+
+/* BLOCCO 2 — CARD PRINCIPALI */
+.booking-card,
+.booking-summary {
+  color: var(--albergo-text);
+  background: var(--albergo-surface-raised);
+  border: 1px solid var(--albergo-border-soft);
+  border-radius: 14px;
+}
+
+/* Il riepilogo resta visibile durante lo scroll su desktop. */
+.booking-summary {
+  position: sticky;
+  top: 1rem;
+}
+
+/* BLOCCO 3 — AVVISO PRENOTAZIONE OSPITE */
+.guest-booking-note {
+  color: var(--albergo-text);
+  background: var(--albergo-surface-warm);
+  border: 1px solid var(--albergo-border);
+}
+
+.guest-card {
+  background: var(--albergo-surface-raised);
+}
+
+/* BLOCCO 4 — VALIDAZIONE */
+.required-star {
+  color: var(--albergo-danger);
+  font-weight: 700;
+}
+
+.required-note {
+  color: var(--albergo-muted);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-width: 2px;
+}
+
+.invalid-feedback {
+  font-size: 0.85rem;
+}
+
+/* BLOCCO 5 — AZIONE PRINCIPALE MATERIAL */
+.hotel-primary {
+  background: #183f3b !important;
+  color: #ffffff !important;
+}
+
+/* BLOCCO 6 — POLICY PRENOTAZIONE SENZA LOGIN */
+.anonymous-policy-notice {
+  color: var(--albergo-text);
+  background: var(--albergo-warning-bg);
+  border: 2px solid var(--albergo-gold);
+  border-radius: 0.75rem;
+  padding: 1rem 1.2rem;
+  line-height: 1.55;
+}
+
+/* BLOCCO 7 — RESPONSIVE: niente sticky su schermi piccoli. */
+@media (max-width: 991.98px) {
+  .booking-summary {
+    position: static;
+  }
+}

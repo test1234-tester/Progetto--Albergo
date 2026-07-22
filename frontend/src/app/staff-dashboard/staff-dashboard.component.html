@@ -1,0 +1,182 @@
+<!--
+  GUIDA DIDATTICA TEMPLATE
+  Template del gestionale staff: sezioni, tabelle, form di modifica/cancellazione e creazione in struttura.
+  Le direttive @if/@for sono il control flow di Angular; formControlName collega
+  i campi HTML ai Reactive Forms definiti nel file TypeScript.
+-->
+<!-- BLOCCO 1: shell dell'intero gestionale staff. -->
+<section class="staff-page container-fluid py-4 px-3 px-lg-5">
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status"></div>
+      <p class="mt-3">Caricamento gestionale staff…</p>
+    </div>
+  } @else if (dashboard(); as data) {
+    <header class="staff-header mb-4">
+      <div>
+        <span class="eyebrow">Pannello operativo</span>
+        <h1>Gestionale staff</h1>
+        <p class="text-muted mb-0">Vista completa di prenotazioni, camere e clienti.</p>
+      </div>
+      <button mat-stroked-button type="button" (click)="loadDashboard()">Aggiorna dati</button>
+    </header>
+
+    <nav class="staff-nav mb-4" aria-label="Sezioni gestionale">
+      <button type="button" [class.active]="activeSection() === 'overview'" (click)="setSection('overview')">Riepilogo</button>
+      <button type="button" [class.active]="activeSection() === 'bookings'" (click)="setSection('bookings')">Prenotazioni</button>
+      <button type="button" [class.active]="activeSection() === 'rooms'" (click)="setSection('rooms')">Camere</button>
+      <button type="button" [class.active]="activeSection() === 'users'" (click)="setSection('users')">Clienti</button>
+    </nav>
+
+    @if (errorMessage()) { <div class="alert alert-danger" role="alert">{{ errorMessage() }}</div> }
+    @if (successMessage()) { <div class="alert alert-success" role="status">{{ successMessage() }}</div> }
+
+    <!-- BLOCCO 2: panoramica con KPI, ultime prenotazioni e stato camere. -->
+    @if (activeSection() === 'overview') {
+      <div class="stats-grid mb-4">
+        <article class="stat-box"><span>Camere occupate</span><strong>{{ data.stats.camereOccupate }} / {{ data.stats.camereTotali }}</strong><small>{{ occupancyPercentage() }}% di occupazione</small></article>
+        <article class="stat-box"><span>Prenotazioni</span><strong>{{ data.stats.prenotazioniTotali }}</strong><small>{{ pendingBookings() }} in attesa</small></article>
+        <article class="stat-box"><span>Clienti registrati</span><strong>{{ data.stats.clientiRegistrati }}</strong><small>Profili presenti nel database</small></article>
+        <article class="stat-box warning"><span>Pagamenti in pendenza</span><strong>{{ data.stats.pagamentiInPendenza }}</strong><small>Da verificare</small></article>
+      </div>
+
+      <div class="overview-grid">
+        <section class="staff-panel">
+          <div class="panel-title"><div><span class="eyebrow">Arrivi</span><h2>Prossime prenotazioni</h2></div><button class="text-button" type="button" (click)="setSection('bookings')">Vedi tutte</button></div>
+          <div class="compact-list">
+            @for (booking of data.bookings.slice(0, 5); track booking.id) {
+              <div class="compact-row"><div><strong>{{ booking.cliente }}</strong><span>{{ booking.camera }} · {{ booking.dataArrivo | date: 'dd/MM/yyyy' }}</span></div><span class="status-dot" [class.ok]="booking.confermata">{{ booking.confermata ? 'Confermata' : 'In attesa' }}</span></div>
+            }
+          </div>
+        </section>
+        <section class="staff-panel">
+          <div class="panel-title"><div><span class="eyebrow">Camere</span><h2>Occupazione</h2></div></div>
+          <div class="room-mini-grid">
+            @for (room of data.rooms.slice(0, 18); track room.id) { <span [class.occupied]="room.occupata">{{ room.numero }}</span> }
+          </div>
+          <p class="legend"><i></i> Libera <i class="occupied"></i> Occupata</p>
+        </section>
+      </div>
+    }
+
+    <!-- BLOCCO 3: gestione completa delle prenotazioni. -->
+    @if (activeSection() === 'bookings') {
+      <section class="staff-panel table-panel">
+        <div class="panel-title">
+          <div><span class="eyebrow">Soggiorni</span><h2>Gestione prenotazioni</h2></div>
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <span class="record-count">{{ data.bookings.length }} prenotazioni</span>
+            <button mat-flat-button class="hotel-primary" type="button" (click)="togglePhysicalBookingForm()">+ Prenotazione in struttura</button>
+          </div>
+        </div>
+
+        @if (showPhysicalBookingForm()) {
+          <!-- BLOCCO 4: prenotazione creata direttamente dalla reception. -->
+          <form class="physical-booking-form booking-editor mt-4" [formGroup]="physicalBookingForm" (ngSubmit)="createPhysicalBooking()" novalidate>
+            <h3 class="h5">Nuova prenotazione in struttura</h3>
+            <p class="required-note"><span class="required-star">*</span> Campi obbligatori</p>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Nome <span class="required-star">*</span></label>
+                <input class="form-control" [class.is-invalid]="isInvalid(physicalBookingForm.controls.nome)" formControlName="nome" />
+                @if (isInvalid(physicalBookingForm.controls.nome)) { <div class="invalid-feedback d-block">Inserisci un nome valido.</div> }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Cognome <span class="required-star">*</span></label>
+                <input class="form-control" [class.is-invalid]="isInvalid(physicalBookingForm.controls.cognome)" formControlName="cognome" />
+                @if (isInvalid(physicalBookingForm.controls.cognome)) { <div class="invalid-feedback d-block">Inserisci un cognome valido.</div> }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Cellulare <span class="required-star">*</span></label>
+                <input class="form-control" [class.is-invalid]="isInvalid(physicalBookingForm.controls.cellulare)" formControlName="cellulare" />
+                @if (isInvalid(physicalBookingForm.controls.cellulare)) { <div class="invalid-feedback d-block">Inserisci un numero di telefono valido.</div> }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Email</label>
+                <input class="form-control" type="email" [class.is-invalid]="isInvalid(physicalBookingForm.controls.email)" formControlName="email" />
+                @if (isInvalid(physicalBookingForm.controls.email)) { <div class="invalid-feedback d-block">Inserisci un indirizzo email valido.</div> }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Camera <span class="required-star">*</span></label>
+                <select class="form-select" [class.is-invalid]="isInvalid(physicalBookingForm.controls.roomId)" formControlName="roomId">
+                  <option [ngValue]="0">Seleziona una camera</option>
+                  @for (room of data.rooms; track room.id) { <option [ngValue]="room.id">{{ room.nome }}</option> }
+                </select>
+                @if (isInvalid(physicalBookingForm.controls.roomId)) { <div class="invalid-feedback d-block">Seleziona una camera.</div> }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Numero persone <span class="required-star">*</span></label>
+                <input class="form-control" [class.is-invalid]="isInvalid(physicalBookingForm.controls.numeroOspiti)" type="number" min="1" max="8" formControlName="numeroOspiti" />
+                @if (isInvalid(physicalBookingForm.controls.numeroOspiti)) { <div class="invalid-feedback d-block">Inserisci da 1 a 8 persone.</div> }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Check-in <span class="required-star">*</span></label>
+                <input class="form-control" [class.is-invalid]="isInvalid(physicalBookingForm.controls.checkIn)" type="date" formControlName="checkIn" />
+                @if (isInvalid(physicalBookingForm.controls.checkIn)) { <div class="invalid-feedback d-block">Inserisci il check-in.</div> }
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Check-out <span class="required-star">*</span></label>
+                <input class="form-control" [class.is-invalid]="isInvalid(physicalBookingForm.controls.checkOut)" type="date" formControlName="checkOut" />
+                @if (isInvalid(physicalBookingForm.controls.checkOut)) { <div class="invalid-feedback d-block">Il check-out deve essere successivo al check-in.</div> }
+              </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button mat-stroked-button type="button" (click)="togglePhysicalBookingForm()">Annulla</button>
+              <button mat-flat-button class="hotel-primary" type="submit" [disabled]="creatingBooking()">{{ creatingBooking() ? 'Salvataggio…' : 'Registra prenotazione' }}</button>
+            </div>
+          </form>
+        }
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>ID</th><th>Origine</th><th>Cliente</th><th>Camera</th><th>Periodo</th><th>Persone</th><th>Stato</th><th>Azioni</th></tr></thead>
+            <tbody>
+              @for (booking of data.bookings; track booking.id) {
+                <tr>
+                  <td>#{{ booking.id }}</td>
+                  <td><span class="badge" [class.text-bg-dark]="booking.origine === 'STRUTTURA'" [class.text-bg-light]="booking.origine !== 'STRUTTURA'">{{ originLabel(booking.origine) }}</span></td>
+                  <td><strong>{{ booking.cliente || '—' }}</strong><small>{{ booking.email }}</small></td>
+                  <td>{{ booking.camera }}</td>
+                  <td>{{ booking.dataArrivo | date: 'dd/MM/yy' }} – {{ booking.dataPartenza | date: 'dd/MM/yy' }}</td>
+                  <td>{{ booking.numeroOspiti || 1 }}</td>
+                  <td><span class="status-dot" [class.ok]="booking.confermata">{{ booking.confermata ? 'Confermata' : 'In attesa' }}</span></td>
+                  <td class="text-end"><div class="action-group"><button mat-stroked-button type="button" (click)="startBookingEdit(booking)">Modifica</button><button mat-flat-button class="hotel-danger" type="button" [disabled]="deletingBookingId() === booking.id" (click)="deleteBooking(booking)">{{ deletingBookingId() === booking.id ? 'Eliminazione…' : 'Cancella' }}</button></div></td>
+                </tr>
+                @if (editingBookingId() === booking.id) {
+                  <tr class="edit-row"><td colspan="8">
+                    <!-- BLOCCO 5: editor inline di una prenotazione esistente. -->
+                    <form class="booking-editor" [formGroup]="bookingEditForm" (ngSubmit)="saveBookingEdit(booking)" novalidate>
+                      <h3 class="h6 mb-3">Modifica prenotazione #{{ booking.id }}</h3>
+                      <p class="required-note"><span class="required-star">*</span> Campi obbligatori</p>
+                      <div class="row g-3">
+                        <div class="col-12 col-lg-4"><label class="form-label">Nominativo <span class="required-star">*</span></label><input class="form-control" [class.is-invalid]="isInvalid(bookingEditForm.controls.nominativo)" formControlName="nominativo" />@if (isInvalid(bookingEditForm.controls.nominativo)) { <div class="invalid-feedback d-block">Inserisci un nominativo valido.</div> }</div>
+                        <div class="col-12 col-md-6 col-lg-4"><label class="form-label">Camera <span class="required-star">*</span></label><select class="form-select" [class.is-invalid]="isInvalid(bookingEditForm.controls.roomId)" formControlName="roomId">@for (room of data.rooms; track room.id) { <option [ngValue]="room.id">{{ room.nome }}</option> }</select>@if (isInvalid(bookingEditForm.controls.roomId)) { <div class="invalid-feedback d-block">Seleziona una camera.</div> }</div>
+                        <div class="col-12 col-md-6 col-lg-4"><label class="form-label">Persone <span class="required-star">*</span></label><input class="form-control" [class.is-invalid]="isInvalid(bookingEditForm.controls.numeroOspiti)" type="number" min="1" max="8" formControlName="numeroOspiti" />@if (isInvalid(bookingEditForm.controls.numeroOspiti)) { <div class="invalid-feedback d-block">Inserisci da 1 a 8 persone.</div> }</div>
+                        <div class="col-12 col-md-6"><label class="form-label">Check-in <span class="required-star">*</span></label><input class="form-control" [class.is-invalid]="isInvalid(bookingEditForm.controls.checkIn)" type="date" formControlName="checkIn" />@if (isInvalid(bookingEditForm.controls.checkIn)) { <div class="invalid-feedback d-block">Inserisci il check-in.</div> }</div>
+                        <div class="col-12 col-md-6"><label class="form-label">Check-out <span class="required-star">*</span></label><input class="form-control" [class.is-invalid]="isInvalid(bookingEditForm.controls.checkOut)" type="date" formControlName="checkOut" />@if (isInvalid(bookingEditForm.controls.checkOut)) { <div class="invalid-feedback d-block">Il check-out deve essere successivo al check-in.</div> }</div>
+                        <div class="col-12"><label class="form-check-label"><input class="form-check-input me-2" type="checkbox" formControlName="confermata" /> Prenotazione confermata</label></div>
+                      </div>
+                      <div class="d-flex gap-2 justify-content-end mt-3"><button mat-stroked-button type="button" (click)="cancelBookingEdit()">Annulla</button><button mat-flat-button class="hotel-primary" type="submit" [disabled]="savingBooking()">{{ savingBooking() ? 'Salvataggio…' : 'Salva modifiche' }}</button></div>
+                    </form>
+                  </td></tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    <!-- BLOCCO 6: inventario camere e cambio stato occupata/libera. -->
+    @if (activeSection() === 'rooms') {
+      <section class="staff-panel table-panel"><div class="panel-title"><div><span class="eyebrow">Inventario</span><h2>Gestione camere</h2></div><span class="record-count">{{ data.rooms.length }} camere</span></div><div class="table-responsive"><table class="table align-middle"><thead><tr><th>Numero</th><th>Camera</th><th>Prezzo/notte</th><th>Occupanti</th><th>Stato</th><th></th></tr></thead><tbody>@for (room of data.rooms; track room.id) { <tr><td><strong>{{ room.numero }}</strong></td><td>{{ room.nome }}</td><td>{{ room.prezzoPerNotte | currency: 'EUR' }}</td><td>{{ room.occupanti }}</td><td><span class="status-dot" [class.ok]="!room.occupata">{{ room.occupata ? 'Occupata' : 'Libera' }}</span></td><td class="text-end"><button mat-stroked-button type="button" [disabled]="pendingItemId() === room.id" (click)="toggleRoom(room)">{{ pendingItemId() === room.id ? 'Attendi…' : (room.occupata ? 'Libera camera' : 'Segna occupata') }}</button></td></tr> }</tbody></table></div></section>
+    }
+
+    <!-- BLOCCO 7: anagrafica dei clienti registrati. -->
+    @if (activeSection() === 'users') {
+      <section class="staff-panel table-panel"><div class="panel-title"><div><span class="eyebrow">Anagrafica</span><h2>Clienti registrati</h2></div><span class="record-count">{{ data.users.length }} clienti</span></div><div class="table-responsive"><table class="table align-middle"><thead><tr><th>ID</th><th>Nominativo</th><th>Username</th><th>Email</th><th>Cellulare</th></tr></thead><tbody>@for (user of data.users; track user.id) { <tr><td>#{{ user.id }}</td><td><strong>{{ user.nominativo || '—' }}</strong></td><td>{{ user.username || '—' }}</td><td>{{ user.email }}</td><td>{{ user.cellulare || '—' }}</td></tr> }</tbody></table></div></section>
+    }
+  } @else {
+    <div class="alert alert-danger">{{ errorMessage() ?? 'Gestionale staff non disponibile.' }}</div>
+  }
+</section>

@@ -1,0 +1,30 @@
+/* ========================================================================== 
+   PAGAMENTO — GUIDA DIDATTICA STILI
+   --------------------------------------------------------------------------
+   Il componente pagamento è volutamente semplice. Questi blocchi mostrano
+   come creare una superficie coerente con il design system senza duplicare
+   colori: tutto arriva da var(--albergo-*).
+   ========================================================================== */
+
+/* BLOCCO 1 — PAGINA */
+.payment-page {
+  min-height: calc(100vh - 160px);
+  padding: clamp(2rem, 6vw, 5rem) 1rem;
+  color: var(--albergo-text);
+  background: var(--albergo-bg-alt);
+}
+
+/* BLOCCO 2 — CARD DEL PAGAMENTO */
+.payment-page .card {
+  background: var(--albergo-surface-raised);
+  border: 1px solid var(--albergo-border-soft);
+  box-shadow: var(--albergo-shadow-soft);
+}
+
+/* BLOCCO 3 — RIEPILOGO ECONOMICO */
+.payment-page .summary,
+.payment-page .payment-summary {
+  color: var(--albergo-text);
+  background: var(--albergo-surface-warm);
+  border-radius: var(--albergo-radius);
+}

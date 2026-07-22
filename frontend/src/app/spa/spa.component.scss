@@ -1,0 +1,481 @@
+/* GUIDA DIDATTICA STILI
+ * Questo foglio riguarda solo il componente omonimo. Angular applica questi
+ * stili in modo incapsulato, mentre colori e token globali vivono in styles.css.
+ */
+/* BLOCCO 1 — TOKEN LOCALI DELLA SPA
+ * La SPA mantiene intenzionalmente un'atmosfera scura anche quando il sito è in
+ * light mode: funziona come una vera esperienza immersiva dentro il sito.
+ * Usiamo token locali statici per evitare che il cambio tema globale inverta
+ * accidentalmente testo e sfondo di questa sezione.
+ */
+.spa-page {
+  --spa-deep: #102a2b;
+  --spa-deepest: #081515;
+  --spa-cream: #fffdf7;
+  --spa-muted: #d6d2c8;
+  --spa-accent: #f0c982;
+  --spa-border: rgba(250, 247, 242, 0.18);
+  --spa-surface-soft: rgba(250, 247, 242, 0.055);
+
+  background-color: var(--spa-deep);
+  color: var(--spa-cream);
+  font-family: var(--albergo-font-body);
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.text-center { text-align: center; }
+.py-4 { padding-top: 2rem; padding-bottom: 2rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+/* BLOCCO 2 — TOP BANNER DEL PASS */
+.top-banner {
+  background: linear-gradient(90deg, #8b5d18, var(--spa-accent));
+  color: var(--spa-deep);
+  padding: 0.75rem 0;
+  font-size: 0.95rem;
+}
+
+.badge {
+  background-color: var(--spa-deep);
+  color: var(--spa-accent);
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+/* BLOCCO 3 — HERO INTRODUTTIVA SPA */
+.hero-section {
+  padding: 3rem 1rem 1.5rem;
+}
+
+.sub-title {
+  color: var(--spa-accent);
+  letter-spacing: 2px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.hero-section h1 {
+  font-family: var(--albergo-font-heading, var(--albergo-font-body));
+  font-size: 2.5rem;
+  color: var(--spa-cream);
+  margin-bottom: 1rem;
+}
+
+.hero-desc {
+  max-width: 800px;
+  margin: 0 auto;
+  color: var(--spa-muted);
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+/* BLOCCO 4 — TAB CATEGORIE HUMAN / PET */
+.tab-btn {
+  background-color: var(--spa-surface-soft);
+  color: var(--spa-muted);
+  border: 1px solid var(--spa-border);
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  margin: 0 0.4rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  background-color: var(--spa-accent);
+  color: var(--spa-deep);
+  border-color: var(--spa-accent);
+}
+
+/* BLOCCO 5 — CAROSELLO PRINCIPALE */
+.carousel-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.main-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.9), transparent);
+}
+
+.tag-badge {
+  background-color: var(--spa-accent);
+  color: var(--spa-deep);
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.image-overlay h3 {
+  color: var(--spa-cream);
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+}
+
+/* BLOCCO 5A — CONTROLLI PRECEDENTE / SUCCESSIVO */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(15, 23, 42, 0.6);
+  color: var(--spa-cream);
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background-color 0.3s;
+}
+
+.nav-btn:hover { background-color: var(--spa-accent); color: var(--spa-deep); }
+.nav-btn.prev { left: 1rem; }
+.nav-btn.next { right: 1rem; }
+
+.video-indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: rgba(220, 38, 38, 0.85);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: white;
+  border-radius: 50%;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* BLOCCO 5B — MINIATURE DEL CAROSELLO */
+.thumbnails-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.thumb-btn {
+  flex: 0 0 90px;
+  height: 60px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  transition: all 0.3s;
+}
+
+.thumb-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb-btn.active {
+  border-color: var(--spa-accent);
+  transform: scale(1.03);
+}
+
+/* BLOCCO 6 — CARD DESCRITTIVA DEL TRATTAMENTO */
+.description-card {
+  background-color: var(--spa-surface-soft);
+  border: 1px solid var(--spa-border);
+  border-radius: 1.25rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  transition: border-color 0.3s;
+}
+
+.description-card:hover {
+  border-color: var(--spa-accent);
+}
+
+.hover-hint {
+  font-size: 0.75rem;
+  color: var(--spa-accent);
+  text-align: right;
+  margin-bottom: 0.5rem;
+}
+
+.tag-label {
+  color: var(--spa-accent);
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.card-header h2 {
+  font-family: var(--albergo-font-heading, var(--albergo-font-body));
+  font-size: 1.8rem;
+  color: var(--spa-cream);
+  margin-top: 0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.stats-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--spa-deep);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  flex: 1;
+}
+
+.stat-box i { font-size: 1.25rem; color: var(--spa-accent); }
+.stat-box small { display: block; color: color-mix(in srgb, var(--spa-muted) 70%, transparent); font-size: 0.75rem; }
+.stat-box strong { color: var(--spa-cream); font-size: 0.95rem; }
+
+.description-text {
+  color: var(--spa-muted);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.features-block {
+  background-color: var(--spa-deep);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.features-block h4 {
+  color: var(--spa-accent);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.features-block ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features-block li {
+  color: var(--spa-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.features-block li i { color: #10b981; margin-right: 0.4rem; }
+
+/* BLOCCO 7 — PREZZO E CALL TO ACTION */
+.pricing-cta {
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--spa-border);
+}
+
+.amount { font-size: 2.2rem; font-weight: bold; color: var(--spa-cream); }
+.period { color: var(--spa-muted); font-size: 0.9rem; }
+.price-sub { color: var(--spa-accent); font-size: 0.85rem; margin-top: 0.25rem; margin-bottom: 1rem; }
+
+.cta-button {
+  background: linear-gradient(135deg, var(--spa-accent), #a86d16);
+  color: var(--spa-deep);
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.3s;
+}
+
+.cta-button:hover { opacity: 0.9; }
+
+/* BLOCCO 8 — MODALE DI PRENOTAZIONE SPA */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-box {
+  background-color: var(--spa-deep);
+  border: 1px solid var(--spa-border);
+  width: 100%;
+  max-width: 550px;
+  max-height: 90vh;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // il box stesso non scrolla: scrolla solo il contenuto interno
+}
+
+.modal-scroll-content {
+  overflow-y: auto;
+  padding-right: 0.5rem; // spazio per non far coprire il testo dalla scrollbar
+  margin-top: 0.5rem; // evita che il testo parta troppo vicino al bottone-X
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--spa-muted);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1; // resta sempre sopra al contenuto che scrolla
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: var(--spa-accent);
+}
+
+.modal-title {
+  font-family: var(--albergo-font-heading, var(--albergo-font-body));
+  color: var(--spa-cream);
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+.modal-subtitle { color: var(--spa-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; color: var(--spa-muted); font-size: 0.85rem; margin-bottom: 0.4rem; }
+
+.form-control {
+  width: 100%;
+  background-color: var(--spa-deep);
+  border: 1px solid var(--spa-border);
+  color: var(--spa-cream);
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+}
+
+.form-control:focus { border-color: var(--spa-accent); outline: none; }
+
+.form-row { display: flex; gap: 1rem; }
+.col { flex: 1; }
+
+.hotel-fields,
+.pet-fields {
+  background-color: var(--spa-deep);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px dashed var(--spa-border);
+}
+
+.help-text { color: var(--spa-accent); font-size: 0.75rem; display: block; margin-top: 0.5rem; }
+
+.checkbox-label { color: var(--spa-muted); font-size: 0.85rem; cursor: pointer; }
+
+.submit-btn {
+  background-color: var(--spa-accent);
+  color: var(--spa-deep);
+  font-weight: bold;
+  width: 100%;
+  padding: 0.9rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* BLOCCO 9 — CONFERMA VISIVA DEL FORM SPA */
+.check-icon { font-size: 3.5rem; color: #10b981; margin-bottom: 1rem; }
+.confirmation-box h3 { color: var(--spa-cream); margin-bottom: 0.5rem; }
+.confirmation-box p { color: var(--spa-muted); font-size: 0.95rem; }
+
+.summary-card {
+  background-color: var(--spa-deep);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.summary-card p { margin-bottom: 0.5rem; font-size: 0.85rem; }
+/* Icone locali: la pagina originale usava classi Font Awesome senza includere
+   la libreria. Questi fallback mantengono le icone visibili anche offline. */
+.spa-page i[class*="fa-"] {
+  display: inline-block;
+  width: 1.25em;
+  text-align: center;
+  font-style: normal;
+}
+.spa-page .fa-crown::before { content: "♛"; }
+.spa-page .fa-spa::before { content: "✦"; }
+.spa-page .fa-dog::before { content: "🐾"; }
+.spa-page .fa-chevron-left::before { content: "‹"; }
+.spa-page .fa-chevron-right::before { content: "›"; }
+.spa-page .fa-film::before { content: "▶"; }
+.spa-page .fa-clock::before { content: "◷"; }
+.spa-page .fa-temperature-three-quarters::before { content: "♨"; }
+.spa-page .fa-check::before { content: "✓"; }
+.spa-page .fa-calendar-check::before { content: "✓"; }
+.spa-page .fa-circle-info::before { content: "ⓘ"; }
+.spa-page .fa-circle-check::before { content: "✓"; }

@@ -1,0 +1,194 @@
+/* ========================================================================== 
+   NAVBAR — GUIDA DIDATTICA STILI
+   --------------------------------------------------------------------------
+   La navbar rimane volutamente scura sia in light sia in dark mode: crea un
+   punto visivo stabile e garantisce forte contrasto con testo e controlli.
+   Ogni blocco qui sotto corrisponde a una parte precisa del template.
+   ========================================================================== */
+
+/* BLOCCO 1 — SUPERFICIE PRINCIPALE DELLA NAVBAR */
+.navbar {
+  background: color-mix(in srgb, var(--albergo-navbar) 97%, transparent);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-block: 0.7rem;
+  box-shadow: 0 10px 32px rgba(8, 24, 24, 0.2);
+  backdrop-filter: blur(14px);
+}
+
+/* BLOCCO 2 — BRAND: simbolo + nome + payoff */
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-right: 2rem;
+  color: var(--albergo-cream-static);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(246, 216, 154, 0.75);
+  border-radius: 50%;
+  color: var(--albergo-gold-soft-static);
+  font-family: var(--albergo-font-heading);
+  font-size: 1.35rem;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-copy strong {
+  color: #ffffff;
+  font-family: var(--albergo-font-heading);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.brand-copy small {
+  margin-top: 0.28rem;
+  color: var(--albergo-gold-soft-static);
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* BLOCCO 3 — LINK PRINCIPALI */
+.main-links {
+  gap: 0.2rem;
+}
+
+.nav-link {
+  position: relative;
+  padding-inline: 0.75rem !important;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.93rem;
+  font-weight: 650;
+}
+
+/* La linea dorata compare solo su hover o route attiva. */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.15rem;
+  left: 0.75rem;
+  height: 2px;
+  background: var(--albergo-gold-soft-static);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #ffffff;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  transform: scaleX(1);
+}
+
+/* BLOCCO 4 — AREA SESSIONE E TOGGLE TEMA */
+.session-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.nav-user {
+  max-width: 220px;
+  margin-right: 0.35rem;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Toggle light/dark: un normale pulsante Material personalizzato via token MDC. */
+.theme-toggle.mat-mdc-button-base {
+  --mdc-outlined-button-label-text-color: #ffffff;
+  --mdc-outlined-button-outline-color: rgba(246, 216, 154, 0.75);
+  min-height: 42px;
+  border-radius: 999px;
+}
+
+.theme-toggle__icon {
+  margin-right: 0.35rem;
+  color: var(--albergo-gold-soft-static);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.theme-toggle__label {
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+/* BLOCCO 5 — PULSANTI DI SESSIONE MATERIAL */
+.nav-login.mat-mdc-button-base,
+.nav-logout.mat-mdc-button-base {
+  --mdc-text-button-label-text-color: #ffffff;
+  --mdc-outlined-button-label-text-color: #ffffff;
+  --mdc-outlined-button-outline-color: rgba(255, 255, 255, 0.72);
+  min-height: 42px;
+}
+
+.nav-register.mat-mdc-button-base {
+  --mdc-filled-button-container-color: #fffdf7;
+  --mdc-filled-button-label-text-color: #102a2b;
+  min-height: 42px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+/* BLOCCO 6 — HAMBURGER BOOTSTRAP */
+.navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+/* BLOCCO 7 — ADATTAMENTO TABLET/MOBILE */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    margin-top: 0.9rem;
+    padding: 0.9rem 0 0.2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .session-actions {
+    align-items: stretch;
+    flex-direction: column;
+    margin-top: 0.8rem;
+  }
+
+  .nav-user {
+    max-width: none;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .theme-toggle.mat-mdc-button-base {
+    justify-content: flex-start;
+  }
+}
+
+/* BLOCCO 8 — ACCESSIBILITÀ: niente animazione decorativa se ridotta dal sistema. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link::after {
+    transition: none;
+  }
+}

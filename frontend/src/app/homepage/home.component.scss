@@ -1,0 +1,567 @@
+/* ========================================================================== 
+   HOMEPAGE — RESTYLING IMMERSIVO + LIGHT/DARK
+   --------------------------------------------------------------------------
+   Questo SCSS usa quasi sempre le variabili globali di src/styles.css.
+   Risultato: la stessa struttura funziona in light e dark mode senza duplicare
+   tutto il foglio di stile.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   BLOCCO 1 — HERO: STRUTTURA E FOTOGRAFIA
+   -------------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  min-height: clamp(680px, 88vh, 940px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Tutti e tre i layer occupano esattamente l'area della hero. */
+.hero-media,
+.hero-media img,
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-media {
+  z-index: -3;
+  background: #102a2b;
+}
+
+/*
+ * L'immagine non viene più "spenta" da un overlay pesante.
+ * object-fit: cover la riempie senza deformarla; heroBreath crea un movimento
+ * lentissimo e quasi impercettibile per aumentare la sensazione immersiva.
+ */
+.hero-media img {
+  display: block;
+  object-fit: cover;
+  object-position: center 45%;
+  transform: scale(1.02);
+  animation: heroBreath 18s ease-in-out infinite alternate;
+}
+
+/*
+ * Overlay MOLTO più leggero del restyling precedente.
+ * La fotografia resta leggibile come immagine, non come semplice texture.
+ */
+.hero-overlay {
+  z-index: -2;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 20, 20, 0.08) 0%,
+      rgba(5, 20, 20, 0.14) 52%,
+      rgba(5, 20, 20, 0.34) 100%
+    );
+}
+
+/* In dark mode aumentiamo appena la parte inferiore, non l'intera fotografia. */
+:host-context(html[data-theme='dark']) .hero-overlay {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 10, 10, 0.08) 0%,
+      rgba(2, 10, 10, 0.18) 50%,
+      rgba(2, 10, 10, 0.46) 100%
+    );
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 2 — HERO: TESTO E GRADIENTE LOCALIZZATO
+   -------------------------------------------------------------------------- */
+.hero-content {
+  position: relative;
+  z-index: 1;
+  width: min(1050px, 100%);
+  padding: clamp(6rem, 11vw, 9rem) 1.25rem;
+  text-align: center;
+  color: #ffffff;
+  isolation: isolate;
+}
+
+/*
+ * Questo pseudo-elemento protegge SOLO la zona del testo.
+ * È un gradiente radiale sfumato: la foto ai lati rimane molto più luminosa.
+ */
+.hero-content::before {
+  content: '';
+  position: absolute;
+  inset: clamp(1rem, 3vw, 2rem) clamp(-3rem, -5vw, -1rem);
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(5, 20, 20, 0.68) 0%,
+      rgba(5, 20, 20, 0.44) 34%,
+      rgba(5, 20, 20, 0.15) 62%,
+      transparent 79%
+    );
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.hero-eyebrow,
+.section-eyebrow,
+.card-eyebrow {
+  margin: 0 0 0.85rem;
+  font-family: var(--albergo-font-body);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.19em;
+  text-transform: uppercase;
+}
+
+.hero-eyebrow {
+  color: #f6d89a;
+  animation: heroReveal 800ms 100ms ease-out both;
+}
+
+.hero-title {
+  max-width: 1000px;
+  margin: 0 auto;
+  color: #ffffff;
+  font-size: clamp(3.2rem, 6.5vw, 6rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+  text-shadow:
+    0 3px 16px rgba(0, 0, 0, 0.45),
+    0 12px 42px rgba(0, 0, 0, 0.28);
+  animation: heroReveal 1000ms 250ms ease-out both;
+}
+
+.hero-desc {
+  max-width: 680px;
+  margin: clamp(1.4rem, 3vw, 2rem) auto 0;
+  color: #ffffff;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+  animation: heroReveal 1000ms 450ms ease-out both;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 3 — HERO: PULSANTI MATERIAL + TESTO SECONDARIO
+   -------------------------------------------------------------------------- */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 2.25rem;
+  animation: heroReveal 900ms 650ms ease-out both;
+}
+
+.hero-primary.mat-mdc-button-base,
+.cta-button.mat-mdc-button-base {
+  --mdc-filled-button-container-color: #fffdf7;
+  --mdc-filled-button-label-text-color: #102a2b;
+  min-height: 50px;
+  padding-inline: 1.55rem;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+.hero-secondary.mat-mdc-button-base {
+  --mdc-outlined-button-label-text-color: #ffffff;
+  --mdc-outlined-button-outline-color: rgba(255, 255, 255, 0.94);
+  min-height: 50px;
+  padding-inline: 1.55rem;
+  border-radius: 999px;
+  font-weight: 800;
+  background: rgba(5, 20, 20, 0.12);
+  backdrop-filter: blur(4px);
+}
+
+.hero-primary:hover,
+.hero-secondary:hover {
+  transform: translateY(-2px);
+}
+
+.hero-reassurance {
+  margin: 1.25rem 0 0;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 650;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+  animation: heroReveal 900ms 800ms ease-out both;
+}
+
+/* Indicatore di scroll: serve a invitare a esplorare la pagina lunga. */
+.scroll-cue {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.1rem;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.scroll-cue span:first-child {
+  font-size: 1.4rem;
+  animation: scrollHint 1.8s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 4 — INTRO
+   -------------------------------------------------------------------------- */
+.intro-section {
+  padding: clamp(4.5rem, 8vw, 7.5rem) 0;
+  background: var(--albergo-bg);
+}
+
+.intro-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: end;
+}
+
+.section-eyebrow,
+.card-eyebrow {
+  color: var(--albergo-gold);
+}
+
+.intro-grid h2,
+.section-heading h2,
+.experience-copy h2,
+.final-cta h2 {
+  margin: 0;
+  font-size: clamp(2.25rem, 4vw, 4rem);
+  line-height: 1.07;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.intro-copy {
+  margin: 0;
+  color: var(--albergo-muted);
+  font-size: clamp(1.05rem, 1.7vw, 1.22rem);
+  line-height: 1.8;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 5 — MATERIAL EXPERIENCE CARDS
+   -------------------------------------------------------------------------- */
+.highlights-section {
+  padding: 0 0 clamp(5rem, 9vw, 8rem);
+  background: var(--albergo-bg);
+}
+
+.section-heading {
+  max-width: 760px;
+  margin-bottom: 2rem;
+}
+
+.highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.experience-card {
+  --mdc-outlined-card-outline-color: var(--albergo-border-soft);
+  --mdc-outlined-card-container-color: var(--albergo-surface-raised);
+  min-height: 100%;
+  border-radius: 1.25rem;
+  box-shadow: var(--albergo-shadow-soft);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.experience-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--albergo-shadow);
+}
+
+.experience-card mat-card-content {
+  padding: 2rem;
+}
+
+.experience-card h3 {
+  margin: 0.3rem 0 0.85rem;
+  font-size: 1.65rem;
+  line-height: 1.2;
+}
+
+.experience-card p:last-child {
+  margin: 0;
+  color: var(--albergo-muted);
+  line-height: 1.7;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 6 — SEZIONI EDITORIALI CAMERE / SPA
+   -------------------------------------------------------------------------- */
+.experience-section {
+  padding: clamp(5rem, 10vw, 9rem) 0;
+  background: var(--albergo-bg-alt);
+}
+
+.experience-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+}
+
+.experience-feature + .experience-feature {
+  margin-top: clamp(5rem, 10vw, 9rem);
+}
+
+.experience-feature--reverse .experience-image {
+  order: 2;
+}
+
+.experience-image {
+  position: relative;
+  overflow: hidden;
+  min-height: 480px;
+  border-radius: 1.75rem;
+  box-shadow: var(--albergo-shadow);
+}
+
+.experience-image::after {
+  content: '';
+  position: absolute;
+  inset: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 1.25rem;
+  pointer-events: none;
+}
+
+.experience-image img {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  display: block;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.experience-image:hover img {
+  transform: scale(1.025);
+}
+
+.experience-copy {
+  max-width: 560px;
+}
+
+.experience-copy p:not(.section-eyebrow):not(.wellness-mantra) {
+  margin: 1.35rem 0 1.8rem;
+  color: var(--albergo-muted);
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.wellness-mantra {
+  margin: 1.5rem 0;
+  color: var(--albergo-heading);
+  font-family: var(--albergo-font-heading);
+  font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+}
+
+.content-action.mat-mdc-button-base {
+  --mdc-outlined-button-label-text-color: var(--albergo-primary);
+  --mdc-outlined-button-outline-color: var(--albergo-primary);
+  min-height: 48px;
+  padding-inline: 1.25rem;
+  border-radius: 999px;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 7 — QUOTE / PAUSA VISIVA
+   -------------------------------------------------------------------------- */
+.quote-section {
+  padding: clamp(5rem, 10vw, 9rem) 0;
+  color: #fffdf7;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(215, 178, 109, 0.14), transparent 24rem),
+    #102a2b;
+}
+
+.quote-content {
+  max-width: 980px;
+  text-align: center;
+}
+
+.quote-mark {
+  margin: 0;
+  color: #f6d89a;
+  font-family: Georgia, serif;
+  font-size: 5rem;
+  line-height: 0.65;
+}
+
+blockquote {
+  margin: 1rem auto 0;
+  color: #ffffff;
+  font-family: var(--albergo-font-heading);
+  font-size: clamp(2rem, 4.4vw, 4.2rem);
+  line-height: 1.16;
+  text-wrap: balance;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 8 — CALL TO ACTION FINALE
+   -------------------------------------------------------------------------- */
+.final-cta {
+  padding: clamp(4rem, 8vw, 7rem) 0;
+  background: var(--albergo-surface-warm);
+}
+
+.final-cta__panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: clamp(2rem, 5vw, 4rem);
+  border: 1px solid var(--albergo-border-soft);
+  border-radius: 1.75rem;
+  background: var(--albergo-surface-raised);
+  box-shadow: var(--albergo-shadow);
+}
+
+.final-cta__panel > div {
+  max-width: 760px;
+}
+
+.final-cta__panel p:last-child {
+  margin: 1rem 0 0;
+  color: var(--albergo-muted);
+  font-size: 1.05rem;
+}
+
+.cta-button.mat-mdc-button-base {
+  --mdc-filled-button-container-color: #183f3b;
+  --mdc-filled-button-label-text-color: #ffffff;
+  flex: 0 0 auto;
+}
+
+:host-context(html[data-theme='dark']) .cta-button.mat-mdc-button-base {
+  --mdc-filled-button-container-color: #a9d8c5;
+  --mdc-filled-button-label-text-color: #10201f;
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 9 — KEYFRAMES DELLE ANIMAZIONI
+   -------------------------------------------------------------------------- */
+@keyframes heroBreath {
+  from {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.07) translate3d(0, -0.6%, 0);
+  }
+}
+
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scrollHint {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 10 — RESPONSIVE
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .intro-grid,
+  .experience-feature {
+    grid-template-columns: 1fr;
+  }
+
+  .highlight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .experience-feature--reverse .experience-image {
+    order: initial;
+  }
+
+  .experience-image,
+  .experience-image img {
+    min-height: 360px;
+  }
+
+  .final-cta__panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    min-height: 720px;
+  }
+
+  .hero-content::before {
+    inset: 3rem -1rem;
+  }
+
+  .hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .hero-actions .mat-mdc-button-base {
+    width: 100%;
+  }
+
+  .experience-image,
+  .experience-image img {
+    min-height: 280px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 11 — ACCESSIBILITÀ: PREFERS-REDUCED-MOTION
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-media img,
+  .hero-eyebrow,
+  .hero-title,
+  .hero-desc,
+  .hero-actions,
+  .hero-reassurance,
+  .scroll-cue span:first-child {
+    animation: none;
+  }
+
+  .experience-card:hover,
+  .experience-image:hover img,
+  .hero-primary:hover,
+  .hero-secondary:hover {
+    transform: none;
+  }
+}

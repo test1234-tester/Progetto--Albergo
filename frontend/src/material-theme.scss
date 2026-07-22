@@ -1,0 +1,69 @@
+@use '@angular/material' as mat;
+
+/* ========================================================================== 
+   ANGULAR MATERIAL 3 — TEMA BASE + TOKEN LIGHT/DARK
+   --------------------------------------------------------------------------
+   mat.theme() abilita gli stili strutturali Material. I colori sottostanti
+   sovrascrivono i system token in modo che pulsanti, card e controlli seguano
+   lo stesso design system del resto dell'hotel.
+   ========================================================================== */
+html {
+  height: 100%;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$cyan-palette,
+        tertiary: mat.$orange-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+/* BLOCCO 1 — MATERIAL IN MODALITÀ CHIARA */
+:root,
+html[data-theme='light'] {
+  --mat-sys-primary: #355c4d;
+  --mat-sys-on-primary: #fffdf7;
+  --mat-sys-primary-container: #f2e7d5;
+  --mat-sys-on-primary-container: #102a2b;
+  --mat-sys-secondary: #7b4e13;
+  --mat-sys-on-secondary: #fffdf7;
+  --mat-sys-secondary-container: #f2e7d5;
+  --mat-sys-on-secondary-container: #102a2b;
+  --mat-sys-tertiary: #183f3b;
+  --mat-sys-on-tertiary: #fffdf7;
+  --mat-sys-error: #6b1f2a;
+  --mat-sys-on-error: #fffdf7;
+  --mat-sys-surface: #fffdf7;
+  --mat-sys-on-surface: #212121;
+  --mat-sys-surface-container: #f7f4ee;
+  --mat-sys-outline: #5a4632;
+}
+
+/* BLOCCO 2 — MATERIAL IN MODALITÀ SCURA */
+html[data-theme='dark'] {
+  --mat-sys-primary: #a9d8c5;
+  --mat-sys-on-primary: #10201f;
+  --mat-sys-primary-container: #203a35;
+  --mat-sys-on-primary-container: #f7f1e7;
+  --mat-sys-secondary: #f0c982;
+  --mat-sys-on-secondary: #30240f;
+  --mat-sys-secondary-container: #443619;
+  --mat-sys-on-secondary-container: #fff1c2;
+  --mat-sys-tertiary: #b9e0d0;
+  --mat-sys-on-tertiary: #10201f;
+  --mat-sys-error: #ffb4bd;
+  --mat-sys-on-error: #3a0711;
+  --mat-sys-surface: #10201f;
+  --mat-sys-on-surface: #f7f1e7;
+  --mat-sys-surface-container: #152a28;
+  --mat-sys-outline: #9c8f7e;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+}

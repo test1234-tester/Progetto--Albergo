@@ -1,0 +1,111 @@
+<!--
+  GUIDA DIDATTICA TEMPLATE — NAVBAR GLOBALE
+  ---------------------------------------------------------------------------
+  Questo componente rimane visibile su tutte le route.
+  Bootstrap gestisce il layout responsive/collapse, Angular Router gestisce
+  la navigazione senza refresh e Angular Material viene usato per le azioni.
+-->
+<nav class="navbar navbar-expand-lg sticky-top" aria-label="Navigazione principale">
+  <div class="container">
+
+    <!-- BLOCCO 1 — BRAND / LOGO TESTUALE
+         routerLink="/" torna alla homepage senza ricaricare l'applicazione. -->
+    <a class="navbar-brand" routerLink="/" aria-label="Grand Hotel Minerva - Home">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-copy">
+        <strong>Grand Hotel Minerva</strong>
+        <small>Boutique · Spa · Relax</small>
+      </span>
+    </a>
+
+    <!-- BLOCCO 2 — HAMBURGER RESPONSIVE
+         Bootstrap mostra questo pulsante quando non c'è spazio per il menu completo. -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarContent"
+      aria-controls="navbarContent"
+      aria-expanded="false"
+      aria-label="Apri il menu"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- BLOCCO 3 — CONTENUTO COLLASSABILE DELLA NAVBAR -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+
+      <!-- BLOCCO 3A — LINK PUBBLICI E LINK CONDIZIONALI PER RUOLO -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 main-links">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/stanze" routerLinkActive="active" ariaCurrentWhenActive="page">Camere</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/spa" routerLinkActive="active" ariaCurrentWhenActive="page">SPA</a>
+        </li>
+
+        <!-- Il link Area personale esiste solo per utenti CLIENTE autenticati. -->
+        @if (authService.isCustomer()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/area-personale" routerLinkActive="active" ariaCurrentWhenActive="page">Area personale</a>
+          </li>
+        }
+
+        <!-- Il gestionale è visibile solo al ruolo STAFF. -->
+        @if (authService.isStaff()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/staff" routerLinkActive="active" ariaCurrentWhenActive="page">Gestionale staff</a>
+          </li>
+        }
+      </ul>
+
+      <!-- BLOCCO 3B — AZIONI A DESTRA: TEMA + SESSIONE -->
+      <div class="session-actions">
+
+        <!-- Toggle light/dark.
+             aria-pressed comunica alle tecnologie assistive lo stato del pulsante. -->
+        <button
+          mat-stroked-button
+          type="button"
+          class="theme-toggle"
+          (click)="toggleTheme()"
+          [attr.aria-pressed]="themeService.isDark()"
+          [attr.aria-label]="themeService.isDark() ? 'Attiva modalità chiara' : 'Attiva modalità scura'"
+          [attr.title]="themeService.isDark() ? 'Modalità chiara' : 'Modalità scura'"
+        >
+          <span class="theme-toggle__icon" aria-hidden="true">
+            {{ themeService.isDark() ? '☀' : '☾' }}
+          </span>
+          <span class="theme-toggle__label">
+            {{ themeService.isDark() ? 'Chiaro' : 'Scuro' }}
+          </span>
+        </button>
+
+        <!-- BLOCCO 3C — STATO AUTENTICAZIONE
+             Dopo il login mostriamo utente + logout; altrimenti login + registrazione. -->
+        @if (authService.isAuthenticated()) {
+          <span class="nav-user">
+            @if (authService.isStaff()) {
+              Reception · {{ authService.currentUser()?.username }}
+            } @else {
+              Ciao, {{ authService.currentUser()?.nome }}
+            }
+          </span>
+          <button mat-stroked-button type="button" class="nav-logout" (click)="logout()">Esci</button>
+        } @else {
+          <a mat-button routerLink="/login" class="nav-login">Accedi</a>
+          <a mat-flat-button routerLink="/register" class="nav-register">Registrati</a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,143 @@
+<!--
+  GUIDA DIDATTICA TEMPLATE
+  Template registrazione con campi obbligatori, validazione e conferma password.
+  Le direttive @if/@for sono il control flow di Angular; formControlName collega
+  i campi HTML ai Reactive Forms definiti nel file TypeScript.
+-->
+<!-- BLOCCO 1 — CONTENITORE E CARD DI REGISTRAZIONE -->
+<section class="auth-page d-flex align-items-center justify-content-center">
+  <div class="card auth-card shadow-sm">
+    <div class="card-body p-4 p-md-5">
+      <h1 class="auth-title mb-2">Crea account cliente</h1>
+      <p class="text-center text-muted mb-2">Gli account staff vengono creati dalla struttura.</p>
+      <p class="required-note text-center mb-4"><span class="required-star">*</span> Campi obbligatori</p>
+
+      <!-- BLOCCO 2 — REACTIVE FORM DI REGISTRAZIONE -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+        <!-- BLOCCO 2A — NOME + VALIDAZIONE -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-nome">Nome <span class="required-star">*</span></label>
+          <input id="reg-nome" type="text" class="form-control" formControlName="nome"
+            [class.is-invalid]="registerForm.controls.nome.invalid && registerForm.controls.nome.touched" />
+          @if (registerForm.controls.nome.invalid && registerForm.controls.nome.touched) {
+            <div class="invalid-feedback d-block">
+              @if (registerForm.controls.nome.hasError('required')) { Il nome è obbligatorio. }
+              @else if (registerForm.controls.nome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+              @else { Controlla il nome inserito. }
+            </div>
+          }
+        </div>
+
+        <!-- BLOCCO 2B — COGNOME + VALIDAZIONE -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-cognome">Cognome <span class="required-star">*</span></label>
+          <input id="reg-cognome" type="text" class="form-control" formControlName="cognome"
+            [class.is-invalid]="registerForm.controls.cognome.invalid && registerForm.controls.cognome.touched" />
+          @if (registerForm.controls.cognome.invalid && registerForm.controls.cognome.touched) {
+            <div class="invalid-feedback d-block">
+              @if (registerForm.controls.cognome.hasError('required')) { Il cognome è obbligatorio. }
+              @else if (registerForm.controls.cognome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+              @else { Controlla il cognome inserito. }
+            </div>
+          }
+        </div>
+
+        <!-- BLOCCO 2C — USERNAME + VALIDAZIONE -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-username">Username <span class="required-star">*</span></label>
+          <input id="reg-username" type="text" class="form-control" formControlName="username"
+            [class.is-invalid]="registerForm.controls.username.invalid && registerForm.controls.username.touched" />
+          @if (registerForm.controls.username.invalid && registerForm.controls.username.touched) {
+            <div class="invalid-feedback d-block">
+              @if (registerForm.controls.username.hasError('required')) { Lo username è obbligatorio. }
+              @else if (registerForm.controls.username.hasError('minlength')) { Inserisci almeno 3 caratteri. }
+              @else { Controlla lo username inserito. }
+            </div>
+          }
+        </div>
+
+        <!-- BLOCCO 2D — CELLULARE + VALIDAZIONE -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-cellulare">Cellulare <span class="required-star">*</span></label>
+          <input id="reg-cellulare" type="tel" class="form-control" formControlName="cellulare"
+            [class.is-invalid]="registerForm.controls.cellulare.invalid && registerForm.controls.cellulare.touched" />
+          @if (registerForm.controls.cellulare.invalid && registerForm.controls.cellulare.touched) {
+            <div class="invalid-feedback d-block">
+              @if (registerForm.controls.cellulare.hasError('required')) { Il cellulare è obbligatorio. }
+              @else if (registerForm.controls.cellulare.hasError('pattern')) { Inserisci un numero di telefono valido. }
+              @else { Controlla il cellulare inserito. }
+            </div>
+          }
+        </div>
+
+        <!-- BLOCCO 2E — EMAIL + VALIDAZIONE -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-email">Email <span class="required-star">*</span></label>
+          <input id="reg-email" type="email" class="form-control" formControlName="email"
+            autocomplete="email"
+            [class.is-invalid]="registerForm.controls.email.invalid && registerForm.controls.email.touched" />
+          @if (registerForm.controls.email.invalid && registerForm.controls.email.touched) {
+            <div class="invalid-feedback d-block">
+              @if (registerForm.controls.email.hasError('required')) { L'email è obbligatoria. }
+              @else if (registerForm.controls.email.hasError('server')) { Questa email non può essere utilizzata o è già registrata. }
+              @else { Inserisci un indirizzo email valido. }
+            </div>
+          }
+        </div>
+
+        <!-- BLOCCO 2F — PASSWORD + VALIDAZIONE -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-password">Password <span class="required-star">*</span></label>
+          <div class="password-field">
+            <input id="reg-password" [type]="showPassword() ? 'text' : 'password'" class="form-control" formControlName="password"
+              autocomplete="new-password"
+              [class.is-invalid]="registerForm.controls.password.invalid && registerForm.controls.password.touched" />
+            <button type="button" class="password-toggle" (click)="togglePassword()"
+              [attr.aria-label]="showPassword() ? 'Nascondi password' : 'Mostra password'"
+              [attr.title]="showPassword() ? 'Nascondi password' : 'Mostra password'">
+              {{ showPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          @if (registerForm.controls.password.invalid && registerForm.controls.password.touched) {
+            <div class="invalid-feedback d-block">
+              @if (registerForm.controls.password.hasError('required')) { La password è obbligatoria. }
+              @else { La password deve avere almeno 6 caratteri. }
+            </div>
+          }
+        </div>
+
+        <!-- BLOCCO 2G — CONFERMA PASSWORD + VALIDAZIONE -->
+        <div class="mb-3">
+          <label class="form-label" for="reg-confirm">Conferma password <span class="required-star">*</span></label>
+          <div class="password-field">
+            <input id="reg-confirm" [type]="showConfirmPassword() ? 'text' : 'password'" class="form-control" formControlName="confirmPassword"
+              autocomplete="new-password"
+              [class.is-invalid]="(registerForm.controls.confirmPassword.invalid || registerForm.errors?.['passwordsMismatch']) && registerForm.controls.confirmPassword.touched" />
+            <button type="button" class="password-toggle" (click)="toggleConfirmPassword()"
+              [attr.aria-label]="showConfirmPassword() ? 'Nascondi conferma password' : 'Mostra conferma password'"
+              [attr.title]="showConfirmPassword() ? 'Nascondi conferma password' : 'Mostra conferma password'">
+              {{ showConfirmPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          @if (registerForm.controls.confirmPassword.touched && registerForm.controls.confirmPassword.hasError('required')) {
+            <div class="invalid-feedback d-block">La conferma password è obbligatoria.</div>
+          } @else if (registerForm.errors?.['passwordsMismatch'] && registerForm.controls.confirmPassword.touched) {
+            <div class="invalid-feedback d-block">Le password non coincidono.</div>
+          }
+        </div>
+
+        <!-- BLOCCO 2H — ERRORE GENERALE / SERVER -->
+        @if (errorMessage()) {
+          <div class="alert alert-danger py-2" role="alert">{{ errorMessage() }}</div>
+        }
+
+        <button mat-flat-button class="hotel-primary w-100 mt-2" type="submit" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Registrazione in corso…' : 'Registrati' }}
+        </button>
+      </form>
+
+      <!-- BLOCCO 3 — LINK VERSO IL LOGIN -->
+      <p class="auth-switch mt-4 mb-0">Hai già un account? <a routerLink="/login">Accedi</a></p>
+    </div>
+  </div>
+</section>

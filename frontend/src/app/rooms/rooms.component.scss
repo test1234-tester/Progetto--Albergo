@@ -1,0 +1,198 @@
+/* ========================================================================== 
+   PAGINA CAMERE — GUIDA DIDATTICA STILI
+   --------------------------------------------------------------------------
+   La pagina ha due aree principali: sidebar di ricerca + risultati/dettaglio.
+   Tutti i colori principali arrivano dai token globali, quindi il layout passa
+   automaticamente da light a dark mode.
+   ========================================================================== */
+
+/* BLOCCO 1 — CONTENITORE DELLA PAGINA */
+.rooms-page {
+  min-height: calc(100vh - 80px);
+  color: var(--albergo-text);
+}
+
+.page-title {
+  color: var(--albergo-heading);
+}
+
+/* BLOCCO 2 — SIDEBAR DI RICERCA */
+.search-sidebar-card {
+  position: sticky;
+  top: 96px;
+  overflow: hidden;
+  background: var(--albergo-card-translucent);
+  border: 1px solid var(--albergo-border-soft) !important;
+  border-radius: 1.25rem;
+  box-shadow: var(--albergo-shadow-soft) !important;
+  backdrop-filter: blur(12px);
+}
+
+/* BLOCCO 3 — CONTENITORE SCORRIBILE DEI RISULTATI */
+.rooms-scroll-container {
+  max-height: 85vh;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-color: var(--albergo-border) transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 7px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--albergo-border);
+    border-radius: 999px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   BLOCCO 4 — CARD CAMERA
+   IMPORTANTE: qui è stato corretto l'effetto "sottiletta".
+   La card e la sua row hanno una min-height reale; l'immagine è posizionata
+   dentro una colonna con altezza garantita e non può più collassare a pochi px.
+   -------------------------------------------------------------------------- */
+.room-poster-card {
+  min-height: 250px;
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--albergo-text);
+  background: var(--albergo-surface-raised);
+  border: 1px solid var(--albergo-border-soft) !important;
+  border-radius: 1.25rem;
+  box-shadow: var(--albergo-shadow-soft) !important;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--albergo-primary) 58%, transparent) !important;
+    box-shadow: var(--albergo-shadow) !important;
+  }
+}
+
+/* La row interna deve avere una dimensione minima indipendente da Bootstrap h-100. */
+.room-poster-card > .row {
+  min-height: 250px;
+}
+
+/* BLOCCO 4A — COLONNA FOTOGRAFICA */
+.room-img-col {
+  position: relative;
+  min-height: 250px;
+  overflow: hidden;
+  background: var(--albergo-surface-muted);
+}
+
+.room-poster-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  border-top-left-radius: 1.25rem;
+  border-bottom-left-radius: 1.25rem;
+  transition: transform 500ms ease;
+}
+
+.room-poster-card:hover .room-poster-img {
+  transform: scale(1.025);
+}
+
+/* BLOCCO 4B — BADGE DEL PREZZO SOPRA L'IMMAGINE */
+.price-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  z-index: 2;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+}
+
+/* BLOCCO 4C — TAG DEI COMFORT */
+.comfort-tags .badge {
+  color: var(--albergo-text) !important;
+  background: var(--albergo-surface-muted) !important;
+  border-color: var(--albergo-border-soft) !important;
+}
+
+/* BLOCCO 5 — DETTAGLIO DELLA CAMERA SELEZIONATA */
+.room-detail-card {
+  color: var(--albergo-text);
+  background: var(--albergo-surface-raised);
+  border: 1px solid var(--albergo-border-soft) !important;
+  border-radius: 1.25rem;
+}
+
+.detail-img-container {
+  overflow: hidden;
+  max-height: 460px;
+  border-radius: 1.3rem;
+  background: var(--albergo-surface-muted);
+
+  .detail-img {
+    width: 100%;
+    max-height: 460px;
+    display: block;
+    object-fit: cover;
+  }
+}
+
+/* BLOCCO 6 — BOX DATI OSPITE / PRENOTAZIONE */
+.guest-booking-box,
+.guest-list-box,
+.card-form-box,
+.pricing-summary-card {
+  color: var(--albergo-text);
+  background: var(--albergo-surface-raised) !important;
+  border-color: var(--albergo-border-soft) !important;
+  border-radius: 1.15rem;
+}
+
+/* BLOCCO 7 — VALIDAZIONE
+   Il messaggio testuale accompagna sempre il bordo rosso: non usiamo solo colore. */
+.required-star {
+  color: var(--albergo-danger);
+  font-weight: 800;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-width: 2px;
+}
+
+.invalid-feedback {
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+/* BLOCCO 8 — RESPONSIVE MOBILE
+   Su mobile l'immagine torna sopra al testo e mantiene comunque 230 px reali. */
+@media (max-width: 767.98px) {
+  .room-poster-card,
+  .room-poster-card > .row {
+    min-height: 0;
+  }
+
+  .room-img-col {
+    min-height: 230px;
+  }
+
+  .room-poster-img {
+    border-top-right-radius: 1.25rem;
+    border-bottom-left-radius: 0;
+  }
+}
+
+/* BLOCCO 9 — ACCESSIBILITÀ DEL MOVIMENTO */
+@media (prefers-reduced-motion: reduce) {
+  .room-poster-card:hover,
+  .room-poster-card:hover .room-poster-img {
+    transform: none;
+  }
+}

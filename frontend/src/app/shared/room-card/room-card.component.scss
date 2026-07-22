@@ -1,0 +1,66 @@
+/* ========================================================================== 
+   ROOM CARD RIUTILIZZABILE — GUIDA DIDATTICA STILI
+   ========================================================================== */
+
+/* BLOCCO 1 — SUPERFICIE DELLA CARD */
+.room-card {
+  border: 1px solid var(--albergo-border-soft);
+  border-radius: var(--albergo-radius);
+  overflow: hidden;
+  color: var(--albergo-text);
+  background: var(--albergo-surface-raised);
+  box-shadow: var(--albergo-shadow-soft);
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.room-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--albergo-shadow);
+}
+
+/* BLOCCO 2 — IMMAGINE O PLACEHOLDER */
+.room-card-img {
+  width: 100%;
+  height: 200px;
+  display: block;
+  object-fit: cover;
+}
+
+.room-card-img-placeholder {
+  background: linear-gradient(135deg, #355c4d 0%, #102a2b 100%);
+}
+
+/* BLOCCO 3 — TESTI DELLA CAMERA */
+.room-card-title {
+  font-size: 1.1rem;
+}
+
+.room-card-desc {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--albergo-muted);
+  font-size: 0.9rem;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* BLOCCO 4 — PREZZO */
+.room-card-price {
+  color: var(--albergo-heading);
+  font-family: var(--albergo-font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.room-card-price small {
+  color: var(--albergo-muted);
+  font-family: var(--albergo-font-body);
+  font-weight: 400;
+}
+
+/* BLOCCO 5 — ACCESSIBILITÀ DEL MOVIMENTO */
+@media (prefers-reduced-motion: reduce) {
+  .room-card:hover {
+    transform: none;
+  }
+}

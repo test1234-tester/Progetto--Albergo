@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>Grand Hotel Minerva</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#102a2b" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <!--
+      BLOCCO TEMA PRE-ANGULAR
+      ------------------------------------------------------------------------
+      Questo piccolo script viene eseguito PRIMA del bootstrap Angular.
+      Serve a evitare il "flash" del tema chiaro quando l'utente aveva già
+      scelto il dark mode nella visita precedente.
+    -->
+    <script>
+      (() => {
+        const storageKey = 'grand-hotel-theme';
+        const saved = localStorage.getItem(storageKey);
+        const systemDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+        const theme = saved === 'light' || saved === 'dark' ? saved : (systemDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      })();
+    </script>
+
+    <!-- Font editoriali: Playfair Display per i titoli, Inter per il testo. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Roboto rimane disponibile per alcuni token interni di Angular Material. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

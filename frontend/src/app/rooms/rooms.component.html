@@ -1,0 +1,491 @@
+<!--
+  GUIDA DIDATTICA TEMPLATE
+  Template del flusso camere: ricerca, elenco risultati, dettaglio, servizi e conferma prenotazione.
+  Le direttive @if/@for sono il control flow di Angular; formControlName collega
+  i campi HTML ai Reactive Forms definiti nel file TypeScript.
+-->
+<!-- BLOCCO 1: contenitore generale della pagina camere. -->
+<section class="rooms-page container-fluid py-4 px-lg-5">
+
+  <!-- ========================================== -->
+  <!-- VISTA A: RICERCA, SELEZIONE E PAGAMENTO    -->
+  <!-- ========================================== -->
+  <!-- BLOCCO 2: finché non c'è conferma mostriamo ricerca, camere e pagamento. -->
+  @if (!prenotazioneConfermata()) {
+    <h1 class="page-title mb-4 fw-bold">Prenota il tuo Soggiorno</h1>
+
+    <div class="row g-4">
+      <!-- COLONNA SINISTRA: Form Filtri -->
+      <div class="col-12 col-lg-4 col-xl-3">
+        <div class="card search-sidebar-card shadow-sm border-0 p-3">
+          <h4 class="card-title fw-bold mb-2 text-primary">
+            <i class="fa-solid fa-magnifying-glass me-2"></i>Cerca disponibilità
+          </h4>
+          <p class="required-note mb-3"><span class="required-star">*</span> Campi obbligatori</p>
+
+          <!-- BLOCCO 3: form ricerca disponibilità (date, adulti, bambini, extra). -->
+          <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form d-flex flex-column gap-3">
+            <div>
+              <label class="form-label fw-semibold" for="checkIn">Check-in <span class="required-star">*</span></label>
+              <input id="checkIn" type="date" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('checkIn'))" formControlName="checkIn" />
+              @if (isInvalid(searchForm.get('checkIn'))) {
+                <div class="invalid-feedback d-block">Inserisci una data di check-in valida.</div>
+              }
+            </div>
+
+            <div>
+              <label class="form-label fw-semibold" for="checkOut">Check-out <span class="required-star">*</span></label>
+              <input id="checkOut" type="date" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('checkOut'))" formControlName="checkOut" />
+              @if (isInvalid(searchForm.get('checkOut'))) {
+                <div class="invalid-feedback d-block">
+                  @if (searchForm.get('checkOut')?.hasError('dateOrder')) { Il check-out deve essere successivo al check-in. }
+                  @else { Inserisci una data di check-out valida. }
+                </div>
+              }
+            </div>
+
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="form-label fw-semibold" for="adulti">Adulti <span class="required-star">*</span></label>
+                <input id="adulti" type="number" min="1" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('adulti'))" formControlName="adulti" />
+                @if (isInvalid(searchForm.get('adulti'))) {
+                  <div class="invalid-feedback d-block">Inserisci almeno 1 adulto.</div>
+                }
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-semibold" for="bambini">Bambini</label>
+                <input id="bambini" type="number" min="0" class="form-control" [class.is-invalid]="isInvalid(searchForm.get('bambini'))" formControlName="bambini" />
+                @if (isInvalid(searchForm.get('bambini'))) {
+                  <div class="invalid-feedback d-block">Il numero di bambini non può essere negativo.</div>
+                }
+              </div>
+            </div>
+
+            <div class="form-check form-switch mt-2">
+              <input class="form-check-input" type="checkbox" id="animali" formControlName="animali">
+              <label class="form-check-label fw-semibold" for="animali">
+                <i class="fa-solid fa-paw me-1 text-secondary"></i> Ho animali domestici
+              </label>
+            </div>
+
+            <div class="form-check form-switch p-2 bg-light rounded border">
+              <input class="form-check-input ms-0 me-2" type="checkbox" id="pacchettoSpa" formControlName="pacchettoSpa">
+              <label class="form-check-label fw-bold text-dark" for="pacchettoSpa">
+                <i class="fa-solid fa-spa me-1 text-primary"></i> Pass SPA All-Inclusive (€200)
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mt-2" [disabled]="isLoading()">
+              {{ isLoading() ? 'Ricerca in corso…' : 'Cerca Disponibilità' }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- COLONNA DESTRA: Lista / Dettaglio -->
+      <div class="col-12 col-lg-8 col-xl-9">
+
+        <!-- ELENCO STANZE -->
+        <!-- BLOCCO 4: elenco camere filtrate; scompare quando una camera viene selezionata. -->
+        @if (!selectedRoom()) {
+          <div class="rooms-scroll-container d-flex flex-column gap-3">
+            @for (room of filteredRooms(); track room.idCamera) {
+              <div class="card room-poster-card shadow-sm border-0" (click)="selezionaStanza(room)">
+                <div class="row g-0 align-items-stretch h-100">
+                  <div class="col-12 col-md-5 col-lg-4 room-img-col">
+                    <img 
+                      [src]="'camere/camera-' + room.idCamera + '.jpg'" 
+                      [alt]="room.nome" 
+                      class="room-poster-img"
+                      (error)="onImgError($event)" />
+                    <span class="badge bg-dark price-badge">€{{ room.prezzoNotte }} / notte</span>
+                  </div>
+
+                  <div class="col-12 col-md-7 col-lg-8 p-3 p-md-4 d-flex flex-column">
+                    <div>
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h3 class="card-title h5 fw-bold text-dark mb-0">{{ room.nome }}</h3>
+                        <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill ms-2">
+                          <i class="fa-solid fa-users me-1"></i>Max {{ room.capienza }} persone
+                        </span>
+                      </div>
+
+                      <p class="text-muted small mb-3">{{ room.descrizione }}</p>
+
+                      <div class="comfort-tags d-flex flex-wrap gap-1 mb-3">
+                        @for (comfort of room.serviziFissi; track comfort) {
+                          <span class="badge bg-light text-dark border"><i class="fa-solid fa-check me-1 text-success"></i>{{ comfort }}</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-auto pt-3 border-top">
+                      <div>
+                        <small class="text-muted d-block">Prezzo per {{ notti() }} {{ notti() === 1 ? 'notte' : 'notti' }}</small>
+                        <strong class="h4 mb-0 text-primary fw-bold">€{{ room.prezzoNotte * notti() }}</strong>
+                      </div>
+                      <button type="button" class="btn btn-primary btn-sm fw-bold px-3 py-2">
+                        Seleziona Stanza <i class="fa-solid fa-chevron-right ms-1"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            } @empty {
+              <div class="alert alert-warning text-center p-4 rounded-3 shadow-sm border-0">
+                <i class="fa-solid fa-bed-pulse fa-3x text-warning mb-3"></i>
+                <h5 class="fw-bold">Nessuna stanza disponibile</h5>
+                <p class="mb-0 text-muted">
+                  Nessuna camera disponibile per <strong>{{ (searchForm.get('adulti')?.value || 0) + (searchForm.get('bambini')?.value || 0) }} persone</strong> nelle date selezionate.
+                </p>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- DETTAGLIO E FORMS DI PAGAMENTO -->
+        <!-- BLOCCO 5: dettaglio della camera selezionata e costruzione del preventivo. -->
+        @if (selectedRoom(); as room) {
+          <div class="card room-detail-card shadow-sm border-0 p-4">
+            <button type="button" class="btn btn-link text-decoration-none p-0 mb-3 text-start" (click)="deselezionaStanza()">
+              <i class="fa-solid fa-arrow-left me-1"></i> Torna alla lista delle camere
+            </button>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="fw-bold mb-0">{{ room.nome }}</h2>
+              <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle rounded-pill fs-6 px-3 py-2">
+                <i class="fa-solid fa-users me-1"></i>Capienza: {{ room.capienza }} persone
+              </span>
+            </div>
+
+            <div class="detail-img-container mb-3 rounded overflow-hidden">
+              <img 
+                [src]="'camere/camera-' + room.idCamera + '.jpg'" 
+                [alt]="room.nome" 
+                class="img-fluid w-100 detail-img"
+                (error)="onImgError($event)" />
+            </div>
+
+            <p class="lead fs-6 mb-4">{{ room.descrizione }}</p>
+
+            <!-- DATI PRENOTAZIONE: account oppure ospite senza registrazione -->
+            <!-- BLOCCO 8: avviso finale per chiarire i limiti della prenotazione anonima. -->
+    @if (!authService.isCustomer()) {
+              <div class="guest-booking-box p-3 bg-warning-subtle rounded mb-4 border border-warning-subtle">
+                <h5 class="fw-bold mb-2"><i class="fa-solid fa-user me-2"></i>Prenota senza registrarti</h5>
+                <p class="small text-muted mb-3">Non serve creare un account: inserisci i dati di contatto a cui inviare la conferma.</p>
+
+                <p class="small text-muted mb-2"><span class="required-star">*</span> Campi obbligatori</p>
+                <!-- BLOCCO 6: dati del solo intestatario quando non esiste un account. -->
+                <form [formGroup]="guestContactForm" class="row g-3" novalidate>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small fw-semibold" for="guest-name">Nome <span class="required-star">*</span></label>
+                    <input id="guest-name" type="text" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.nome)" formControlName="nome" autocomplete="given-name" />
+                    @if (isInvalid(guestContactForm.controls.nome)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.nome.hasError('required')) { Il nome è obbligatorio. }
+                        @else if (guestContactForm.controls.nome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                        @else { Controlla il nome inserito. }
+                      </div>
+                    }
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small fw-semibold" for="guest-surname">Cognome <span class="required-star">*</span></label>
+                    <input id="guest-surname" type="text" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.cognome)" formControlName="cognome" autocomplete="family-name" />
+                    @if (isInvalid(guestContactForm.controls.cognome)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.cognome.hasError('required')) { Il cognome è obbligatorio. }
+                        @else if (guestContactForm.controls.cognome.hasError('minlength')) { Inserisci almeno 2 caratteri. }
+                        @else { Controlla il cognome inserito. }
+                      </div>
+                    }
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small fw-semibold" for="guest-email">Email <span class="required-star">*</span></label>
+                    <input id="guest-email" type="email" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.email)" formControlName="email" autocomplete="email" />
+                    @if (isInvalid(guestContactForm.controls.email)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.email.hasError('required')) { L'email è obbligatoria. }
+                        @else if (guestContactForm.controls.email.hasError('email')) { Inserisci un indirizzo email valido. }
+                        @else { Controlla l'email inserita. }
+                      </div>
+                    }
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label small fw-semibold" for="guest-phone">Cellulare <span class="required-star">*</span></label>
+                    <input id="guest-phone" type="tel" class="form-control" [class.is-invalid]="isInvalid(guestContactForm.controls.cellulare)" formControlName="cellulare" autocomplete="tel" />
+                    @if (isInvalid(guestContactForm.controls.cellulare)) {
+                      <div class="invalid-feedback d-block">
+                        @if (guestContactForm.controls.cellulare.hasError('required')) { Il cellulare è obbligatorio. }
+                        @else if (guestContactForm.controls.cellulare.hasError('pattern')) { Inserisci un numero di telefono valido. }
+                        @else { Controlla il cellulare inserito. }
+                      </div>
+                    }
+                  </div>
+                </form>
+
+                <p class="small mt-3 mb-0">Hai già un account? <a routerLink="/login">Accedi</a> e la prenotazione comparirà nella tua Area personale.</p>
+              </div>
+            } @else {
+              <div class="alert alert-success py-2 mb-4">
+                La prenotazione verrà collegata al tuo account e sarà visibile nell'Area personale.
+              </div>
+            }
+
+            <div class="guest-list-box p-3 bg-light rounded mb-4 border">
+              <h5 class="fw-bold mb-2"><i class="fa-solid fa-users me-2 text-primary"></i>Numero di persone</h5>
+              <p class="mb-1">La prenotazione è per <strong>{{ requestedGuests() }} {{ requestedGuests() === 1 ? 'persona' : 'persone' }}</strong>.</p>
+              <p class="small text-muted mb-0">
+                {{ searchForm.get('adulti')?.value }} adulti
+                @if ((searchForm.get('bambini')?.value ?? 0) > 0) { <span> · {{ searchForm.get('bambini')?.value }} bambini</span> }
+                · non sono richiesti i dati personali degli accompagnatori.
+              </p>
+            </div>
+
+            <!-- SERVIZI OPZIONALI -->
+            <div class="optional-services-box p-3 bg-light rounded mb-4 border">
+              <h5 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle text-primary me-2"></i>Personalizza con Servizi Opzionali</h5>
+              
+              <div class="d-flex flex-column gap-2">
+                @for (opz of serviziOpzionaliDisponibili; track opz.id) {
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" [id]="'opt-' + opz.id" (change)="toggleServizioOpzionale(opz, $event)">
+                    <label class="form-check-label d-flex justify-content-between w-100" [for]="'opt-' + opz.id">
+                      <span>{{ opz.nome }}</span>
+                      <strong class="text-dark">+€{{ opz.prezzo }}</strong>
+                    </label>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- RIEPILOGO IMPORTI -->
+            <div class="pricing-summary-card p-3 rounded bg-primary-subtle border border-primary-subtle mb-4">
+              <h5 class="fw-bold text-primary mb-3">Riepilogo Importo e Pagamento</h5>
+              
+              <div class="d-flex justify-content-between mb-1">
+                <span>Soggiorno ({{ notti() }} {{ notti() === 1 ? 'notte' : 'notti' }}):</span>
+                <strong>€{{ room.prezzoNotte * notti() }}</strong>
+              </div>
+
+              @if (searchForm.get('pacchettoSpa')?.value) {
+                <div class="d-flex justify-content-between mb-1 text-success">
+                  <span><i class="fa-solid fa-spa me-1"></i>Pass SPA All-Inclusive:</span>
+                  <strong>+€200</strong>
+                </div>
+              }
+
+              @for (opt of serviziOpzionaliScelti(); track opt.id) {
+                <div class="d-flex justify-content-between mb-1 text-muted">
+                  <span>{{ opt.nome }}:</span>
+                  <strong>+€{{ opt.prezzo }}</strong>
+                </div>
+              }
+
+              <hr>
+
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="h5 fw-bold mb-0">Totale Soggiorno:</span>
+                <strong class="h4 fw-bold text-primary mb-0">€{{ costoTotale().toFixed(2) }}</strong>
+              </div>
+
+              <div class="alert alert-warning border-0 my-3 p-3 text-dark">
+                <h6 class="fw-bold mb-1"><i class="fa-solid fa-circle-info me-1"></i> Caparra Confirmatoria (10%)</h6>
+                <p class="small mb-0">
+                  Per confermare la prenotazione è richiesto un acconto del <strong>10% (€{{ caparra().toFixed(2) }})</strong>.
+                  Il restante saldo di <strong>€{{ saldoRimanente().toFixed(2) }}</strong> verrà saldato in struttura.
+                </p>
+              </div>
+
+              <!-- SELEZIONE METODO DI PAGAMENTO -->
+              <div class="payment-method-selection mt-3">
+                <label class="fw-bold mb-2 d-block">Scegli la modalità di pagamento della Caparra (€{{ caparra().toFixed(2) }}):</label>
+                
+                <div class="d-flex gap-4 mb-3">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="payRadio" id="payCard" value="carta" [checked]="metodoPagamento() === 'carta'" (change)="metodoPagamento.set('carta')">
+                    <label class="form-check-label fw-semibold" for="payCard"><i class="fa-solid fa-credit-card me-1"></i> Carta di Credito</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="payRadio" id="payBank" value="bonifico" [checked]="metodoPagamento() === 'bonifico'" (change)="metodoPagamento.set('bonifico')">
+                    <label class="form-check-label fw-semibold" for="payBank"><i class="fa-solid fa-building-columns me-1"></i> Bonifico Bancario</label>
+                  </div>
+                </div>
+
+                <!-- FORM CARTA DI CREDITO -->
+                @if (metodoPagamento() === 'carta') {
+                  <!-- BLOCCO 7: campi carta mostrati solo quando il metodo scelto è carta. -->
+                  <form class="card-form-box p-3 bg-white rounded border mb-3 shadow-sm" [formGroup]="cardPaymentForm" novalidate>
+                    <h6 class="fw-bold text-dark mb-1"><i class="fa-regular fa-credit-card me-2 text-primary"></i>Dati della Carta di Credito</h6>
+                    <p class="required-note mb-3"><span class="required-star">*</span> Campi obbligatori</p>
+                    <div class="row g-3">
+                      <div class="col-12">
+                        <label class="form-label small fw-semibold mb-1" for="card-holder">Nome e Cognome Intestatario <span class="required-star">*</span></label>
+                        <input id="card-holder" type="text" class="form-control" placeholder="es. Mario Rossi" formControlName="intestatario" [class.is-invalid]="isInvalid(cardPaymentForm.controls.intestatario)" autocomplete="cc-name" />
+                        @if (isInvalid(cardPaymentForm.controls.intestatario)) { <div class="invalid-feedback d-block">Inserisci il nome dell'intestatario.</div> }
+                      </div>
+                      <div class="col-12">
+                        <label class="form-label small fw-semibold mb-1" for="card-number">Numero Carta <span class="required-star">*</span></label>
+                        <div class="input-group">
+                          <input id="card-number" type="text" inputmode="numeric" class="form-control" placeholder="1234 5678 9012 3456" maxlength="23" formControlName="numeroCarta" [class.is-invalid]="isInvalid(cardPaymentForm.controls.numeroCarta)" autocomplete="cc-number" />
+                          <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
+                        </div>
+                        @if (isInvalid(cardPaymentForm.controls.numeroCarta)) { <div class="invalid-feedback d-block">Inserisci un numero carta valido (13–19 cifre).</div> }
+                      </div>
+                      <div class="col-6">
+                        <label class="form-label small fw-semibold mb-1" for="card-expiry">Scadenza (MM/AA) <span class="required-star">*</span></label>
+                        <input id="card-expiry" type="text" inputmode="numeric" class="form-control" placeholder="MM/AA" maxlength="5" formControlName="scadenza" [class.is-invalid]="isInvalid(cardPaymentForm.controls.scadenza)" autocomplete="cc-exp" />
+                        @if (isInvalid(cardPaymentForm.controls.scadenza)) { <div class="invalid-feedback d-block">Usa il formato MM/AA.</div> }
+                      </div>
+                      
+                      <!-- CAMPO CVC CON MASCHERAMENTO E TOGGLE OCCHIO -->
+                      <div class="col-6">
+                        <label class="form-label small fw-semibold mb-1" for="card-cvc">CVC / CVV <span class="required-star">*</span></label>
+                        <div class="input-group">
+                          <input 
+                            id="card-cvc"
+                            [type]="mostraCvc() ? 'text' : 'password'" 
+                            inputmode="numeric"
+                            class="form-control" 
+                            [class.is-invalid]="isInvalid(cardPaymentForm.controls.cvc)"
+                            placeholder="•••" 
+                            maxlength="4" 
+                            formControlName="cvc"
+                            autocomplete="cc-csc" />
+                          <button 
+                            type="button" 
+                            class="btn btn-outline-secondary" 
+                            (click)="toggleMostraCvc()"
+                            [attr.aria-label]="mostraCvc() ? 'Nascondi CVC' : 'Mostra CVC'"
+                            [attr.title]="mostraCvc() ? 'Nascondi CVC' : 'Mostra CVC'">
+                            <i class="fa-solid" [class.fa-eye]="!mostraCvc()" [class.fa-eye-slash]="mostraCvc()"></i>
+                          </button>
+                        </div>
+                        @if (isInvalid(cardPaymentForm.controls.cvc)) { <div class="invalid-feedback d-block">Inserisci 3 o 4 cifre.</div> }
+                      </div>
+                    </div>
+                  </form>
+
+                  @if (errorMessage()) {
+                    <div class="alert alert-danger mt-3">{{ errorMessage() }}</div>
+                  }
+                  <button type="button" class="btn btn-success btn-lg w-100 fw-bold py-3" (click)="confermaEPay()" [disabled]="isSubmitting()">
+                    <i class="fa-solid fa-lock me-2"></i>{{ isSubmitting() ? 'Salvataggio…' : 'CONFERMA PRENOTAZIONE' }}
+                  </button>
+                } 
+                
+                <!-- COORDINATE BONIFICO BANCARIO -->
+                @else {
+                  <div class="bank-details-box p-3 bg-white rounded border mb-3 shadow-sm">
+                    <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-building-columns me-2 text-primary"></i>Coordinate Bancarie per il Versamento</h6>
+                    <p class="small text-muted mb-3">Effettua il versamento della caparra di <strong>€{{ caparra().toFixed(2) }}</strong> tramite le seguenti coordinate:</p>
+
+                    <div class="bg-light p-3 rounded border mb-3">
+                      <div class="row g-2 small">
+                        <div class="col-4 text-muted">Beneficiario:</div>
+                        <div class="col-8 fw-bold">Grand Hotel Lux S.r.l.</div>
+
+                        <div class="col-4 text-muted">IBAN:</div>
+                        <div class="col-8 fw-bold text-break text-primary">IT 99 A 0123 4567 8901 2345 6789 01</div>
+
+                        <div class="col-4 text-muted">Banca:</div>
+                        <div class="col-8 fw-bold">Intesa Sanpaolo</div>
+
+                        <div class="col-4 text-muted">BIC / SWIFT:</div>
+                        <div class="col-8 fw-bold">BCITITMM</div>
+
+                        <div class="col-4 text-muted">Causale:</div>
+                        <div class="col-8 fw-bold text-dark">Caparra Prenotazione Cam. {{ room.idCamera }} - {{ searchForm.get('checkIn')?.value }}</div>
+                      </div>
+                    </div>
+
+                    <div class="alert alert-danger py-2 px-3 small mb-0 d-flex align-items-center border-0">
+                      <i class="fa-solid fa-triangle-exclamation me-2 fa-lg flex-shrink-0"></i>
+                      <div>
+                        <strong>Nota Bene:</strong> Se il versamento del bonifico non perverrà entro <strong>3 giorni lavorativi</strong>, la prenotazione verrà automaticamente cancellata.
+                      </div>
+                    </div>
+                  </div>
+
+                  @if (errorMessage()) {
+                    <div class="alert alert-danger mt-3">{{ errorMessage() }}</div>
+                  }
+                  <button type="button" class="btn btn-primary btn-lg w-100 fw-bold py-3" (click)="confermaEPay()" [disabled]="isSubmitting()">
+                    <i class="fa-solid fa-calendar-check me-2"></i>{{ isSubmitting() ? 'Salvataggio…' : 'CONFERMA PRENOTAZIONE' }}
+                  </button>
+                }
+
+              </div>
+            </div>
+
+          </div>
+        }
+
+      </div>
+    </div>
+
+    @if (!authService.isCustomer()) {
+      <div class="anonymous-policy-notice mt-4" role="note">
+        <strong>Importante:</strong> una prenotazione effettuata senza login non viene collegata a un account e non potrà essere modificata dall’Area personale. Per eventuali variazioni o cancellazioni sarà necessario contattare direttamente la struttura.
+      </div>
+    }
+  }
+
+  <!-- ========================================== -->
+  <!-- VISTA B: CONFERMA E REGISTRAZIONE RAPIDA   -->
+  <!-- ========================================== -->
+  @else {
+    <div class="container py-4" style="max-width: 800px;">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-center p-4 p-md-5">
+        
+        <div class="mb-3">
+          <span class="bg-success-subtle text-success d-inline-flex align-items-center justify-content-center rounded-circle p-3" style="width: 80px; height: 80px;">
+            <i class="fa-solid fa-circle-check fa-3x"></i>
+          </span>
+        </div>
+
+        <h2 class="fw-bold text-dark mb-2">Prenotazione Confermata!</h2>
+        <p class="text-muted fs-6 mb-4">
+          Grazie! Abbiamo inviato la mail di conferma con tutti i dettagli dell'ordine all'indirizzo 
+          <strong class="text-dark">{{ emailCliente() }}</strong>.
+        </p>
+
+        <div class="bg-light rounded-3 p-3 mb-4 d-inline-block mx-auto border">
+          <small class="text-muted d-block text-uppercase fw-bold">Codice Prenotazione</small>
+          <span class="h3 fw-bold text-primary mb-0">#{{ codicePrenotazione() }}</span>
+        </div>
+
+        <!-- INVITO ALLA REGISTRAZIONE UTENTE: solo per chi ha prenotato come ospite -->
+        @if (!authService.isCustomer()) {
+          <div class="card border-primary-subtle bg-primary-subtle rounded-4 p-4 mb-4 text-start shadow-sm">
+            <div class="d-flex align-items-start gap-3">
+              <div class="bg-primary text-white rounded-circle p-2 d-none d-sm-block">
+                <i class="fa-solid fa-user-plus fa-lg"></i>
+              </div>
+              <div class="flex-grow-1">
+                <h5 class="fw-bold text-primary mb-1">Vuoi avere anche un'Area personale?</h5>
+                <p class="small text-dark mb-3">
+                  La prenotazione è già confermata senza account. Puoi comunque registrarti per usare le funzioni riservate ai clienti.
+                </p>
+                <a routerLink="/register" class="btn btn-primary fw-bold px-4 py-2">
+                  <i class="fa-solid fa-key me-2"></i>Crea Account
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+          <button type="button" class="btn btn-outline-secondary fw-semibold px-4" (click)="nuovaPrenotazione()">
+            <i class="fa-solid fa-arrow-left me-2"></i>Fai un'altra prenotazione
+          </button>
+          <a routerLink="/" class="btn btn-light fw-semibold px-4 border">
+            <i class="fa-solid fa-house me-2"></i>Torna alla Home
+          </a>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</section>

@@ -1,0 +1,175 @@
+<!--
+  GUIDA DIDATTICA TEMPLATE — HOMEPAGE
+  ---------------------------------------------------------------------------
+  La homepage è costruita come una piccola narrazione: prima crea atmosfera,
+  poi racconta i punti di forza, mostra camere/SPA e chiude con una CTA.
+  Ogni blocco usa elementi semantici (<header>, <section>, <article>) per
+  rendere la pagina più leggibile sia nel codice sia per le tecnologie assistive.
+-->
+
+<!-- BLOCCO 1 — HERO IMMERSIVA
+     È il primo impatto della pagina. La fotografia è decorativa perché il testo
+     comunica già il contenuto; per questo l'immagine ha alt="". -->
+<header class="hero-section">
+  <section class="hero" aria-labelledby="hero-title">
+
+    <!-- BLOCCO 1A — FOTOGRAFIA DI SFONDO
+         fetchpriority="high" suggerisce al browser che questa immagine è importante. -->
+    <div class="hero-media" aria-hidden="true">
+      <img src="hero.jpg" alt="" fetchpriority="high" />
+    </div>
+
+    <!-- BLOCCO 1B — OVERLAY LEGGERO
+         Non scurisce più tutta la foto: serve solo ad ammorbidire i bordi e a
+         mantenere leggibilità quando la fotografia contiene zone molto luminose. -->
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <!-- BLOCCO 1C — CONTENUTO TESTUALE DELLA HERO -->
+    <div class="hero-content container">
+      <p class="hero-eyebrow">GRAND HOTEL · SPA · RELAX</p>
+
+      <h1 id="hero-title" class="hero-title">
+        Dove tutto il resto si fa lontano.
+      </h1>
+
+      <p class="hero-desc">
+        Uno spazio di quiete, acqua e benessere in cui lasciarti andare.
+      </p>
+
+      <!-- BLOCCO 1D — CTA ANGULAR MATERIAL
+           mat-flat-button = azione principale; mat-stroked-button = secondaria. -->
+      <div class="hero-actions" aria-label="Azioni principali">
+        <a mat-flat-button routerLink="/stanze" class="hero-primary">Scopri le camere</a>
+        <a mat-stroked-button routerLink="/spa" class="hero-secondary">Entra nella SPA</a>
+      </div>
+
+      <p class="hero-reassurance">Il tuo soggiorno. Il tuo tempo.</p>
+    </div>
+
+    <!-- BLOCCO 1E — INDICATORE DI SCROLL DECORATIVO -->
+    <a class="scroll-cue" href="#home-intro" aria-label="Scorri per scoprire la struttura">
+      <span aria-hidden="true">↓</span>
+      <span>Scopri</span>
+    </a>
+  </section>
+</header>
+
+<!-- BLOCCO 2 — INTRODUZIONE
+     Due colonne: frase evocativa a sinistra, promessa della struttura a destra. -->
+<section id="home-intro" class="intro-section" aria-labelledby="intro-title">
+  <div class="container intro-grid">
+    <div>
+      <p class="section-eyebrow">UNA PAUSA DAL MONDO</p>
+      <h2 id="intro-title">Lascia che il ritmo cambi.</h2>
+    </div>
+
+    <p class="intro-copy">
+      Camere accoglienti, acqua, calore e spazi pensati per restituirti qualcosa
+      che spesso manca: il tempo di esserci davvero.
+    </p>
+  </div>
+</section>
+
+<!-- BLOCCO 3 — HIGHLIGHTS MATERIAL
+     @for genera una card per ogni elemento dell'array `highlights` nel TypeScript. -->
+<section class="highlights-section" aria-labelledby="highlights-title">
+  <div class="container">
+    <div class="section-heading">
+      <p class="section-eyebrow">L'ESPERIENZA</p>
+      <h2 id="highlights-title">Tre modi per sentirti altrove.</h2>
+    </div>
+
+    <div class="highlight-grid">
+      @for (item of highlights; track item.title) {
+        <!-- BLOCCO 3A — MAT-CARD RIUTILIZZATA PER OGNI PUNTO DI FORZA -->
+        <mat-card appearance="outlined" class="experience-card">
+          <mat-card-content>
+            <p class="card-eyebrow">{{ item.eyebrow }}</p>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description }}</p>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- BLOCCO 4 — ESPERIENZA CAMERE
+     Articolo editoriale: fotografia ampia + testo + link alla route Camere. -->
+<section class="experience-section" aria-label="Esperienze in hotel">
+  <article class="experience-feature container">
+    <div class="experience-image image-room">
+      <img
+        src="camere/camera-20.jpg"
+        alt="Camera dell'hotel arredata in stile elegante"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="experience-copy">
+      <p class="section-eyebrow">CAMERE</p>
+      <h2>Uno spazio che sa farti restare.</h2>
+      <p>
+        Luci morbide, dettagli essenziali e il comfort di avere tutto ciò che serve,
+        senza avere fretta di andare altrove.
+      </p>
+      <a mat-stroked-button routerLink="/stanze" class="content-action">Vedi le disponibilità</a>
+    </div>
+  </article>
+
+  <!-- BLOCCO 5 — ESPERIENZA SPA
+       La classe --reverse inverte foto e testo su desktop per creare ritmo visivo. -->
+  <article class="experience-feature experience-feature--reverse container">
+    <div class="experience-image image-spa">
+      <img
+        src="Gemini_Generated_Image_ukvqepukvqepukvq.png"
+        alt="Ambiente SPA con atmosfera rilassante"
+        loading="lazy"
+      />
+    </div>
+
+    <div class="experience-copy">
+      <p class="section-eyebrow">SPA & WELLNESS</p>
+      <h2>Entra nella quiete.</h2>
+
+      <!-- BLOCCO 5A — MANTRA VISIVO
+           Le interruzioni di riga danno ritmo senza aggiungere testo superfluo. -->
+      <p class="wellness-mantra">
+        Il tuo tempo.<br />
+        Il tuo spazio.<br />
+        Il tuo benessere.
+      </p>
+
+      <p>
+        Acqua, calore e silenzio accompagnano ogni momento. Scegli il tuo percorso
+        e lascia che, per qualche ora, tutto il resto rimanga fuori.
+      </p>
+      <a mat-stroked-button routerLink="/spa" class="content-action">Scopri la SPA</a>
+    </div>
+  </article>
+</section>
+
+<!-- BLOCCO 6 — PAUSA NARRATIVA
+     Non contiene un'azione: interrompe volutamente il ritmo prima del finale. -->
+<section class="quote-section" aria-label="Filosofia dell'hotel">
+  <div class="container quote-content">
+    <p class="quote-mark" aria-hidden="true">“</p>
+    <blockquote>
+      A volte basta cambiare ritmo per sentirsi già lontani.
+    </blockquote>
+  </div>
+</section>
+
+<!-- BLOCCO 7 — CALL TO ACTION FINALE
+     Ripresenta la prenotazione solo dopo aver raccontato l'esperienza. -->
+<section class="final-cta" aria-labelledby="cta-title">
+  <div class="container final-cta__panel">
+    <div>
+      <p class="section-eyebrow">LA TUA PAUSA DAL MONDO</p>
+      <h2 id="cta-title">Smetti di pensare al tempo.</h2>
+      <p>Da qui inizia la tua pausa dal mondo.</p>
+    </div>
+
+    <a mat-flat-button routerLink="/stanze" class="cta-button">Inizia il soggiorno</a>
+  </div>
+</section>

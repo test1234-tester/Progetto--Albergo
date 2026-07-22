@@ -1,0 +1,44 @@
+<!--
+  GUIDA DIDATTICA TEMPLATE — FOOTER
+  Il footer chiude tutte le route e contiene brand, navigazione secondaria e contatti.
+-->
+<footer class="app-footer">
+  <div class="container">
+    <!-- BLOCCO 1 — AREA PRINCIPALE A TRE COLONNE -->
+    <div class="footer-top">
+      <div class="footer-intro">
+        <p class="footer-kicker">GRAND HOTEL MINERVA</p>
+        <h2 class="footer-brand">Dove il tempo torna tuo.</h2>
+        <p class="footer-description">
+          Camere, benessere e quiete: pochi elementi, scelti per farti sentire lontano senza dover andare di fretta.
+        </p>
+      </div>
+
+      <!-- BLOCCO 2 — NAVIGAZIONE SECONDARIA -->
+      <div class="footer-column">
+        <h3 class="footer-heading">Esplora</h3>
+        <ul class="footer-links">
+          <li><a routerLink="/">Home</a></li>
+          <li><a routerLink="/stanze">Camere</a></li>
+          <li><a routerLink="/spa">SPA</a></li>
+        </ul>
+      </div>
+
+      <!-- BLOCCO 3 — CONTATTI -->
+      <div class="footer-column">
+        <h3 class="footer-heading">Contatti</h3>
+        <address class="footer-links footer-address">
+          <span>info&#64;albergo-online.it</span>
+          <span>+39 02 1234567</span>
+          <span>Reception tutti i giorni</span>
+        </address>
+      </div>
+    </div>
+
+    <!-- BLOCCO 4 — NOTE FINALI / COPYRIGHT -->
+    <div class="footer-bottom">
+      <p>&copy; {{ currentYear }} Grand Hotel Minerva. Progetto didattico.</p>
+      <p>Interfaccia progettata con attenzione a contrasto, tastiera e leggibilità.</p>
+    </div>
+  </div>
+</footer>
